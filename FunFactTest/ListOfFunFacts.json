@@ -1,0 +1,120 @@
+{
+  "List_Of_Landmarks": [
+    {
+      "Landmark_ID": "L0000000001",
+      "Landmark_Name": "Henry Hall",
+      "Landmark_Address": "515 W 38th St",
+      "Landmark_City": "New York",
+      "Landmark_State": "NY",
+      "Landmark_Zip": "10018",
+      "Landmark_Country": "US",
+      "Landmark_Type": "Apartment",
+      "Latitude": "40.7576393",
+      "Longitude": "-73.99792409999998",
+      "List_Of_Fun_Facts": [
+        {
+          "Fun_fact_ID": "L0000000001-001",
+          "Fun_Fact_Description": "Henry Hall is the first of its kind - a community and a destination - like the boutique hotel you never want to leave or the members-only club where everyone’s welcome",
+          "Likes": "2",
+          "Dislikes": "2",
+          "Verification_Flag": "Y",
+          "Image_Name": "henryhall",
+          "Dispute_Flag": "N",
+          "Submitted-By": "rushidolas",
+          "Source": "https://henryhallnyc.com/"
+        },
+        {
+          "Fun_fact_ID": "L0000000001-002",
+          "Fun_Fact_Description": "515 West 38th Street, the site of the former Legacy Recording Studio, is at the epicenter of Hudson Yards - where Henry Hall is redefining luxury for a new generation of New Yorkers",
+          "Likes": "4",
+          "Dislikes": "2",
+          "Verification_Flag": "Y",
+          "Image_Name": "henryhall2",
+          "Dispute_Flag": "N",
+          "Submitted-By": "dhwanishah",
+          "Source": "https://henryhallnyc.com/"
+        }
+      ]
+    },
+    {
+      "Landmark_ID": "L0000000002",
+      "Landmark_Name": "Empire State Building",
+      "Landmark_Address": "350 5th Ave",
+      "Landmark_City": "New York",
+      "Landmark_State": "NY",
+      "Landmark_Zip": "10118",
+      "Landmark_Country": "US",
+      "Landmark_Type": "Office Building",
+      "Latitude": "40.748534",
+      "Longitude": "-73.985637",
+      "List_Of_Fun_Facts": [
+        {
+          "Fun_fact_ID": "L0000000002-001",
+          "Fun_Fact_Description": "It was constructed during a race to create the world’s tallest building. The main competition was between 40 Wall Street’s Bank of Manhattan building and the Chrysler Building. But in the end Empire State Building beat the Chrysler Building by about 200 ft",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "empirestate1",
+          "Dispute_Flag": "N",
+          "Submitted-By": "rushidolas",
+          "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-002",
+          "Fun_Fact_Description": "It was modeled after two earlier buildings. Architect William Lamb of the firm Shreve, Lamb and Harmon is said to have modeled the Empire State Building after Winston-Salem, North Carolina’s Reynolds Building and Carew Tower in Cincinnati",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "empirestate2",
+          "Dispute_Flag": "N",
+          "Submitted-By": "rushidolas",
+          "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-003",
+          "Fun_Fact_Description": "The building was finished in record time. Despite the colossal size of the project, the design, planning and construction of the Empire State Building took just 20 months from start to finish",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "empirestate3",
+          "Dispute_Flag": "N",
+          "Submitted-By": "rushidolas",
+          "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-004",
+          "Fun_Fact_Description": "Its upper tower was originally designed as a mooring mast for airships. Convinced that transatlantic airship travel was the wave of the future, the building’s owners originally constructed the mast as a docking port for lighter-than-air dirigibles",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "empirestate4",
+          "Dispute_Flag": "N",
+          "Submitted-By": "rushidolas",
+          "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-005",
+          "Fun_Fact_Description": "The Empire State Building got off to a rocky start thanks to the 1929 stock market crash and the onset of the Great Depression. Less than 25 percent of the building’s retail space was occupied upon its opening in 1931, earning it the nickname the “Empty State Building”",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "empirestate5",
+          "Dispute_Flag": "N",
+          "Submitted-By": "rushidolas",
+          "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-006",
+          "Fun_Fact_Description": "During the 1945 bomber crash, several pieces of the B-25 entered an elevator shaft containing a 19-year-old elevator operator. The elevator plummeted from the 75th floor, but luckily severed elevator cable had gathered at the bottom of the shaft, cushioning the blow, and Betty Lou Oliver survived",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "empirestate6",
+          "Dispute_Flag": "N",
+          "Submitted-By": "rushidolas",
+          "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
+        }
+      ]
+    }
+  ]
+}
