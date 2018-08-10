@@ -1,0 +1,28 @@
+{
+  "List_Of_Landmarks": [
+    {
+      "Landmark_ID": "L0000000001",
+      "Landmark_Name": "Henry Hall",
+      "Landmark_Address": "515 W 38th St",
+      "Landmark_City": "New York",
+      "Landmark_State": "NY",
+      "Landmark_Zip": "10018",
+      "Landmark_Country": "US",
+      "Landmark_Type": "Apartment",
+      "Latitude": "40.7576393",
+      "Longitude": "-73.99792409999998",
+    },
+    {
+      "Landmark_ID": "L0000000002",
+      "Landmark_Name": "Empire State Building",
+      "Landmark_Address": "350 5th Ave",
+      "Landmark_City": "New York",
+      "Landmark_State": "NY",
+      "Landmark_Zip": "10118",
+      "Landmark_Country": "US",
+      "Landmark_Type": "Office Building",
+      "Latitude": "40.748534",
+      "Longitude": "-73.985637"
+    }
+  ]
+}

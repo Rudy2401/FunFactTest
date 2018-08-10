@@ -18,9 +18,10 @@
           "Likes": "2",
           "Dislikes": "2",
           "Verification_Flag": "Y",
-          "Image_Name": "henryhall",
+          "Image_Name": "L0000000002-1",
           "Dispute_Flag": "N",
-          "Submitted-By": "rushidolas",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 12, 2018",
           "Source": "https://henryhallnyc.com/"
         },
         {
@@ -29,9 +30,10 @@
           "Likes": "4",
           "Dislikes": "2",
           "Verification_Flag": "Y",
-          "Image_Name": "henryhall2",
+          "Image_Name": "L0000000002-2",
           "Dispute_Flag": "N",
-          "Submitted-By": "dhwanishah",
+          "Submitted_By": "dhwanishah",
+          "Date_Submitted": "JULY 12, 2018",
           "Source": "https://henryhallnyc.com/"
         }
       ]
@@ -50,13 +52,14 @@
       "List_Of_Fun_Facts": [
         {
           "Fun_fact_ID": "L0000000002-001",
-          "Fun_Fact_Description": "It was constructed during a race to create the world’s tallest building. The main competition was between 40 Wall Street’s Bank of Manhattan building and the Chrysler Building. But in the end Empire State Building beat the Chrysler Building by about 200 ft",
+          "Fun_Fact_Description": "In the late-1920s, as New York’s economy boomed like never before, builders were in a mad dash to erect the world’s largest skyscraper. The main competition was between 40 Wall Street’s Bank of Manhattan building and the Chrysler Building. When completed in 1931, the colossus loomed 1,250 feet over the streets of Midtown Manhattan. It would remain the world’s tallest building for nearly 40 years until the completion of the first World Trade Center tower in 1970.",
           "Likes": "1",
           "Dislikes": "0",
           "Verification_Flag": "Y",
-          "Image_Name": "empirestate1",
+          "Image_Name": "L0000000001-1",
           "Dispute_Flag": "N",
-          "Submitted-By": "rushidolas",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 12, 2018",
           "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
         },
         {
@@ -65,9 +68,10 @@
           "Likes": "1",
           "Dislikes": "0",
           "Verification_Flag": "Y",
-          "Image_Name": "empirestate2",
+          "Image_Name": "L0000000001-2",
           "Dispute_Flag": "N",
-          "Submitted-By": "rushidolas",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 12, 2018",
           "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
         },
         {
@@ -76,9 +80,10 @@
           "Likes": "1",
           "Dislikes": "0",
           "Verification_Flag": "Y",
-          "Image_Name": "empirestate3",
+          "Image_Name": "L0000000001-3",
           "Dispute_Flag": "N",
-          "Submitted-By": "rushidolas",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 12, 2018",
           "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
         },
         {
@@ -87,9 +92,10 @@
           "Likes": "1",
           "Dislikes": "0",
           "Verification_Flag": "Y",
-          "Image_Name": "empirestate4",
+          "Image_Name": "L0000000001-4",
           "Dispute_Flag": "N",
-          "Submitted-By": "rushidolas",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 12, 2018",
           "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
         },
         {
@@ -98,21 +104,155 @@
           "Likes": "1",
           "Dislikes": "0",
           "Verification_Flag": "Y",
-          "Image_Name": "empirestate5",
+          "Image_Name": "L0000000001-5",
           "Dispute_Flag": "N",
-          "Submitted-By": "rushidolas",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 12, 2018",
           "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
         },
         {
           "Fun_fact_ID": "L0000000002-006",
-          "Fun_Fact_Description": "During the 1945 bomber crash, several pieces of the B-25 entered an elevator shaft containing a 19-year-old elevator operator. The elevator plummeted from the 75th floor, but luckily severed elevator cable had gathered at the bottom of the shaft, cushioning the blow, and Betty Lou Oliver survived",
+          "Fun_Fact_Description": "On the morning of July 28, 1945, while flying an Army B-25 bomber toward New York’s La Guardia Airport, Army Lt. Col. William F. Smith became disoriented in heavy fog and drifted over Midtown Manhattan. The World War II combat veteran managed to dodge several skyscrapers, but he was unable to avoid plowing into the 78th and 79th floors of the Empire State at 200 miles an hour",
           "Likes": "1",
           "Dislikes": "0",
           "Verification_Flag": "Y",
-          "Image_Name": "empirestate6",
+          "Image_Name": "L0000000001-6",
           "Dispute_Flag": "N",
-          "Submitted-By": "rushidolas",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 12, 2018",
           "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-007",
+          "Fun_Fact_Description": "A woman survived a 75-story plunge in one of the building’s elevators. During the 1945 bomber crash, several pieces of the B-25’s engine sliced through the Empire State Building and entered an elevator shaft. The cables for two cars were severed, including one containing a 19-year-old elevator operator named Betty Lou Oliver. The elevator plummeted from the 75th floor and soon crashed into the subbasement, but luckily for Oliver, more than a thousand feet of severed elevator cable had gathered at the bottom of the shaft, cushioning the blow",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-7",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 12, 2018",
+          "Source": "https://www.history.com/news/10-surprising-facts-about-the-empire-state-building"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-008",
+          "Fun_Fact_Description": "In 2011, Cornell researchers analyzed millions of Flickr photos and concluded that the Empire State Building is the most photographed building in the world. Remember to tag your shots #L0000000001-Building.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-8",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-009",
+          "Fun_Fact_Description": "Static electricity gathers at high heights, and under the right atmospheric conditions, couples can experience a slight electric shock when they kiss.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-9",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-010",
+          "Fun_Fact_Description": "New York can look pretty tiny from all the way up here, but not as tiny as The New York City Panorama, built for the 1964 World's Fair. Compare the views at the Queens museum.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-10",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-011",
+          "Fun_Fact_Description": "On a clear day you can see five states from our Observatories: New York, New Jersey, Pennsylvania, Connecticut and Massachusetts.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-11",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-012",
+          "Fun_Fact_Description": "The top of the Empire State Building is used for broadcasting the majority of commercial TV stations and FM radio stations in New York City.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-12",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-013",
+          "Fun_Fact_Description": "The Empire State Building is home to so many businesses that it has its own zip code: 10118.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-13",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-014",
+          "Fun_Fact_Description": "In a 2007 poll conducted by the American Institute of Architects, the Empire State Building was named “America’s Favorite Architecture,” ahead of even The White House.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-14",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-015",
+          "Fun_Fact_Description": "The Empire State Building is the tallest LEED certified building in the United States.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-15",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-016",
+          "Fun_Fact_Description": "The Empire State Building lobby is one of the few interiors in New York to be designated a historic landmark by the Landmarks Preservation Commission.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-16",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
+        },
+        {
+          "Fun_fact_ID": "L0000000002-017",
+          "Fun_Fact_Description": "The American Society of Civil Engineers named the Empire State Building one of the Seven Wonders of the Modern World. View the official list.",
+          "Likes": "1",
+          "Dislikes": "0",
+          "Verification_Flag": "Y",
+          "Image_Name": "L0000000001-17",
+          "Dispute_Flag": "N",
+          "Submitted_By": "rushidolas",
+          "Date_Submitted": "JULY 13, 2018",
+          "Source": "http://www.esbnyc.com/fun-facts"
         }
       ]
     }

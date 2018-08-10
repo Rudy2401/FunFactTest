@@ -8,13 +8,23 @@
 
 /* Begin PBXBuildFile section */
 		8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */; };
+		D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */ = {isa = PBXBuildFile; fileRef = D834DFF720F677690091CA40 /* ListOfFunFacts.json */; };
+		D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */; };
+		D8DF6A5E210634800031A153 /* DisputeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DF6A5D210634800031A153 /* DisputeViewController.swift */; };
+		D8ED8FF8210A49480010EF7C /* AddFactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */; };
+		D8ED8FFA210A49780010EF7C /* AddressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FF9210A49780010EF7C /* AddressViewController.swift */; };
+		D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */; };
+		D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F76AF0210E1A3100A039D2 /* AddressCell.swift */; };
+		D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */; };
+		D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */ = {isa = PBXBuildFile; fileRef = D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */; };
+		D8F76AF72112812400A039D2 /* FirebaseCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F76AF62112812400A039D2 /* FirebaseCore.framework */; };
+		D8F76AF92112812400A039D2 /* FirebaseFirestore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F76AF82112812400A039D2 /* FirebaseFirestore.framework */; };
 		D8FE7F8320DB2712007B4550 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7F8220DB2712007B4550 /* AppDelegate.swift */; };
 		D8FE7F8520DB2712007B4550 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7F8420DB2712007B4550 /* ViewController.swift */; };
 		D8FE7F8820DB2712007B4550 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8FE7F8620DB2712007B4550 /* Main.storyboard */; };
 		D8FE7F8A20DB2716007B4550 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D8FE7F8920DB2716007B4550 /* Assets.xcassets */; };
 		D8FE7F8D20DB2716007B4550 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D8FE7F8B20DB2716007B4550 /* LaunchScreen.storyboard */; };
 		D8FE7F9720DB2795007B4550 /* AnnotationBottomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7F9620DB2795007B4550 /* AnnotationBottomView.swift */; };
-		D8FE7F9A20DB2BAB007B4550 /* AnnotationBottomView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D8FE7F9920DB2BAB007B4550 /* AnnotationBottomView.xib */; };
 		D8FE7FA220DC4237007B4550 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7FA120DC4237007B4550 /* Utils.swift */; };
 		D8FE7FA420DC491F007B4550 /* FunFactAnnotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */; };
 		D8FE7FAA20E45083007B4550 /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7FA920E45082007B4550 /* ContentViewController.swift */; };
@@ -27,6 +37,17 @@
 		1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunFactTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A9A8A65C29502B3DDAE2E25 /* Pods-FunFactTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunFactTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.debug.xcconfig"; sourceTree = "<group>"; };
 		8583EE7FC03419D00EFF4C12 /* Pods-FunFactTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunFactTest.release.xcconfig"; path = "Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.release.xcconfig"; sourceTree = "<group>"; };
+		D834DFF720F677690091CA40 /* ListOfFunFacts.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ListOfFunFacts.json; sourceTree = "<group>"; };
+		D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactJSONParser.swift; sourceTree = "<group>"; };
+		D8DF6A5D210634800031A153 /* DisputeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisputeViewController.swift; sourceTree = "<group>"; };
+		D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactViewController.swift; sourceTree = "<group>"; };
+		D8ED8FF9210A49780010EF7C /* AddressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressViewController.swift; sourceTree = "<group>"; };
+		D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchTableViewController.swift; sourceTree = "<group>"; };
+		D8F76AF0210E1A3100A039D2 /* AddressCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressCell.swift; sourceTree = "<group>"; };
+		D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ListOfLandmarks.json; sourceTree = "<group>"; };
+		D8F76AF62112812400A039D2 /* FirebaseCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8F76AF82112812400A039D2 /* FirebaseFirestore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FirebaseFirestore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8FE7F7F20DB2712007B4550 /* FunFactTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FunFactTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8FE7F8220DB2712007B4550 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D8FE7F8420DB2712007B4550 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -35,12 +56,11 @@
 		D8FE7F8C20DB2716007B4550 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D8FE7F8E20DB2716007B4550 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D8FE7F9620DB2795007B4550 /* AnnotationBottomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationBottomView.swift; sourceTree = "<group>"; };
-		D8FE7F9920DB2BAB007B4550 /* AnnotationBottomView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AnnotationBottomView.xib; sourceTree = "<group>"; };
 		D8FE7FA120DC4237007B4550 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactAnnotation.swift; sourceTree = "<group>"; };
 		D8FE7FA920E45082007B4550 /* ContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
 		D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactPageViewController.swift; sourceTree = "<group>"; };
-		D8FE7FAD20EAE746007B4550 /* PodFile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PodFile; sourceTree = SOURCE_ROOT; };
+		D8FE7FAD20EAE746007B4550 /* PodFile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PodFile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		D8FE7FAF20EAEBAE007B4550 /* FontAwesome_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FontAwesome_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -49,6 +69,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8F76AF72112812400A039D2 /* FirebaseCore.framework in Frameworks */,
+				D8F76AF92112812400A039D2 /* FirebaseFirestore.framework in Frameworks */,
 				D8FE7FB020EAEBAE007B4550 /* FontAwesome_swift.framework in Frameworks */,
 				8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */,
 			);
@@ -69,6 +91,8 @@
 		D569FB58055CD1C61272A23D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D8F76AF62112812400A039D2 /* FirebaseCore.framework */,
+				D8F76AF82112812400A039D2 /* FirebaseFirestore.framework */,
 				D8FE7FAF20EAEBAE007B4550 /* FontAwesome_swift.framework */,
 				1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */,
 			);
@@ -96,6 +120,8 @@
 		D8FE7F8120DB2712007B4550 /* FunFactTest */ = {
 			isa = PBXGroup;
 			children = (
+				D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */,
+				D834DFF720F677690091CA40 /* ListOfFunFacts.json */,
 				D8FE7FAD20EAE746007B4550 /* PodFile */,
 				D8FE7FA920E45082007B4550 /* ContentViewController.swift */,
 				D8FE7F8220DB2712007B4550 /* AppDelegate.swift */,
@@ -105,10 +131,16 @@
 				D8FE7F8B20DB2716007B4550 /* LaunchScreen.storyboard */,
 				D8FE7F8E20DB2716007B4550 /* Info.plist */,
 				D8FE7F9620DB2795007B4550 /* AnnotationBottomView.swift */,
-				D8FE7F9920DB2BAB007B4550 /* AnnotationBottomView.xib */,
 				D8FE7FA120DC4237007B4550 /* Utils.swift */,
 				D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */,
 				D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */,
+				D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */,
+				D8DF6A5D210634800031A153 /* DisputeViewController.swift */,
+				D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */,
+				D8ED8FF9210A49780010EF7C /* AddressViewController.swift */,
+				D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */,
+				D8F76AF0210E1A3100A039D2 /* AddressCell.swift */,
+				D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */,
 			);
 			path = FunFactTest;
 			sourceTree = "<group>";
@@ -125,6 +157,7 @@
 				D8FE7F7C20DB2712007B4550 /* Frameworks */,
 				D8FE7F7D20DB2712007B4550 /* Resources */,
 				7A2B440DD41034D44BFFEF02 /* [CP] Embed Pods Frameworks */,
+				C94BB9B8944481857F037B07 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -141,6 +174,9 @@
 		D8FE7F7720DB2712007B4550 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				KnownAssetTags = (
+					New,
+				);
 				LastSwiftUpdateCheck = 0940;
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Rushi Dolas";
@@ -173,11 +209,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D8FE7F9A20DB2BAB007B4550 /* AnnotationBottomView.xib in Resources */,
 				D8FE7FAE20EAE747007B4550 /* PodFile in Resources */,
+				D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */,
 				D8FE7F8D20DB2716007B4550 /* LaunchScreen.storyboard in Resources */,
 				D8FE7F8A20DB2716007B4550 /* Assets.xcassets in Resources */,
+				D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */,
 				D8FE7F8820DB2712007B4550 /* Main.storyboard in Resources */,
+				D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,15 +247,79 @@
 			);
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
+				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
+				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
+				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FontAwesome.swift/FontAwesome_swift.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
+				"${PODS_ROOT}/TwitterCore/iOS/TwitterCore.framework",
+				"${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC/GRPCClient.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-ProtoRPC/ProtoRPC.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-RxLibrary/RxLibrary.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FontAwesome_swift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TwitterCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TwitterKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRPCClient.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProtoRPC.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxLibrary.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C94BB9B8944481857F037B07 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseFacebookAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseGoogleAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebasePhoneAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseTwitterAuthUI.bundle",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+				"${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseFacebookAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseGoogleAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebasePhoneAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseTwitterAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TwitterKitResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -227,13 +329,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */,
+				D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */,
+				D8DF6A5E210634800031A153 /* DisputeViewController.swift in Sources */,
 				D8FE7FA220DC4237007B4550 /* Utils.swift in Sources */,
 				D8FE7F8520DB2712007B4550 /* ViewController.swift in Sources */,
 				D8FE7FA420DC491F007B4550 /* FunFactAnnotation.swift in Sources */,
 				D8FE7F9720DB2795007B4550 /* AnnotationBottomView.swift in Sources */,
+				D8ED8FF8210A49480010EF7C /* AddFactViewController.swift in Sources */,
 				D8FE7FAC20E4671C007B4550 /* FunFactPageViewController.swift in Sources */,
+				D8ED8FFA210A49780010EF7C /* AddressViewController.swift in Sources */,
 				D8FE7F8320DB2712007B4550 /* AppDelegate.swift in Sources */,
 				D8FE7FAA20E45083007B4550 /* ContentViewController.swift in Sources */,
+				D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,7 +493,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "-.FunFactTest";
+				PRODUCT_BUNDLE_IDENTIFIER = com.rushi.FunFacts;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -404,7 +512,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "-.FunFactTest";
+				PRODUCT_BUNDLE_IDENTIFIER = com.rushi.FunFacts;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

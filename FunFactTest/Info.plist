@@ -2,16 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDisplayName</key>
-	<string></string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Regions needs to always be able to access your location.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Regions needs to always be able to access your location.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Regions needs to always be able to access your location.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string></string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -24,10 +18,29 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.920303967337-0030cd3a8qncfa7111fkr46t4a0n8i5b</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Regions needs to always be able to access your location.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Regions needs to always be able to access your location.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Regions needs to always be able to access your location.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo usage for fun fact image</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
