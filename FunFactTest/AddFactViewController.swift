@@ -22,6 +22,7 @@ class AddFactViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     @IBOutlet weak var sourceTextField: UITextField!
     @IBOutlet weak var submitButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
+    @IBOutlet weak var contentView: UIView!
     var address: String = ""
     var landmarkName: String = ""
     var pickerData: [String] = [String]()
@@ -35,6 +36,7 @@ class AddFactViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     var listOfFunFacts = ViewController.ListOfFunFacts.init(listOfFunFacts: [])
     var funFactDict = [String: [ViewController.FunFact]]()
     var popup: UIView!
+    var popupLabel: UILabel!
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -178,44 +180,44 @@ class AddFactViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         type = pickerData[row]
     }
     
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.textColor == UIColor.lightGray {
-            textView.text = nil
-            textView.textColor = UIColor.black
-        }
-        if textView.tag == 1 {
-            moveTextView(textView, moveDistance: -250, up: true)
-            navigationController?.navigationBar.isHidden = true
-        }
-    }
+//    func textViewDidBeginEditing(_ textView: UITextView) {
+//        if textView.textColor == UIColor.lightGray {
+//            textView.text = nil
+//            textView.textColor = UIColor.black
+//        }
+//        if textView.tag == 1 {
+//            moveTextView(textView, moveDistance: -250, up: true)
+//            navigationController?.navigationBar.isHidden = true
+//        }
+//    }
+//
+//    func textViewDidEndEditing(_ textView: UITextView) {
+//        if textView.text.isEmpty {
+//            if textView.tag == 0 {
+//                textView.text = "Enter image caption."
+//            }
+//            else if textView.tag == 1 {
+//                textView.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise."
+//            }
+//
+//            textView.textColor = UIColor.lightGray
+//        }
+//        if textView.tag == 1 {
+//            moveTextView(textView, moveDistance: -250, up: false)
+//            navigationController?.navigationBar.isHidden = false
+//        }
+//    }
     
-    func textViewDidEndEditing(_ textView: UITextView) {
-        if textView.text.isEmpty {
-            if textView.tag == 0 {
-                textView.text = "Enter image caption."
-            }
-            else if textView.tag == 1 {
-                textView.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise."
-            }
-            
-            textView.textColor = UIColor.lightGray
-        }
-        if textView.tag == 1 {
-            moveTextView(textView, moveDistance: -250, up: false)
-            navigationController?.navigationBar.isHidden = false
-        }
-    }
-    
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        moveTextField(textField, moveDistance: -250, up: true)
-        navigationController?.navigationBar.isHidden = true
-    }
-    
-    // Finish Editing The Text Field
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        moveTextField(textField, moveDistance: -250, up: false)
-        navigationController?.navigationBar.isHidden = false
-    }
+//    func textFieldDidBeginEditing(_ textField: UITextField) {
+//        moveTextField(textField, moveDistance: -250, up: true)
+//        navigationController?.navigationBar.isHidden = true
+//    }
+//
+//    // Finish Editing The Text Field
+//    func textFieldDidEndEditing(_ textField: UITextField) {
+//        moveTextField(textField, moveDistance: -250, up: false)
+//        navigationController?.navigationBar.isHidden = false
+//    }
     
     // Hide the keyboard when the return key pressed
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -290,9 +292,10 @@ class AddFactViewController: UIViewController, UIPickerViewDataSource, UIPickerV
                 ]){ err in
                     if let err = err {
                         print("Error writing document: \(err)")
+                        self.showAlert(message: "fail")
                     } else {
                         print("Document successfully written!")
-                        self.showAlert()
+                        self.showAlert(message: "success")
 //                        self.navigationController?.popViewController(animated: true)
                     }
                 }
@@ -343,9 +346,10 @@ class AddFactViewController: UIViewController, UIPickerViewDataSource, UIPickerV
             ]){ err in
                 if let err = err {
                     print("Error writing document: \(err)")
+                    self.showAlert(message: "fail")
                 } else {
                     print("Document successfully written!")
-                    self.showAlert()
+                    self.showAlert(message: "success")
 //                    self.navigationController?.popViewController(animated: true)
                 }
             }
@@ -353,11 +357,18 @@ class AddFactViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         }
     }
     
-    func showAlert() {
+    func showAlert(message: String) {
         // customise your view
-        popup = UIView(frame: CGRect(x: 100, y: 200, width: 200, height: 200))
-        popup.backgroundColor = UIColor.red
-        
+        popup = UIView(frame: CGRect(x: 0, y: 0, width: contentView.frame.width, height: (navigationController?.navigationBar.frame.height)!))
+        popup.backgroundColor = UIColor.clear
+        popupLabel.font = UIFont(name: "Avenir Next", size: 12.0)
+        if message == "success" {
+            popupLabel.text = "Fun Fact uploaded successfully!"
+        }
+        else if message == "fail" {
+            popupLabel.text = "Error while uploading Fun Fact!"
+        }
+        popup.addSubview(popupLabel)
         // show on screen
         self.view.addSubview(popup)
         
@@ -377,9 +388,9 @@ class AddFactViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         // Create a storage reference from our storage service
         let storageRef = storage.reference()
         // Data in memory
-        data = UIImageJPEGRepresentation(landmarkImage.image!, 1.0)!
-//        let compImage = landmarkImage.image!.compressTo(300)
-//        data = UIImageJPEGRepresentation(compImage!, 1)!
+//        data = UIImageJPEGRepresentation(landmarkImage.image!, 1.0)!
+        let compImage = landmarkImage.image!.compressTo(300)
+        data = UIImageJPEGRepresentation(compImage!, 1)!
         
         // Create a reference to the file you want to upload
         let landmarkRef = storageRef.child("images/\(imageName)")
