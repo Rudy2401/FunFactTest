@@ -6,4 +6,7 @@ target 'FunFactTest' do
 	pod 'Firebase/Core'
 	pod 'Firebase/Firestore'
 	pod 'FirebaseUI'
+    pod 'FBSDKLoginKit'
+    pod 'Bolts'
+    pod 'FBSDKCoreKit'
 end
