@@ -14,10 +14,10 @@ import FirebaseFirestore
 class SignInViewController: UIViewController {
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
-    @IBOutlet weak var signInButton: UIButton!
+    @IBOutlet weak var signInButton: CustomButton!
     @IBOutlet weak var emailImageButton: UIButton!
     @IBOutlet weak var passwordImageButton: UIButton!
-    @IBOutlet weak var signUpButton: UIButton!
+    @IBOutlet weak var signUpButton: CustomButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,10 +31,7 @@ class SignInViewController: UIViewController {
         passwordImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         passwordImageButton.setTitle(String.fontAwesomeIcon(name: .lock), for: .normal)
         
-        signInButton.layer.cornerRadius = 25
         signInButton.layer.backgroundColor = Constants.redColor.cgColor
-        
-        signUpButton.layer.cornerRadius = 25
         signUpButton.layer.backgroundColor = Constants.greenColor.cgColor
         
         let cancelItem = UIBarButtonItem(

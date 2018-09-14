@@ -25,4 +25,5 @@ struct FunFact  {
     let submittedBy: String
     let dateSubmitted: String
     let source: String
+    let tags: [String]
 }

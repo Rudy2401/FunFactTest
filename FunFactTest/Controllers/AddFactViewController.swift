@@ -22,7 +22,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
     @IBOutlet weak var imageCaption: UITextView!
     @IBOutlet weak var funFactDescription: UITextView!
     @IBOutlet weak var sourceTextField: UITextField!
-    @IBOutlet weak var submitButton: UIButton!
+    @IBOutlet weak var submitButton: CustomButton!
     @IBOutlet weak var contentView: UIView!
     var address: String?
     var landmarkName: String?
@@ -43,11 +43,12 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         navigationController?.navigationBar.tintColor = UIColor.darkGray
 
         scrollView.scrollIndicatorInsets = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 2)
+        scrollView.autoresizingMask = UIViewAutoresizing(rawValue: UIViewAutoresizing.RawValue(UInt8(UIViewAutoresizing.flexibleWidth.rawValue) | UInt8(UIViewAutoresizing.flexibleHeight.rawValue)))
         self.hideKeyboardWhenTappedAround()
         funFactDict = Dictionary(grouping: listOfFunFacts.listOfFunFacts, by: { $0.landmarkId })
         imageCaption.tag = 0
         funFactDescription.tag = 1
-        pickerData = ["--- Select landmark type ---", "Apartment", "Office Building", "Stadium", "Museum", "Park", "Restaurant/Cafe", "Landmark"]
+        pickerData = Constants.landmarkTypes
         self.landmarkType.delegate = self
         self.landmarkType.dataSource = self
         self.funFactDescription.delegate = self
@@ -104,7 +105,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         imageCaption.text = "Enter image caption."
         imageCaption.textColor = UIColor.lightGray
         
-        funFactDescription.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise."
+        funFactDescription.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable."
         funFactDescription.textColor = UIColor.lightGray
         
         funFactDescription.layer.borderWidth = 0.5
@@ -115,16 +116,23 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         sourceTextField.layer.borderColor = UIColor.darkGray.cgColor
         sourceTextField.layer.cornerRadius = 5
         
-        submitButton.layer.cornerRadius = 20
         submitButton.backgroundColor = Constants.redColor
         
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
-        let submitBarButton = UIBarButtonItem(customView: submitButton)
+        // Hide the navigation bar on the this view controller
+        self.navigationController?.toolbar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         
-        let toolBarItems: [UIBarButtonItem]
-        toolBarItems = [submitBarButton]
-        self.setToolbarItems(toolBarItems, animated: true)
+        // Show the navigation bar on other view controllers
+        self.navigationController?.toolbar.isHidden = false
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -491,6 +499,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
             }
             // Metadata contains file metadata such as size, content-type.
             metadata.contentType = "image/jpeg"
+            metadata.cacheControl = "public,max-age=300"
             landmarkRef.putData(data, metadata: metadata)
             // You can also access to download URL after upload.
             landmarkRef.downloadURL { (url, error) in

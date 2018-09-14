@@ -21,23 +21,55 @@ class WelcomeViewController: UIViewController {
     @IBOutlet weak var insideView: UIView!
     @IBOutlet weak var welcomeTitle: UILabel!
     
+    var signedInView: UIView?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        GIDSignIn.sharedInstance().delegate = self
-        GIDSignIn.sharedInstance().uiDelegate = self
-        setupButtons()
-        animateLabel()
-        insideView.addBackground()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = true
+        if Auth.auth().currentUser != nil {
+            // User is signed in.
+            insideView.isHidden = true
+            signedInView = UIView(frame: self.view.frame)
+            signedInView?.addBackground()
+            let labelText = "Fun Facts"
+            let label = UILabel(frame: CGRect(x: 20, y: (signedInView?.frame.height)!/2, width: (signedInView?.frame.width)!-40, height: 60))
+            label.textAlignment = .center
+            label.font = UIFont(name: "AvenirNext-Bold", size: 35)
+            label.text = labelText
+            signedInView?.addSubview(label)
+            self.view.addSubview(signedInView!)
+            self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
+        } else {
+            // No user is signed in.
+            insideView.isHidden = false
+            signedInView?.isHidden = true
+            GIDSignIn.sharedInstance().delegate = self
+            GIDSignIn.sharedInstance().uiDelegate = self
+            setupButtons()
+            anotherAnimateLabel()
+            insideView.addBackground()
+        }
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func anotherAnimateLabel() {
+        if welcomeTitle.center != CGPoint(x:50, y:10) {
+            UIView.animate(withDuration: 1.0, delay: 0.0, usingSpringWithDamping: 0.9, initialSpringVelocity: 0.0, options: .transitionCurlDown, animations: { () -> Void in
+                self.welcomeTitle.center = CGPoint(x:100, y:70)
+            }, completion: nil)
+        }
+        welcomeTitle.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).cgColor
+        welcomeTitle.layer.shadowOffset = CGSize(width: 0, height: 3)
+        welcomeTitle.layer.shadowOpacity = 1.0
+        welcomeTitle.layer.shadowRadius = 10.0
+        welcomeTitle.layer.masksToBounds = false
     }
     
     func animateLabel() {

@@ -70,7 +70,11 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.tintColor = .darkGray
-        navigationController?.navigationBar.prefersLargeTitles = true
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+        } else {
+            // Fallback on earlier versions
+        }
 //        configurePageControl()
         self.setViewControllers([viewControllerAtIndex(0)] as? [UIViewController], direction: .forward, animated: true, completion: nil)
     }
@@ -132,6 +136,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         dataViewController.verifiedFlag = funFactDict[landmarkID]![index].verificationFlag
         dataViewController.disputeFlag = funFactDict[landmarkID]![index].disputeFlag
         dataViewController.imageCaption = funFactDict[landmarkID]![index].imageCaption
+        dataViewController.tags = funFactDict[landmarkID]![index].tags
         if (Int(funFactDict[landmarkID]![index].likes)! + Int(funFactDict[landmarkID]![index].dislikes)!) == 0 {
             dataViewController.likesObject = " 0%" as AnyObject
         }

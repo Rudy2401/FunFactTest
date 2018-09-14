@@ -42,7 +42,8 @@ class FirestoreConnection {
                                           disputeFlag: document.data()["disputeFlag"] as! String,
                                           submittedBy: document.data()["submittedBy"] as! String,
                                           dateSubmitted: document.data()["dateSubmitted"] as! String,
-                                          source: document.data()["source"] as! String)
+                                          source: document.data()["source"] as! String,
+                                          tags: document.data()["tags"] as! [String])
                     listOfFunFacts.append(funFact)
                 }
                 completion(listOfFunFacts, nil)
@@ -140,7 +141,8 @@ class FirestoreConnection {
                                           disputeFlag: document.data()["disputeFlag"] as! String,
                                           submittedBy: document.data()["submittedBy"] as! String,
                                           dateSubmitted: document.data()["dateSubmitted"] as! String,
-                                          source: document.data()["source"] as! String)
+                                          source: document.data()["source"] as! String,
+                                          tags: document.data()["tags"] as! [String])
                     self.listOfFunFacts?.listOfFunFacts.append(funFact)
                 }
             }

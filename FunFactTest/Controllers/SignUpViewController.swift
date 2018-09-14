@@ -14,7 +14,7 @@ class SignUpViewController: UIViewController {
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
-    @IBOutlet weak var signUpButton: UIButton!
+    @IBOutlet weak var signUpButton: CustomButton!
     @IBOutlet weak var nameImageButton: UIButton!
     @IBOutlet weak var emailImageButton: UIButton!
     @IBOutlet weak var passwordImageButton: UIButton!
@@ -35,7 +35,6 @@ class SignUpViewController: UIViewController {
         passwordImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         passwordImageButton.setTitle(String.fontAwesomeIcon(name: .lock), for: .normal)
         
-        signUpButton.layer.cornerRadius = 25
         signUpButton.layer.backgroundColor = Constants.redColor.cgColor
         
         let cancelItem = UIBarButtonItem(
@@ -120,8 +119,10 @@ class SignUpViewController: UIViewController {
             ]){ err in
                 if let err = err {
                     print("Error writing document: \(err)")
+                    self.showAlert(message: "success")
                 } else {
                     print("Document successfully written!")
+                    self.showAlert(message: "fail")
                 }
             }
             
@@ -139,10 +140,10 @@ class SignUpViewController: UIViewController {
     }
     func showAlert(message: String) {
         if message == "success" {
-            popup = UIAlertController(title: "Success", message: "Fun Fact uploaded successfully!", preferredStyle: .alert)
+            popup = UIAlertController(title: "Success", message: "User created successfully!", preferredStyle: .alert)
         }
         if message == "fail" {
-            popup = UIAlertController(title: "Error", message: "Error while uploading Fun Fact", preferredStyle: .alert)
+            popup = UIAlertController(title: "Error", message: "Error while creating user", preferredStyle: .alert)
         }
         
         self.present(popup, animated: true, completion: nil)

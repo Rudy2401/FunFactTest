@@ -9,4 +9,5 @@ target 'FunFactTest' do
     pod 'FBSDKLoginKit'
     pod 'Bolts'
     pod 'FBSDKCoreKit'
+    pod 'MapKitGoogleStyler'
 end

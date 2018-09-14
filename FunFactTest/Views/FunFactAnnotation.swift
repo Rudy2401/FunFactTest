@@ -24,8 +24,4 @@ class FunFactAnnotation: NSObject, MKAnnotation {
         self.coordinate = coordinate
         super.init()
     }
-    
-    var subtitle: String? {
-        return address
-    }
 }

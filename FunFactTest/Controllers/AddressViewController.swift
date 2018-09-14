@@ -16,7 +16,7 @@ protocol HandleMapSearch {
 class AddressViewController: UIViewController {
     
     @IBOutlet weak var mapView: MKMapView!
-    @IBOutlet weak var submitButton: UIButton!
+    @IBOutlet weak var submitButton: CustomButton!
     
     let locationManager = CLLocationManager()
     var resultSearchController: UISearchController? = nil
@@ -39,15 +39,9 @@ class AddressViewController: UIViewController {
         super.viewDidLoad()
         self.hideKeyboardWhenTappedAround() 
         submitButton.backgroundColor = Constants.redColor
-        submitButton.layer.cornerRadius = 20
+        mapView.bringSubview(toFront: submitButton)
         
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
-        
-        let submitBarButton = UIBarButtonItem(customView: submitButton)
-        
-        let toolBarItems: [UIBarButtonItem]
-        toolBarItems = [submitBarButton]
-        self.setToolbarItems(toolBarItems, animated: true)
         
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
@@ -80,6 +74,19 @@ class AddressViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Hide the navigation bar on the this view controller
+        self.navigationController?.toolbar.isHidden = true
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // Show the navigation bar on other view controllers
+        self.navigationController?.toolbar.isHidden = false
     }
 
     @IBAction func submitAction(_ sender: Any) {

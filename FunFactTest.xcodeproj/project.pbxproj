@@ -25,6 +25,15 @@
 		D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18572212A1E510093B66C /* LandmarkStruct.swift */; };
 		D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18574212A1F2F0093B66C /* FunFactStruct.swift */; };
 		D8DF6A5E210634800031A153 /* DisputeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DF6A5D210634800031A153 /* DisputeViewController.swift */; };
+		D8E78FED21409D26006F03B9 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */; };
+		D8E78FF12141FC9B006F03B9 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E78FF02141FC9B006F03B9 /* CustomButton.swift */; };
+		D8E78FF321430F73006F03B9 /* overlay-google.json in Resources */ = {isa = PBXBuildFile; fileRef = D8E78FF221430F73006F03B9 /* overlay-google.json */; };
+		D8E78FF5214310E5006F03B9 /* MapKitGoogleStyler.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8E78FF4214310E5006F03B9 /* MapKitGoogleStyler.framework */; };
+		D8E78FF721432A19006F03B9 /* overlay-brightcolors.json in Resources */ = {isa = PBXBuildFile; fileRef = D8E78FF621432A19006F03B9 /* overlay-brightcolors.json */; };
+		D8E78FF921432BF4006F03B9 /* overlay-blue.json in Resources */ = {isa = PBXBuildFile; fileRef = D8E78FF821432BF4006F03B9 /* overlay-blue.json */; };
+		D8E78FFB21432CBF006F03B9 /* overlay-dark.json in Resources */ = {isa = PBXBuildFile; fileRef = D8E78FFA21432CBF006F03B9 /* overlay-dark.json */; };
+		D8E78FFD2143323C006F03B9 /* overlay-light.json in Resources */ = {isa = PBXBuildFile; fileRef = D8E78FFC2143323C006F03B9 /* overlay-light.json */; };
+		D8E78FFF214349CE006F03B9 /* overlay-sharp.json in Resources */ = {isa = PBXBuildFile; fileRef = D8E78FFE214349CE006F03B9 /* overlay-sharp.json */; };
 		D8ED8FF8210A49480010EF7C /* AddFactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */; };
 		D8ED8FFA210A49780010EF7C /* AddressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FF9210A49780010EF7C /* AddressViewController.swift */; };
 		D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */; };
@@ -70,6 +79,15 @@
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
 		D8D18574212A1F2F0093B66C /* FunFactStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactStruct.swift; sourceTree = "<group>"; };
 		D8DF6A5D210634800031A153 /* DisputeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisputeViewController.swift; sourceTree = "<group>"; };
+		D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		D8E78FF02141FC9B006F03B9 /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
+		D8E78FF221430F73006F03B9 /* overlay-google.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "overlay-google.json"; sourceTree = "<group>"; };
+		D8E78FF4214310E5006F03B9 /* MapKitGoogleStyler.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MapKitGoogleStyler.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8E78FF621432A19006F03B9 /* overlay-brightcolors.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "overlay-brightcolors.json"; sourceTree = "<group>"; };
+		D8E78FF821432BF4006F03B9 /* overlay-blue.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "overlay-blue.json"; sourceTree = "<group>"; };
+		D8E78FFA21432CBF006F03B9 /* overlay-dark.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "overlay-dark.json"; sourceTree = "<group>"; };
+		D8E78FFC2143323C006F03B9 /* overlay-light.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "overlay-light.json"; sourceTree = "<group>"; };
+		D8E78FFE214349CE006F03B9 /* overlay-sharp.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "overlay-sharp.json"; sourceTree = "<group>"; };
 		D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactViewController.swift; sourceTree = "<group>"; };
 		D8ED8FF9210A49780010EF7C /* AddressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressViewController.swift; sourceTree = "<group>"; };
 		D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchTableViewController.swift; sourceTree = "<group>"; };
@@ -100,6 +118,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8E78FF5214310E5006F03B9 /* MapKitGoogleStyler.framework in Frameworks */,
 				D8F76AF72112812400A039D2 /* FirebaseCore.framework in Frameworks */,
 				D8F76AF92112812400A039D2 /* FirebaseFirestore.framework in Frameworks */,
 				D8FE7FB020EAEBAE007B4550 /* FontAwesome_swift.framework in Frameworks */,
@@ -122,6 +141,7 @@
 		D569FB58055CD1C61272A23D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D8E78FF4214310E5006F03B9 /* MapKitGoogleStyler.framework */,
 				D8F76AF62112812400A039D2 /* FirebaseCore.framework */,
 				D8F76AF82112812400A039D2 /* FirebaseFirestore.framework */,
 				D8FE7FAF20EAEBAE007B4550 /* FontAwesome_swift.framework */,
@@ -136,6 +156,12 @@
 				D834DFF720F677690091CA40 /* ListOfFunFacts.json */,
 				D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */,
 				D88DBE7E212EFC48009A2CC2 /* Constants.swift */,
+				D8E78FF221430F73006F03B9 /* overlay-google.json */,
+				D8E78FF621432A19006F03B9 /* overlay-brightcolors.json */,
+				D8E78FF821432BF4006F03B9 /* overlay-blue.json */,
+				D8E78FFA21432CBF006F03B9 /* overlay-dark.json */,
+				D8E78FFC2143323C006F03B9 /* overlay-light.json */,
+				D8E78FFE214349CE006F03B9 /* overlay-sharp.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -151,6 +177,7 @@
 				D848BD3D2134F05800C31CD0 /* CustomTextField.swift */,
 				D848BD4021357F3F00C31CD0 /* CustomUINavigation.swift */,
 				D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */,
+				D8E78FF02141FC9B006F03B9 /* CustomButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -183,6 +210,7 @@
 				D848BD392134909E00C31CD0 /* SignInViewController.swift */,
 				D848BD3B213490D100C31CD0 /* SignUpViewController.swift */,
 				D848BD462137838B00C31CD0 /* ImageViewViewController.swift */,
+				D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -293,13 +321,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8E78FF921432BF4006F03B9 /* overlay-blue.json in Resources */,
+				D8E78FFB21432CBF006F03B9 /* overlay-dark.json in Resources */,
 				D8FE7FAE20EAE747007B4550 /* PodFile in Resources */,
 				D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */,
 				D8FE7F8D20DB2716007B4550 /* LaunchScreen.storyboard in Resources */,
 				D8FE7F8A20DB2716007B4550 /* Assets.xcassets in Resources */,
 				D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */,
 				D8FE7F8820DB2712007B4550 /* Main.storyboard in Resources */,
+				D8E78FF321430F73006F03B9 /* overlay-google.json in Resources */,
+				D8E78FFD2143323C006F03B9 /* overlay-light.json in Resources */,
 				D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */,
+				D8E78FF721432A19006F03B9 /* overlay-brightcolors.json in Resources */,
+				D8E78FFF214349CE006F03B9 /* overlay-sharp.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -339,6 +373,7 @@
 				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/MapKitGoogleStyler/MapKitGoogleStyler.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 				"${PODS_ROOT}/TwitterCore/iOS/TwitterCore.framework",
@@ -360,6 +395,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapKitGoogleStyler.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TwitterCore.framework",
@@ -426,8 +462,10 @@
 				D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */,
 				D8DF6A5E210634800031A153 /* DisputeViewController.swift in Sources */,
 				D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */,
+				D8E78FED21409D26006F03B9 /* ProfileViewController.swift in Sources */,
 				D8FE7FA220DC4237007B4550 /* Utils.swift in Sources */,
 				D8F9012121304B9500D83F8E /* WelcomeViewController.swift in Sources */,
+				D8E78FF12141FC9B006F03B9 /* CustomButton.swift in Sources */,
 				D8FE7F8520DB2712007B4550 /* MainViewController.swift in Sources */,
 				D8FE7FA420DC491F007B4550 /* FunFactAnnotation.swift in Sources */,
 				D8FE7F9720DB2795007B4550 /* AnnotationBottomView.swift in Sources */,
@@ -589,6 +627,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XQECAX5M82;
 				INFOPLIST_FILE = FunFactTest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -609,6 +648,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XQECAX5M82;
 				INFOPLIST_FILE = FunFactTest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -13,6 +13,8 @@ import Firebase
 import FirebaseStorage
 import FontAwesome_swift
 import UserNotifications
+import MapKitGoogleStyler
+import FirebaseUI
 
 class MainViewController: UIViewController {
     
@@ -26,6 +28,7 @@ class MainViewController: UIViewController {
     @IBOutlet var likeLabel: UILabel!
     @IBOutlet var noOfFunFactsLabel: UILabel!
     @IBOutlet var distanceLabel: UILabel!
+    @IBOutlet weak var typeColor: UIView!
     
     var landmarkTitle = ""
     var landmarkID = ""
@@ -36,6 +39,7 @@ class MainViewController: UIViewController {
     var landmarkImage = UIImage()
     var annotations: [FunFactAnnotation]?
     var notificationCount = 0
+    var profileToolButton: UIButton?
     
     // 1. create locationManager
     let locationManager = CLLocationManager()
@@ -43,6 +47,7 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        typeColor.layer.cornerRadius = 2.5
         annotationBottomView.isHidden = true
         self.hideKeyboardWhenTappedAround()
         setupToolbarAndNavigationbar()
@@ -52,22 +57,7 @@ class MainViewController: UIViewController {
         locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters;
         locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         self.locationManager.delegate = self
-        
-        // get the singleton object
-        self.notificationCenter = UNUserNotificationCenter.current()
-        
-        // register as it's delegate
-        notificationCenter?.delegate = self as? UNUserNotificationCenterDelegate
-        
-        // define what do you need permission to use
-        let options: UNAuthorizationOptions = [.alert, .sound]
-        
-        // request permission
-        notificationCenter?.requestAuthorization(options: options) { (granted, error) in
-            if !granted {
-                print("Permission not granted")
-            }
-        }
+//        updateImageMetadata()
         
         // 3. setup mapView
         mapView.delegate = self
@@ -75,20 +65,18 @@ class MainViewController: UIViewController {
         mapView.userTrackingMode = .follow
         currentLocationButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         currentLocationButton.setTitle(String.fontAwesomeIcon(name: .locationArrow), for: .normal)
+//        configureTileOverlay()
         
         // 4. setup Firestore data
         loadDataFromFirestore()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-    }
-    
+
     @IBAction func showCurrentLocation(_ sender: Any) {
         mapView.setCenter(mapView.userLocation.coordinate, animated: true)
     }
     
     func setupBottomView (annotationClicked: FunFactAnnotation, listOfLandmarks: [Landmark]) {
+        typeColor.backgroundColor = Constants.getColorFor(type: annotationClicked.type)
         annotationBottomView.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
         annotationBottomView.layer.shadowOffset = CGSize(width: 0, height: 3)
         annotationBottomView.layer.shadowOpacity = 1.0
@@ -139,22 +127,48 @@ class MainViewController: UIViewController {
             self.landmarkImageView.image = imageFromCache
             self.landmarkImageView!.layer.cornerRadius = 5
         } else {
-            
-            var image = UIImage()
-            
             let storage = Storage.storage()
-            let gsReference = storage.reference(forURL: "gs://funfacts-5b1a9.appspot.com/images/\(imageName)")
-            
-            gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
-                if let error = error {
-                    print("error = \(error)")
-                } else {
-                    image = UIImage(data: data!)!
-                    self.landmarkImageView.image = image
-                    self.landmarkImageView!.layer.cornerRadius = 5
+            let storageRef = storage.reference()
+            let gsReference = storageRef.child("images/\(imageName)")
+            self.landmarkImageView.sd_setImage(with: gsReference, placeholderImage: UIImage())
+            self.landmarkImageView.layer.cornerRadius = 5
+        }
+    }
+    
+    func updateImageMetadata() {
+        // Create reference to the file whose metadata we want to change
+        let storage = Storage.storage()
+        let storageRef = storage.reference()
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let imageName = document.data()["imageName"] as! String
+                    let imageRef = storageRef.child("images/\(imageName).jpeg")
+                    
+                    // Create file metadata to update
+                    let newMetadata = StorageMetadata()
+                    newMetadata.cacheControl = "public,max-age=300"
+                    newMetadata.contentType = "image/jpeg"
+                    
+                    // Update metadata properties
+                    imageRef.updateMetadata(newMetadata) { metadata, error in
+                        if let error = error {
+                            print (error)
+                        } else {
+                            // Updated metadata for 'images/forest.jpg' is returned
+                            print (metadata?.contentType)
+                            print (metadata?.name)
+                            print (metadata?.cacheControl)
+                        }
+                    }
                 }
             }
         }
+        
+        
     }
     
     func setupFunFactDetailsBottomView(annotationClicked: FunFactAnnotation, listOfFunFacts: [FunFact]) {
@@ -220,6 +234,12 @@ class MainViewController: UIViewController {
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        if Auth.auth().currentUser != nil {
+            profileToolButton?.addTarget(self, action: #selector(viewProfile), for: .touchUpInside)
+        }
+        else {
+
+        }
         self.navigationController!.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 10.0)
         // 1. status is not determined
         if CLLocationManager.authorizationStatus() == .notDetermined {
@@ -238,7 +258,11 @@ class MainViewController: UIViewController {
         
     }
     @objc func viewAddFact(recognizer: UITapGestureRecognizer) {
-        performSegue(withIdentifier: "addFactDetail", sender: nil)
+        performSegue(withIdentifier: "addFactDetail", sender: self)
+    }
+    
+    @objc func viewProfile(recognizer: UITapGestureRecognizer) {
+        performSegue(withIdentifier: "profileSegue", sender: self)
     }
     
     @objc func viewBottomAnnotation(recognizer: UITapGestureRecognizer) {
@@ -344,7 +368,8 @@ class MainViewController: UIViewController {
                                           disputeFlag: document.data()["disputeFlag"] as! String,
                                           submittedBy: document.data()["submittedBy"] as! String,
                                           dateSubmitted: document.data()["dateSubmitted"] as! String,
-                                          source: document.data()["source"] as! String)
+                                          source: document.data()["source"] as! String,
+                                          tags: document.data()["tags"] as! [String])
                     self.listOfFunFacts.listOfFunFacts.append(funFact)
                 }
             }
@@ -374,6 +399,8 @@ class MainViewController: UIViewController {
                                         lon: Double(document.data()["longitude"] as! String)!,
                                         title: document.data()["name"] as! String,
                                         landmarkID: document.data()["id"] as! String)
+                    let source = (querySnapshot?.metadata.isFromCache)! ? "local cache" : "server"
+                    print("Metadata: Data fetched from \(source)")
                 }
             }
         }
@@ -409,22 +436,29 @@ class MainViewController: UIViewController {
         
         let profileLabel1 = String.fontAwesomeIcon(name: .user)
         let profileLabelAttr1 = NSAttributedString(string: profileLabel1, attributes: Constants.toolBarImageSolidAttribute)
+        let profileLabelAttrClicked1 = NSAttributedString(string: profileLabel1, attributes: Constants.toolBarImageClickedAttribute)
         
         let profileLabel2 = "\nProfile"
         let profileLabelAttr2 = NSAttributedString(string: profileLabel2, attributes: Constants.toolBarLabelAttribute)
+        let profileLabelAttrClicked2 = NSAttributedString(string: profileLabel2, attributes: Constants.toolBarLabelClickedAttribute)
         
         let completeProfileLabel = NSMutableAttributedString()
         completeProfileLabel.append(profileLabelAttr1)
         completeProfileLabel.append(profileLabelAttr2)
         
+        let completeProfileLabelClicked = NSMutableAttributedString()
+        completeProfileLabelClicked.append(profileLabelAttrClicked1)
+        completeProfileLabelClicked.append(profileLabelAttrClicked2)
+        
         let profile = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 4, height: self.view.frame.size.height))
         profile.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-        profile.setTitleColor(UIColor.gray, for: .normal)
-        profile.setTitleColor(UIColor.darkGray, for: .highlighted)
         profile.setAttributedTitle(completeProfileLabel, for: .normal)
+        profile.setAttributedTitle(completeProfileLabelClicked, for: .selected)
+        profile.setAttributedTitle(completeProfileLabelClicked, for: .highlighted)
         profile.titleLabel?.textAlignment = .center
-        //        addFact.addTarget(self, action: #selector(tapppedToolBarBtn), for: .touchUpInside)
+        
         let profileBtn = UIBarButtonItem(customView: profile)
+        self.profileToolButton = profile
         
         let settingsLabel1 = String.fontAwesomeIcon(name: .cog)
         let settingsAttr1 = NSAttributedString(string: settingsLabel1, attributes: Constants.toolBarImageSolidAttribute)
@@ -482,12 +516,14 @@ extension MainViewController: MKMapViewDelegate {
         if view.annotation is MKUserLocation {
             return
         }
-        let annotation = view.annotation as! FunFactAnnotation
-        if let view = view as? MKPinAnnotationView {
-            view.pinTintColor = UIColor.gray
+        
+        if let annotation = view.annotation as? FunFactAnnotation {
+            setupBottomView(annotationClicked: annotation, listOfLandmarks: self.listOfLandmarks.listOfLandmarks)
+            setupFunFactDetailsBottomView(annotationClicked: annotation, listOfFunFacts: self.listOfFunFacts.listOfFunFacts)
         }
-        setupBottomView(annotationClicked: annotation, listOfLandmarks: self.listOfLandmarks.listOfLandmarks)
-        setupFunFactDetailsBottomView(annotationClicked: annotation, listOfFunFacts: self.listOfFunFacts.listOfFunFacts)
+        else {
+            
+        }
     }
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
@@ -495,19 +531,74 @@ extension MainViewController: MKMapViewDelegate {
             //return nil so map view draws "blue dot" for standard user location
             return nil
         }
+        var annotationView = MKMarkerAnnotationView()
+        guard annotation is FunFactAnnotation else { return nil }
         
-        let reuseId = "pin"
-        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
-        if pinView == nil {
-            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            pinView!.animatesDrop = true
-            pinView?.pinTintColor = UIColor.red
+        let identifier = "annotation"
+        var image = UIImage()
+        var color = UIColor.red
+        switch (annotation as! FunFactAnnotation).type {
+        case Constants.landmarkTypes[1]:
+            color = .orange
+            image = UIImage.fontAwesomeIcon(name: .home, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+        case Constants.landmarkTypes[2]:
+            color = .blue
+            image = UIImage.fontAwesomeIcon(name: .building, style: .solid, textColor: .white, size: CGSize(width: 20, height: 20))
+        case Constants.landmarkTypes[3]:
+            color = .black
+            image = UIImage.fontAwesomeIcon(name: .footballBall, style: .solid, textColor: .white, size: CGSize(width: 20, height: 20))
+        case Constants.landmarkTypes[4]:
+            color = .green
+            image = UIImage.fontAwesomeIcon(name: .book, style: .solid, textColor: .white, size: CGSize(width: 20, height: 20))
+        case Constants.landmarkTypes[5]:
+            color = .cyan
+            image = UIImage.fontAwesomeIcon(name: .tree, style: .solid, textColor: .white, size: CGSize(width: 20, height: 20))
+        case Constants.landmarkTypes[6]:
+            color = .gray
+            image = UIImage.fontAwesomeIcon(name: .utensils, style: .solid, textColor: .white, size: CGSize(width: 20, height: 20))
+        case Constants.landmarkTypes[7]:
+            color = .purple
+            image = UIImage.fontAwesomeIcon(name: .university, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+
+        default:
+            color = .red
         }
-        else {
-            pinView!.annotation = annotation
+        if let dequedView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView {
+            annotationView = dequedView
+        } else{
+            annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+        }
+        self.typeColor.backgroundColor = color
+        annotationView.markerTintColor = color
+        annotationView.glyphImage = image
+        annotationView.glyphTintColor = .white
+        annotationView.clusteringIdentifier = identifier
+        return annotationView
+    }
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        // This is the final step. This code can be copied and pasted into your project
+        // without thinking on it so much. It simply instantiates a MKTileOverlayRenderer
+        // for displaying the tile overlay.
+        if let tileOverlay = overlay as? MKTileOverlay {
+            return MKTileOverlayRenderer(tileOverlay: tileOverlay)
+        } else {
+            return MKOverlayRenderer(overlay: overlay)
+        }
+    }
+    private func configureTileOverlay() {
+        // We first need to have the path of the overlay configuration JSON
+        guard let overlayFileURLString = Bundle.main.path(forResource: "overlay-sharp", ofType: "json") else {
+            return
+        }
+        let overlayFileURL = URL(fileURLWithPath: overlayFileURLString)
+        
+        // After that, you can create the tile overlay using MapKitGoogleStyler
+        guard let tileOverlay = try? MapKitGoogleStyler.buildOverlay(with: overlayFileURL) else {
+            return
         }
         
-        return pinView
+        // And finally add it to your MKMapView
+        mapView.add(tileOverlay)
     }
    
 }
@@ -529,7 +620,7 @@ extension MainViewController: CLLocationManagerDelegate {
         let alert = UIAlertController(title: "Warning", message: "enter \(region.identifier)", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
-        showNotification(forRegion: region)
+//        showNotification(forRegion: region)
     }
     
     // 2. user exit region
@@ -548,77 +639,109 @@ extension MainViewController: CLLocationManagerDelegate {
         self.currentLocationCoordinate = currentLocationCoordinate
     }
     
-    func showNotification(forRegion region: CLRegion!) {
-        
-        // customize your notification content
-        let content = UNMutableNotificationContent()
-        content.title = "Near " + region.identifier + "?"
-        content.subtitle = "Did you know?"
-        
-        var tempLandmarkID = ""
-        for landmark in listOfLandmarks.listOfLandmarks {
-            if region.identifier == landmark.name {
-                tempLandmarkID = landmark.id
-                break
-            }
-        }
-        for funFact in listOfFunFacts.listOfFunFacts {
-            if funFact.landmarkId == tempLandmarkID {
-                content.body = (self.listOfFunFacts.listOfFunFacts.first?.description)!
-                let imageData = UIImageJPEGRepresentation(CacheManager.shared.getFromCache(key: "\(funFact.image).jpeg") as! UIImage, 1.0)
-                guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: "\(funFact.image).jpeg", data: imageData! as NSData, options: nil) else { return  }
-
-                content.attachments = [attachment]
-                break
-            }
-        }
-        content.sound = UNNotificationSound.default()
-        notificationCount += 1
-        
-        // when the notification will be triggered
-        let timeInSeconds: TimeInterval = (6) // 60s * 15 = 15min
-        // the actual trigger object
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInSeconds,
-                                                        repeats: false)
-        
-        // notification unique identifier, for this example, same as the region to avoid duplicate notifications
-        let identifier = region.identifier
-        
-        // the notification request object
-        let request = UNNotificationRequest(identifier: identifier,
-                                            content: content,
-                                            trigger: trigger)
-        
-        // trying to add the notification request to notification center
-        notificationCenter?.add(request, withCompletionHandler: { (error) in
-            if error != nil {
-                print("Error adding notification with identifier: \(identifier)")
-            }
-        })
-    }
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        // when app is open and in foregroud
-        completionHandler(.alert)
-    }
-    
-    
+//    func showNotification(forRegion region: CLRegion!) {
+//
+//        // customize your notification content
+//        let content = UNMutableNotificationContent()
+//        content.title = "Near " + region.identifier + "?"
+//        content.subtitle = "Did you know?"
+//
+//        var tempLandmarkID = ""
+//        for landmark in listOfLandmarks.listOfLandmarks {
+//            if region.identifier == landmark.name {
+//                tempLandmarkID = landmark.id
+//                break
+//            }
+//        }
+//        for funFact in listOfFunFacts.listOfFunFacts {
+//            if funFact.landmarkId == tempLandmarkID {
+//                content.body = (self.listOfFunFacts.listOfFunFacts.first?.description)!
+//
+//                let imageName = "\(funFact.image).jpeg"
+//                let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
+//                if imageFromCache != nil {
+//                    let imageData = UIImageJPEGRepresentation(imageFromCache!, 1.0)
+//                    guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: "\(funFact.image).jpeg", data: imageData! as NSData, options: nil) else { return  }
+//                    content.attachments = [attachment]
+//                    break
+//                } else {
+//                    let s = funFact.id
+//                    let imageName = "\(s).jpeg"
+//
+//                    let storage = Storage.storage()
+//                    let gsReference = storage.reference(forURL: "gs://funfacts-5b1a9.appspot.com/images/\(imageName)")
+//
+//                    gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
+//                        if let error = error {
+//                            print("error = \(error)")
+//                        } else {
+//                            guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: "\(funFact.image).jpeg", data: data! as NSData, options: nil) else { return  }
+//                            content.attachments = [attachment]
+//                        }
+//                    }
+//                    break
+//                }
+//            }
+//        }
+//        content.sound = UNNotificationSound.default()
+//        notificationCount += 1
+//
+//        // when the notification will be triggered
+//        let timeInSeconds: TimeInterval = (6) // 60s * 15 = 15min
+//        // the actual trigger object
+//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInSeconds,
+//                                                        repeats: false)
+//
+//        // notification unique identifier, for this example, same as the region to avoid duplicate notifications
+//        let identifier = region.identifier
+//
+//        // the notification request object
+//        let request = UNNotificationRequest(identifier: identifier,
+//                                            content: content,
+//                                            trigger: trigger)
+//
+//        // trying to add the notification request to notification center
+//        notificationCenter?.add(request, withCompletionHandler: { (error) in
+//            if error != nil {
+//                print("Error adding notification with identifier: \(identifier)")
+//            }
+//        })
+//    }
 }
-extension UNNotificationAttachment {
+//extension UNNotificationAttachment {
     
     /// Save the image to disk
-    static func create(imageFileIdentifier: String, data: NSData, options: [NSObject : AnyObject]?) -> UNNotificationAttachment? {
-        let fileManager = FileManager.default
-        let tmpSubFolderName = ProcessInfo.processInfo.globallyUniqueString
-        let tmpSubFolderURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(tmpSubFolderName, isDirectory: true)
-        
-        do {
-            try fileManager.createDirectory(at: tmpSubFolderURL!, withIntermediateDirectories: true, attributes: nil)
-            let fileURL = tmpSubFolderURL?.appendingPathComponent(imageFileIdentifier)
-            try data.write(to: fileURL!, options: [])
-            let imageAttachment = try UNNotificationAttachment.init(identifier: imageFileIdentifier, url: fileURL!, options: options)
-            return imageAttachment
-        } catch let error {
-            print("error \(error)")
-        }
-        return nil
-    }}
+//    static func create(imageFileIdentifier: String, data: NSData, options: [NSObject : AnyObject]?) -> UNNotificationAttachment? {
+//        let fileManager = FileManager.default
+//        let tmpSubFolderName = ProcessInfo.processInfo.globallyUniqueString
+//        let tmpSubFolderURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(tmpSubFolderName, isDirectory: true)
+//
+//        do {
+//            try fileManager.createDirectory(at: tmpSubFolderURL!, withIntermediateDirectories: true, attributes: nil)
+//            let fileURL = tmpSubFolderURL?.appendingPathComponent(imageFileIdentifier)
+//            try data.write(to: fileURL!, options: [])
+//            let imageAttachment = try UNNotificationAttachment.init(identifier: imageFileIdentifier, url: fileURL!, options: options)
+//            return imageAttachment
+//        } catch let error {
+//            print("error \(error)")
+//        }
+//        return nil
+//    }
+//
+//}
+
+//extension MainViewController: UNUserNotificationCenterDelegate {
+//    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+//        // when app is open and in foregroud
+//        completionHandler(.alert)
+//    }
+//    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+//
+//        // get the notification identifier to respond accordingly
+//        let identifier = response.notification.request.identifier
+//        print ("identifier = \(identifier)")
+//        // do what you need to do
+//
+//        // ...
+//    }
+//}

@@ -14,7 +14,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     @IBOutlet weak var helpText: UILabel!
     @IBOutlet weak var reasonPicker: UIPickerView!
     @IBOutlet weak var notesText: UITextView!
-    @IBOutlet weak var submitButton: UIButton!
+    @IBOutlet weak var submitButton: CustomButton!
     var pickerData: [String] = [String]()
     var funFactID: String = ""
     var disputeDict = [String: Dispute]()
@@ -33,6 +33,10 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         self.reasonPicker.dataSource = self
         self.notesText.delegate = self
         
+        reasonPicker.layer.borderWidth = 0.5
+        reasonPicker.layer.borderColor = UIColor.gray.cgColor
+        reasonPicker.layer.cornerRadius = 5
+        
         let cancelItem = UIBarButtonItem(
             title: "Cancel",
             style: .plain,
@@ -41,12 +45,20 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         )
         navigationItem.rightBarButtonItem = cancelItem
         
-        navigationController?.navigationBar.prefersLargeTitles = true
+        if #available(iOS 11.0, *) {
+            navigationController?.navigationBar.prefersLargeTitles = true
+        } else {
+            // Fallback on earlier versions
+        }
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.tintColor = .darkGray
         if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedStringKey.foregroundColor: UIColor.black, NSAttributedStringKey.font: customFont ]
+            if #available(iOS 11.0, *) {
+                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedStringKey.foregroundColor: UIColor.black, NSAttributedStringKey.font: customFont ]
+            } else {
+                // Fallback on earlier versions
+            }
         }
         navigationItem.title = "Dispute Fact"
         
@@ -59,7 +71,6 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         notesText.layer.cornerRadius = 5
         
         submitButton.layer.backgroundColor = Constants.redColor.cgColor
-        submitButton.layer.cornerRadius = 25
         print(funFactID)
     }
     

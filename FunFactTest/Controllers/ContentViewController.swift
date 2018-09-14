@@ -34,6 +34,7 @@ class ContentViewController: UIViewController {
     var address: String = ""
     var verifiedFlag: String = ""
     var disputeFlag: String = ""
+    var tags: [String] = [""]
     var funFactDict = [String: [FunFact]]()
     var listOfLandmarks = ListOfLandmarks.init(listOfLandmarks: [])
     var listOfFunFacts = ListOfFunFacts(listOfFunFacts: [])
@@ -127,12 +128,17 @@ class ContentViewController: UIViewController {
         
         let funFactDescAttr = NSMutableAttributedString(string: (dataObject as! String))
         let unverifiedAttr = NSMutableAttributedString(string: " (This fact needs verification)", attributes: Constants.attribute14ItalicsDG)
+        let tagsAttr = NSMutableAttributedString(string: "", attributes: Constants.attribute14DemiBlue)
+        for tag in tags {
+            tagsAttr.append(NSMutableAttributedString(string: " #\(tag) ", attributes: Constants.attribute14DemiBlue))
+        }
         
         let attributedFunFactDesc = NSMutableAttributedString()
         attributedFunFactDesc.append(funFactDescAttr)
         if verifiedFlag == "N" {
             attributedFunFactDesc.append(unverifiedAttr)
         }
+        attributedFunFactDesc.append(tagsAttr)
         
         textLabel.attributedText = attributedFunFactDesc
         
@@ -180,25 +186,18 @@ class ContentViewController: UIViewController {
         let imageName = "\(imageId).jpeg"
         let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
         if imageFromCache != nil {
+            print("******In cache")
             self.landmarkImage.image = imageFromCache
             self.landmarkImage.layer.cornerRadius = 5
         } else {
-            var image = UIImage()
             let s = funFactID
             let imageName = "\(s).jpeg"
             
             let storage = Storage.storage()
-            let gsReference = storage.reference(forURL: "gs://funfacts-5b1a9.appspot.com/images/\(imageName)")
-            
-            gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
-                if let error = error {
-                    print("error = \(error)")
-                } else {
-                    image = UIImage(data: data!)!
-                    self.landmarkImage.image = image
-                    self.landmarkImage.layer.cornerRadius = 5
-                }
-            }
+            let storageRef = storage.reference()
+            let gsReference = storageRef.child("images/\(imageName)")
+            self.landmarkImage.sd_setImage(with: gsReference, placeholderImage: UIImage())
+            self.landmarkImage.layer.cornerRadius = 5
         }
     }
     @objc func disputeTapAction(sender : UITapGestureRecognizer) {
@@ -222,7 +221,6 @@ class ContentViewController: UIViewController {
     }
     
     @objc func viewImageViewer(sender : UITapGestureRecognizer) {
-        print ("**** Clicked image")
         performSegue(withIdentifier: "imageSegue", sender: nil)
     }
     
