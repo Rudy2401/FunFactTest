@@ -91,7 +91,7 @@ class SignInViewController: UIViewController {
             // Email verification
             guard (Auth.auth().currentUser?.isEmailVerified)!
                 else {
-                    let alertController = UIAlertController(title: "Login Error", message: "You haven't confirmed your email address yet. We sent you a confirmation email when you sign up. Please click the verification link in that email. If you need us to send the confirmation email again, please tap Resend Email.", preferredStyle: .alert)
+                    let alertController = UIAlertController(title: "Login Error", message: "You haven't confirmed your email address yet. We sent you a confirmation email when you signed up. Please click the verification link in that email. If you need us to send the confirmation email again, please tap Resend Email.", preferredStyle: .alert)
                     
                     let okayAction = UIAlertAction(title: "Resend email", style: .default, handler: { (action) in
                         Auth.auth().currentUser?.sendEmailVerification(completion: nil)

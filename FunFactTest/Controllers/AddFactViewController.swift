@@ -17,13 +17,17 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var landmarkImage: UIImageView!
     @IBOutlet weak var landmarkType: UIPickerView!
-    @IBOutlet var landmarkNameTextField: UITextField?
-    @IBOutlet var addressTextField: UITextField?
+    @IBOutlet weak var landmarkNameTextField: UITextField?
+    @IBOutlet weak var addressTextField: UITextField?
     @IBOutlet weak var imageCaption: UITextView!
     @IBOutlet weak var funFactDescription: UITextView!
     @IBOutlet weak var sourceTextField: UITextField!
     @IBOutlet weak var submitButton: CustomButton!
     @IBOutlet weak var contentView: UIView!
+    @IBOutlet weak var addressBtn: UIButton!
+    @IBOutlet weak var landmarkNameBtn: UIButton!
+    @IBOutlet weak var sourceBtn: UIButton!
+    
     var address: String?
     var landmarkName: String?
     var pickerData: [String] = [String]()
@@ -37,13 +41,25 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
     var listOfFunFacts = ListOfFunFacts.init(listOfFunFacts: [])
     var funFactDict = [String: [FunFact]]()
     var popup = UIAlertController()
+    var tag = 100
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.tintColor = UIColor.darkGray
+        navigationController?.navigationBar.tintColor = .darkGray
 
         scrollView.scrollIndicatorInsets = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 2)
         scrollView.autoresizingMask = UIViewAutoresizing(rawValue: UIViewAutoresizing.RawValue(UInt8(UIViewAutoresizing.flexibleWidth.rawValue) | UInt8(UIViewAutoresizing.flexibleHeight.rawValue)))
+        scrollView.isUserInteractionEnabled = true
+        
+        addressBtn.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+        addressBtn.setTitle(String.fontAwesomeIcon(name: .mapMarked), for: .normal)
+        
+        landmarkNameBtn.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+        landmarkNameBtn.setTitle(String.fontAwesomeIcon(name: .university), for: .normal)
+        
+        sourceBtn.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+        sourceBtn.setTitle(String.fontAwesomeIcon(name: .book), for: .normal)
+
         self.hideKeyboardWhenTappedAround()
         funFactDict = Dictionary(grouping: listOfFunFacts.listOfFunFacts, by: { $0.landmarkId })
         imageCaption.tag = 0
@@ -54,7 +70,6 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         self.funFactDescription.delegate = self
         self.imageCaption.delegate  = self
         self.sourceTextField.delegate  = self
-        navigationController?.navigationBar.prefersLargeTitles = true
         
         let cancelItem = UIBarButtonItem(
             title: "Cancel",
@@ -66,14 +81,14 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         
         navigationItem.title = "Add A New Fun Fact"
         
-        addressTextField?.layer.borderWidth = 0.5
+        addressTextField?.layer.borderWidth = 0
         addressTextField?.layer.borderColor = UIColor.darkGray.cgColor
         addressTextField?.layer.cornerRadius = 5
-        landmarkNameTextField?.layer.borderWidth = 0.5
+        landmarkNameTextField?.layer.borderWidth = 0
         landmarkNameTextField?.layer.borderColor = UIColor.darkGray.cgColor
         landmarkNameTextField?.layer.cornerRadius = 5
         
-        landmarkType?.layer.borderWidth = 0.5
+        landmarkType?.layer.borderWidth = 0
         landmarkType?.layer.borderColor = UIColor.darkGray.cgColor
         landmarkType?.layer.cornerRadius = 5
         
@@ -89,30 +104,30 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         addressTextField?.addGestureRecognizer(mytapGestureRecognizer)
         addressTextField?.isUserInteractionEnabled = true
         landmarkImage.layer.borderWidth = 0.5
-        landmarkImage.layer.borderColor = UIColor.darkGray.cgColor
+        landmarkImage.layer.borderColor = UIColor.lightGray.cgColor
         landmarkImage.layer.cornerRadius = 5
-        landmarkImage.image = UIImage.fontAwesomeIcon(name: .camera, style: .solid, textColor: .darkGray, size: CGSize(width: landmarkImage.bounds.width, height: landmarkImage.bounds.height), backgroundColor: .clear)
+        landmarkImage.image = UIImage.fontAwesomeIcon(name: .images, style: .solid, textColor: .lightGray, size: CGSize(width: landmarkImage.frame.width, height: landmarkImage.frame.height), backgroundColor: .clear)
         
         let imagePickerTapGesture = UITapGestureRecognizer(target: self, action: #selector(viewImagePicker))
         imagePickerTapGesture.numberOfTapsRequired = 1
         landmarkImage?.addGestureRecognizer(imagePickerTapGesture)
         landmarkImage?.isUserInteractionEnabled = true
         
-        imageCaption.layer.borderWidth = 0.5
+        imageCaption.layer.borderWidth = 0
         imageCaption.layer.borderColor = UIColor.darkGray.cgColor
         imageCaption.layer.cornerRadius = 5
         
-        imageCaption.text = "Enter image caption."
+        imageCaption.text = "Click on the icon to select image. Enter image caption here."
         imageCaption.textColor = UIColor.lightGray
         
         funFactDescription.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable."
         funFactDescription.textColor = UIColor.lightGray
         
-        funFactDescription.layer.borderWidth = 0.5
+        funFactDescription.layer.borderWidth = 0
         funFactDescription.layer.borderColor = UIColor.darkGray.cgColor
         funFactDescription.layer.cornerRadius = 5
         
-        sourceTextField.layer.borderWidth = 0.5
+        sourceTextField.layer.borderWidth = 0
         sourceTextField.layer.borderColor = UIColor.darkGray.cgColor
         sourceTextField.layer.cornerRadius = 5
         
@@ -210,43 +225,48 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         type = pickerData[row]
     }
     
+    func textViewDidChange(_ textView: UITextView) {
+        
+    }
+    
     func textViewDidBeginEditing(_ textView: UITextView) {
+        tag = textView.tag
         if textView.textColor == UIColor.lightGray {
             textView.text = nil
             textView.textColor = UIColor.black
         }
-        if textView.tag == 1 {
-//            moveTextView(textView, moveDistance: -250, up: true)
-//            navigationController?.navigationBar.isHidden = true
-        }
+//        if textView.tag == 1 {
+            moveTextView(textView, moveDistance: -250, up: true)
+            navigationController?.navigationBar.isHidden = true
+//        }
     }
 
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
             if textView.tag == 0 {
-                textView.text = "Enter image caption."
+                textView.text = "Click on the icon to select image. Enter image caption here."
             }
             else if textView.tag == 1 {
-                textView.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise."
+                textView.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable."
             }
 
             textView.textColor = UIColor.lightGray
         }
-        if textView.tag == 1 {
-//            moveTextView(textView, moveDistance: -250, up: false)
-//            navigationController?.navigationBar.isHidden = false
-        }
+//        if textView.tag == 1 {
+            moveTextView(textView, moveDistance: -250, up: false)
+            navigationController?.navigationBar.isHidden = false
+//        }
     }
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-//        moveTextField(textField, moveDistance: -250, up: true)
-//        navigationController?.navigationBar.isHidden = true
+        moveTextField(textField, moveDistance: -250, up: true)
+        navigationController?.navigationBar.isHidden = true
     }
 
     // Finish Editing The Text Field
     func textFieldDidEndEditing(_ textField: UITextField) {
-//        moveTextField(textField, moveDistance: -250, up: false)
-//        navigationController?.navigationBar.isHidden = false
+        moveTextField(textField, moveDistance: -250, up: false)
+        navigationController?.navigationBar.isHidden = false
     }
     
     // Hide the keyboard when the return key pressed
@@ -329,7 +349,8 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
                     "submittedBy": Auth.auth().currentUser?.uid ?? "",
                     "dateSubmitted": myStringafd,
                     "imageCaption": imageCaption.text!,
-                    "source": sourceTextField.text!
+                    "source": sourceTextField.text!,
+                    "tags": funFactDescription.text.hashtags()
                 ]){ err in
                     if let err = err {
                         print("Error writing document: \(err)")
@@ -340,6 +361,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
                     }
                 }
                 uploadImage(imageName: fid + ".jpeg")
+                addHashtags(funFactID: fid, hashtags: funFactDescription.text.hashtags())
                 return
             }
             else {
@@ -380,7 +402,8 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
                 "submittedBy": Auth.auth().currentUser?.uid ?? "",
                 "dateSubmitted": myStringafd,
                 "imageCaption": imageCaption.text!,
-                "source": sourceTextField.text!
+                "source": sourceTextField.text!,
+                "tags": funFactDescription.text.hashtags()
             ]){ err in
                 if let err = err {
                     print("Error writing document: \(err)")
@@ -391,6 +414,25 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
                 }
             }
             uploadImage(imageName: newid + "-001.jpeg")
+            addHashtags(funFactID: newid + "-001", hashtags: funFactDescription.text.hashtags())
+        }
+    }
+    
+    func addHashtags(funFactID: String, hashtags: [String]) {
+        let db = Firestore.firestore()
+        let funFactRef = db.collection("funFacts").document(funFactID)
+        
+        for hashtag in hashtags {
+            db.collection("hashtags").document(hashtag).setData([
+                funFactID: funFactRef,
+                "count": 1
+            ], merge: true){ err in
+                if let err = err {
+                    print("Error writing document: \(err)")
+                } else {
+                    print("Document successfully written!")
+                }
+            }
         }
     }
     
@@ -411,7 +453,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
             message += "Please enter a landmark name"
             Utils.alertWithTitle(title: title, message: message, viewController: self, toFocus: self.landmarkNameTextField!, type: "textfield")
         }
-        if funFactDescription?.text == "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise." {
+        if funFactDescription?.text == "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable." {
             errors = true
             message += "Please enter a fun fact description"
             Utils.alertWithTitle(title: title, message: message, viewController: self, toFocus: self.funFactDescription!, type: "textview")
@@ -572,5 +614,21 @@ extension UIImage {
             }
         }
         completion(UIImage(data: imageData)!, compressionQuality)
+    }
+}
+extension String
+{
+    func hashtags() -> [String]
+    {
+        if let regex = try? NSRegularExpression(pattern: "#[a-z0-9]+", options: .caseInsensitive)
+        {
+            let string = self as NSString
+            
+            return regex.matches(in: self, options: [], range: NSRange(location: 0, length: string.length)).map {
+                string.substring(with: $0.range).replacingOccurrences(of: "#", with: "").lowercased()
+            }
+        }
+        
+        return []
     }
 }

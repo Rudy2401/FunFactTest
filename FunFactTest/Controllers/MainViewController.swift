@@ -57,7 +57,7 @@ class MainViewController: UIViewController {
         locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters;
         locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         self.locationManager.delegate = self
-//        updateImageMetadata()
+//        updateTags()
         
         // 3. setup mapView
         mapView.delegate = self
@@ -135,6 +135,58 @@ class MainViewController: UIViewController {
         }
     }
     
+    func updateData() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    var description = document.data()["description"] as! String
+                    let tags = document.data()["tags"] as! [String]
+                    for tag in tags {
+                        description.append(" #\(tag)")
+                    }
+                    
+                    db.collection("funFacts").document(document.data()["id"] as! String).setData(["description": description], merge: true)
+                }
+            }
+        }
+    }
+    func updateTags() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let id = document.data()["id"] as! String
+                    let tags = document.data()["tags"] as! [String]
+                    let funFactRef = db.collection("funFacts").document(id)
+                    for tag in tags {
+                        db.collection("hashtags").document(tag).setData([id: funFactRef], merge: true)
+                    }
+                }
+            }
+        }
+    }
+    
+    func deleteTags() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let description = document.data()["description"] as! String
+                    let onlyDesc = description.components(separatedBy: "#")[0]
+                    
+                    db.collection("funFacts").document(document.data()["id"] as! String).setData(["description": onlyDesc], merge: true)
+                }
+            }
+        }
+    }
+    
     func updateImageMetadata() {
         // Create reference to the file whose metadata we want to change
         let storage = Storage.storage()
@@ -159,9 +211,6 @@ class MainViewController: UIViewController {
                             print (error)
                         } else {
                             // Updated metadata for 'images/forest.jpg' is returned
-                            print (metadata?.contentType)
-                            print (metadata?.name)
-                            print (metadata?.cacheControl)
                         }
                     }
                 }
@@ -280,6 +329,7 @@ class MainViewController: UIViewController {
         let db = Firestore.firestore()
         downloadLandmarks(db)
         downloadFunFacts(db)
+        
         
         let spinner = showLoader(view: self.view)
         firestore.downloadImagesIntoCache()

@@ -128,17 +128,21 @@ class ContentViewController: UIViewController {
         
         let funFactDescAttr = NSMutableAttributedString(string: (dataObject as! String))
         let unverifiedAttr = NSMutableAttributedString(string: " (This fact needs verification)", attributes: Constants.attribute14ItalicsDG)
-        let tagsAttr = NSMutableAttributedString(string: "", attributes: Constants.attribute14DemiBlue)
-        for tag in tags {
-            tagsAttr.append(NSMutableAttributedString(string: " #\(tag) ", attributes: Constants.attribute14DemiBlue))
-        }
         
+        let searchPattern = "#\\w+"
+        var ranges: [NSRange] = [NSRange]()
+        
+        let regex = try! NSRegularExpression(pattern: searchPattern, options: [])
+        ranges = regex.matches(in: funFactDescAttr.string, options: [], range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
+        
+        for range in ranges {
+            funFactDescAttr.addAttributes(Constants.attribute14DemiBlue, range: NSRange(location: range.location, length: range.length))
+        }
         let attributedFunFactDesc = NSMutableAttributedString()
         attributedFunFactDesc.append(funFactDescAttr)
         if verifiedFlag == "N" {
             attributedFunFactDesc.append(unverifiedAttr)
         }
-        attributedFunFactDesc.append(tagsAttr)
         
         textLabel.attributedText = attributedFunFactDesc
         

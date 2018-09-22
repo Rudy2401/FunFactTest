@@ -18,9 +18,12 @@
 		D848BD4321358BF200C31CD0 /* CustomViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */; };
 		D848BD452136F50C00C31CD0 /* DisputeStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD442136F50C00C31CD0 /* DisputeStruct.swift */; };
 		D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD462137838B00C31CD0 /* ImageViewViewController.swift */; };
+		D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7B92151BF3C00B14B5F /* firebase.json */; };
+		D87ED7BC2151BF5400B14B5F /* functions in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7BB2151BF5400B14B5F /* functions */; };
 		D88DBE7F212EFC48009A2CC2 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE7E212EFC48009A2CC2 /* Constants.swift */; };
 		D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE80212F3727009A2CC2 /* CacheManager.swift */; };
 		D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE83212F68F9009A2CC2 /* FancyButton.swift */; };
+		D8B26C4221568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json in Resources */ = {isa = PBXBuildFile; fileRef = D8B26C4121568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json */; };
 		D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */; };
 		D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18572212A1E510093B66C /* LandmarkStruct.swift */; };
 		D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18574212A1F2F0093B66C /* FunFactStruct.swift */; };
@@ -71,10 +74,13 @@
 		D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewBackground.swift; sourceTree = "<group>"; };
 		D848BD442136F50C00C31CD0 /* DisputeStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisputeStruct.swift; sourceTree = "<group>"; };
 		D848BD462137838B00C31CD0 /* ImageViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewViewController.swift; sourceTree = "<group>"; };
+		D87ED7B92151BF3C00B14B5F /* firebase.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = firebase.json; sourceTree = "<group>"; };
+		D87ED7BB2151BF5400B14B5F /* functions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = functions; sourceTree = "<group>"; };
 		D88DBE7E212EFC48009A2CC2 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D88DBE80212F3727009A2CC2 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FunFactTest.entitlements; sourceTree = "<group>"; };
 		D88DBE83212F68F9009A2CC2 /* FancyButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FancyButton.swift; sourceTree = "<group>"; };
+		D8B26C4121568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json"; sourceTree = "<group>"; };
 		D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConnection.swift; sourceTree = "<group>"; };
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
 		D8D18574212A1F2F0093B66C /* FunFactStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactStruct.swift; sourceTree = "<group>"; };
@@ -169,15 +175,15 @@
 		D8D1856D2129EDD70093B66C /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				D88DBE83212F68F9009A2CC2 /* FancyButton.swift */,
-				D8FE7F9620DB2795007B4550 /* AnnotationBottomView.swift */,
-				D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */,
 				D8F76AF0210E1A3100A039D2 /* AddressCell.swift */,
+				D8FE7F9620DB2795007B4550 /* AnnotationBottomView.swift */,
 				D848BD3521343FAF00C31CD0 /* ButtonWithShadow.swift */,
+				D8E78FF02141FC9B006F03B9 /* CustomButton.swift */,
 				D848BD3D2134F05800C31CD0 /* CustomTextField.swift */,
 				D848BD4021357F3F00C31CD0 /* CustomUINavigation.swift */,
 				D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */,
-				D8E78FF02141FC9B006F03B9 /* CustomButton.swift */,
+				D88DBE83212F68F9009A2CC2 /* FancyButton.swift */,
+				D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -185,13 +191,13 @@
 		D8D1856E2129EDFA0093B66C /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */,
-				D8FE7FA120DC4237007B4550 /* Utils.swift */,
-				D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */,
-				D8D18572212A1E510093B66C /* LandmarkStruct.swift */,
-				D8D18574212A1F2F0093B66C /* FunFactStruct.swift */,
 				D88DBE80212F3727009A2CC2 /* CacheManager.swift */,
 				D848BD442136F50C00C31CD0 /* DisputeStruct.swift */,
+				D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */,
+				D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */,
+				D8D18574212A1F2F0093B66C /* FunFactStruct.swift */,
+				D8D18572212A1E510093B66C /* LandmarkStruct.swift */,
+				D8FE7FA120DC4237007B4550 /* Utils.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -199,18 +205,18 @@
 		D8D1856F2129EE020093B66C /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				D8FE7F8420DB2712007B4550 /* MainViewController.swift */,
-				D8FE7FA920E45082007B4550 /* ContentViewController.swift */,
-				D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */,
 				D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */,
-				D8DF6A5D210634800031A153 /* DisputeViewController.swift */,
-				D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */,
 				D8ED8FF9210A49780010EF7C /* AddressViewController.swift */,
-				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
+				D8FE7FA920E45082007B4550 /* ContentViewController.swift */,
+				D8DF6A5D210634800031A153 /* DisputeViewController.swift */,
+				D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */,
+				D848BD462137838B00C31CD0 /* ImageViewViewController.swift */,
+				D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */,
+				D8FE7F8420DB2712007B4550 /* MainViewController.swift */,
+				D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */,
 				D848BD392134909E00C31CD0 /* SignInViewController.swift */,
 				D848BD3B213490D100C31CD0 /* SignUpViewController.swift */,
-				D848BD462137838B00C31CD0 /* ImageViewViewController.swift */,
-				D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */,
+				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -236,6 +242,9 @@
 		D8FE7F8120DB2712007B4550 /* FunFactTest */ = {
 			isa = PBXGroup;
 			children = (
+				D8B26C4121568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json */,
+				D87ED7BB2151BF5400B14B5F /* functions */,
+				D87ED7B92151BF3C00B14B5F /* firebase.json */,
 				D8FE7F8220DB2712007B4550 /* AppDelegate.swift */,
 				D8FE7F8620DB2712007B4550 /* Main.storyboard */,
 				D8FE7F8B20DB2716007B4550 /* LaunchScreen.storyboard */,
@@ -321,6 +330,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */,
 				D8E78FF921432BF4006F03B9 /* overlay-blue.json in Resources */,
 				D8E78FFB21432CBF006F03B9 /* overlay-dark.json in Resources */,
 				D8FE7FAE20EAE747007B4550 /* PodFile in Resources */,
@@ -328,12 +338,14 @@
 				D8FE7F8D20DB2716007B4550 /* LaunchScreen.storyboard in Resources */,
 				D8FE7F8A20DB2716007B4550 /* Assets.xcassets in Resources */,
 				D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */,
+				D87ED7BC2151BF5400B14B5F /* functions in Resources */,
 				D8FE7F8820DB2712007B4550 /* Main.storyboard in Resources */,
 				D8E78FF321430F73006F03B9 /* overlay-google.json in Resources */,
 				D8E78FFD2143323C006F03B9 /* overlay-light.json in Resources */,
 				D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */,
 				D8E78FF721432A19006F03B9 /* overlay-brightcolors.json in Resources */,
 				D8E78FFF214349CE006F03B9 /* overlay-sharp.json in Resources */,
+				D8B26C4221568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
