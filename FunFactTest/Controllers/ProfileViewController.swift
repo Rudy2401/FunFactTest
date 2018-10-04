@@ -22,6 +22,7 @@ class ProfileViewController: UIViewController {
     
     var factsSubmitted = 0
     var disputesSubmitted = 0
+    var userProfile: User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,35 +51,20 @@ class ProfileViewController: UIViewController {
             userImageView.layer.borderColor = UIColor.gray.cgColor
             
             let db = Firestore.firestore()
-            db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-                if let err = err {
-                    print("Error getting documents: \(err)")
-                } else {
-                    for document in querySnapshot!.documents {
-                        if Auth.auth().currentUser?.uid == document.data()["submittedBy"] as? String {
-                            self.factsSubmitted += 1
-                        }
-                    }
+            db.collection("users").document(Auth.auth().currentUser?.uid ?? "").getDocument { (snapshot, error) in
+                if let document = snapshot {
+                    self.factsSubmitted = document.data()?["submittedCount"] as! Int
+                    self.disputesSubmitted = document.data()?["disputeCount"] as! Int
                     self.submittedNum.text = String(self.factsSubmitted)
-                }
-            }
-            db.collection("disputes").getDocuments() { (querySnapshot, err) in
-                if let err = err {
-                    print("Error getting documents: \(err)")
-                } else {
-                    for document in querySnapshot!.documents {
-                        if Auth.auth().currentUser?.uid == document.data()["user"] as? String {
-                            self.disputesSubmitted += 1
-                        }
-                    }
                     self.disputesNum.text = String(self.disputesSubmitted)
+                } else {
+                    print("Document does not exist")
                 }
-            }
-            
+            }            
         }
         else {
             signInView.isHidden = false
-            view.bringSubview(toFront: signInView)
+            view.bringSubviewToFront(signInView)
             signInButton.layer.backgroundColor = Constants.redColor.cgColor
         }
     }

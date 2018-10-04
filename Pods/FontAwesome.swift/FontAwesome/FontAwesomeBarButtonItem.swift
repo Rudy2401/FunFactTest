@@ -25,6 +25,7 @@ import UIKit
 @IBDesignable public class FontAwesomeBarButtonItem: UIBarButtonItem {
 
     @IBInspectable public var isFontAwesomeCSSCode: Bool = true
+    @IBInspectable public var styleName: String = "Brands"
     @IBInspectable public var size: CGFloat = 25.0
 
     public override func awakeFromNib() {
@@ -43,13 +44,13 @@ import UIKit
             }
         }
         updateFontAttributes { (state, font) in
-            let currentAttributes = titleTextAttributes(for: state) ?? [:]
-            var attributes = [NSAttributedStringKey: Any]()
+            let currentAttributes = convertFromOptionalNSAttributedStringKeyDictionary(titleTextAttributes(for: state)) ?? [:]
+            var attributes = [NSAttributedString.Key: Any]()
             currentAttributes.enumerated().forEach {
-                let currentAttribute = NSAttributedStringKey(rawValue: $0.element.key)
+                let currentAttribute = NSAttributedString.Key(rawValue: $0.element.key)
                 attributes[currentAttribute] = $0.element.value
             }
-            attributes[NSAttributedStringKey.font] = font
+            attributes[NSAttributedString.Key.font] = font
             setTitleTextAttributes(attributes, for: state)
         }
     }
@@ -57,7 +58,6 @@ import UIKit
 }
 
 extension FontAwesomeBarButtonItem: FontAwesomeTextRepresentable {
-
     var isTextCSSCode: Bool {
         return isFontAwesomeCSSCode
     }
@@ -66,8 +66,18 @@ extension FontAwesomeBarButtonItem: FontAwesomeTextRepresentable {
         return size
     }
 
-    static func supportedStates() -> [UIControlState] {
+    var fontStyle: FontAwesomeStyle {
+        return FontAwesomeStyle(rawValue: styleName) ?? .solid
+    }
+
+    static func supportedStates() -> [UIControl.State] {
         return [.normal, .highlighted, .disabled]
     }
 
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromOptionalNSAttributedStringKeyDictionary(_ input: [NSAttributedString.Key: Any]?) -> [String: Any]? {
+	guard let input = input else { return nil }
+	return Dictionary(uniqueKeysWithValues: input.map {key, value in (key.rawValue, value)})
 }

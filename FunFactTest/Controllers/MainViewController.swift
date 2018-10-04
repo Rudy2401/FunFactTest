@@ -40,6 +40,7 @@ class MainViewController: UIViewController {
     var annotations: [FunFactAnnotation]?
     var notificationCount = 0
     var profileToolButton: UIButton?
+    var userProfile: User?
     
     // 1. create locationManager
     let locationManager = CLLocationManager()
@@ -48,7 +49,8 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         typeColor.layer.cornerRadius = 2.5
-        annotationBottomView.isHidden = true
+
+        annotationBottomView.alpha = 0.0
         self.hideKeyboardWhenTappedAround()
         setupToolbarAndNavigationbar()
         
@@ -57,7 +59,9 @@ class MainViewController: UIViewController {
         locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters;
         locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         self.locationManager.delegate = self
-//        updateTags()
+//        updateLikesDislikes()
+//        updateUsersDisputes()
+//        updateUserCounts()
         
         // 3. setup mapView
         mapView.delegate = self
@@ -65,6 +69,7 @@ class MainViewController: UIViewController {
         mapView.userTrackingMode = .follow
         currentLocationButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         currentLocationButton.setTitle(String.fontAwesomeIcon(name: .locationArrow), for: .normal)
+        mapView.layoutMargins = UIEdgeInsets(top: 200, left: 0, bottom: 20, right: 0)
 //        configureTileOverlay()
         
         // 4. setup Firestore data
@@ -88,8 +93,8 @@ class MainViewController: UIViewController {
         annotationBottomView.layer.borderWidth = CGFloat.init(0.2)
         annotationBottomView.layer.borderColor = UIColor.lightGray.cgColor
         annotationBottomView.layer.cornerRadius = 5
-        let numOffAttr = [ NSAttributedStringKey.foregroundColor: UIColor.darkGray,
-                           NSAttributedStringKey.font: UIFont(name: "Avenir Next", size: 12.0)!]
+        let numOffAttr = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                           NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]
         var landmark = Landmark(id: "", name: "", address: "", city: "", state: "", zipcode: "", country: "", type: "", latitude: "", longitude: "", image: "")
         
         for lm in listOfLandmarks {
@@ -135,6 +140,63 @@ class MainViewController: UIViewController {
         }
     }
     
+    func downloadUserProfile(completionHandler: @escaping (User) -> ())  {
+        let db = Firestore.firestore()
+        var user = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
+        db.collection("users").document(Auth.auth().currentUser?.uid ?? "").getDocument { (snapshot, error) in
+            if let document = snapshot {
+                user.dislikeCount = document.data()?["dislikeCount"] as! Int
+                user.likeCount = document.data()?["likeCount"] as! Int
+                user.disputeCount = document.data()?["disputeCount"] as! Int
+                user.submittedCount = document.data()?["submittedCount"] as! Int
+                user.email = document.data()?["email"] as! String
+                user.name = document.data()?["name"] as! String
+                user.phoneNumber = document.data()?["phoneNumber"] as! String
+                user.photoURL = document.data()?["photoURL"] as! String
+                user.provider = document.data()?["provider"] as! String
+                user.uid = document.data()?["uid"] as! String
+                
+                self.downloadOtherUserData(collection: "funFactsLiked", completionHandler: { (ref) in
+                    self.userProfile?.funFactsLiked = ref
+                })
+                self.downloadOtherUserData(collection: "funFactsDisliked", completionHandler: { (ref) in
+                    self.userProfile?.funFactsDisliked = ref
+                })
+                self.downloadOtherUserData(collection: "funFactsSubmitted", completionHandler: { (ref) in
+                    self.userProfile?.funFactsSubmitted = ref
+                })
+                self.downloadOtherUserData(collection: "funFactsDisputed", completionHandler: { (ref) in
+                    self.userProfile?.funFactsDisputed = ref
+                })
+                
+                completionHandler(user)
+            }
+            else {
+                let err = error
+                print("Error getting documents: \(String(describing: err))")
+            }
+        }
+    }
+    
+    func downloadOtherUserData(collection: String, completionHandler: @escaping ([DocumentReference]) -> ()) {
+        var refs = [DocumentReference]()
+        let db = Firestore.firestore()
+        db.collection("users").document(Auth.auth().currentUser?.uid ?? "").collection(collection).getDocuments() { (snap, error) in
+            if let err = error {
+                print("Error getting documents: \(err)")
+            } else {
+                for doc in snap!.documents {
+                    if collection == "funFactsDisputed" {
+                        refs.append(doc.data()["disputeID"] as! DocumentReference)
+                    } else {
+                        refs.append(doc.data()["funFactID"] as! DocumentReference)
+                    }
+                }
+            }
+            completionHandler(refs)
+        }
+    }
+    
     func updateData() {
         let db = Firestore.firestore()
         db.collection("funFacts").getDocuments() { (querySnapshot, err) in
@@ -164,8 +226,76 @@ class MainViewController: UIViewController {
                     let tags = document.data()["tags"] as! [String]
                     let funFactRef = db.collection("funFacts").document(id)
                     for tag in tags {
-                        db.collection("hashtags").document(tag).setData([id: funFactRef], merge: true)
+                        db.collection("hashtags").document(tag).collection("funFacts").document(id).setData(["funFactID": funFactRef], merge: true)
                     }
+                }
+            }
+        }
+    }
+    
+    func updateUsers() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let id = document.data()["id"] as! String
+                    let user = document.data()["submittedBy"] as! String
+                    let funFactRef = db.collection("funFacts").document(id)
+                    
+                    db.collection("users").document(user).collection("funFactsSubmitted").document(id).setData(["funFactID": funFactRef], merge: true)
+
+                }
+            }
+        }
+    }
+    func updateUsersDisputes() {
+        let db = Firestore.firestore()
+        db.collection("disputes").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let id = document.data()["disputeID"] as! String
+                    let user = document.data()["user"] as! String
+                    let disputeRef = db.collection("disputes").document(id)
+                    
+                    db.collection("users").document(user).collection("funFactsDisputed").document(id).setData(["disputeID": disputeRef], merge: true)
+                    
+                }
+            }
+        }
+    }
+    func updateLikesDislikes() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let funFactId = document.data()["id"] as! String
+                    db.collection("funFacts").document(funFactId).setData(["likes": 0], merge: true)
+                    db.collection("funFacts").document(funFactId).setData(["dislikes": 0], merge: true)
+                }
+            }
+        }
+    }
+    
+    func updateUserCounts() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            var userCount = [String: Int]()
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let user = document.data()["submittedBy"] as! String
+                    userCount[user] = (userCount[user] ?? 0) + 1
+                }
+                print ("userCount = \(userCount)")
+                for user in userCount.keys {
+                    db.collection("users").document(user).setData(["submittedCount": userCount[user]!], merge: true)
                 }
             }
         }
@@ -230,8 +360,8 @@ class MainViewController: UIViewController {
         var count = 0
         for funFact in listOfFunFacts {
             if funFact.landmarkId == annotationClicked.landmarkID {
-                like += Int(funFact.likes)!
-                dislike += Int(funFact.dislikes)!
+                like += funFact.likes
+                dislike += funFact.dislikes
                 count += 1
             }
         }
@@ -263,7 +393,8 @@ class MainViewController: UIViewController {
         mytapGestureRecognizer.numberOfTapsRequired = 1
         annotationBottomView.addGestureRecognizer(mytapGestureRecognizer)
         annotationBottomView.isUserInteractionEnabled = true
-        setView(view: annotationBottomView,  hidden: false)
+        
+        setView(view: annotationBottomView,  alpha: 1.0)
         
         let mapViewGesture = UITapGestureRecognizer(target: self, action: #selector(mapViewTap))
         mapViewGesture.numberOfTapsRequired = 1
@@ -273,14 +404,23 @@ class MainViewController: UIViewController {
     }
     
     @objc func mapViewTap(sender : UIGestureRecognizer) {
-        setView(view: annotationBottomView,  hidden: true)
+        setView(view: annotationBottomView,  alpha: 0.0)
     }
     
-    func setView(view: UIView, hidden: Bool) {
-        UIView.transition(with: view, duration: 0.5, options: .transitionCrossDissolve, animations: {
-            view.isHidden = hidden
+    func setView(view: UIView, alpha: CGFloat) {
+        UIView.transition(with: view, duration: 0.5, options: [.transitionCrossDissolve, .curveEaseInOut], animations: {
+            view.alpha = alpha
+        }, completion: { finished in
+            // Compeleted
         })
     }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        downloadUserProfile() { (user) in
+            self.userProfile = user
+        }
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if Auth.auth().currentUser != nil {
@@ -361,7 +501,7 @@ class MainViewController: UIViewController {
             
             // 5. setup circle
             let circle = MKCircle(center: coordinate, radius: regionRadius)
-            mapView.add(circle)
+            mapView.addOverlay(circle)
         }
         else {
             print("System can't track regions")
@@ -376,7 +516,7 @@ class MainViewController: UIViewController {
         var pageContent = Array<Any>()
         for i in 0..<listOfFunFacts.listOfFunFacts.count {
             if listOfFunFacts.listOfFunFacts[i].landmarkId == landmarkID {
-                pageContent.append(listOfFunFacts.listOfFunFacts[i].description)
+                pageContent.append(listOfFunFacts.listOfFunFacts[i].id)
             }
         }
         var address = ""
@@ -395,10 +535,14 @@ class MainViewController: UIViewController {
         destinationVC?.listOfFunFacts = listOfFunFacts
         destinationVC?.listOfLandmarks = listOfLandmarks
         destinationVC?.address = address
+        destinationVC?.userProfile = userProfile!
         
         let destinationAddFactVC = segue.destination as? AddNewFactViewController
         destinationAddFactVC?.listOfLandmarks.listOfLandmarks = listOfLandmarks.listOfLandmarks
         destinationAddFactVC?.listOfFunFacts.listOfFunFacts = listOfFunFacts.listOfFunFacts
+        
+        let profileViewVC = segue.destination as? ProfileViewController
+        profileViewVC?.userProfile = userProfile
     }
     
     func downloadFunFacts(_ db: Firestore) {
@@ -410,8 +554,8 @@ class MainViewController: UIViewController {
                     let funFact = FunFact(landmarkId: document.data()["landmarkId"] as! String,
                                           id: document.data()["id"] as! String,
                                           description: document.data()["description"] as! String,
-                                          likes: document.data()["likes"] as! String,
-                                          dislikes: document.data()["dislikes"] as! String,
+                                          likes: document.data()["likes"] as! Int,
+                                          dislikes: document.data()["dislikes"] as! Int,
                                           verificationFlag: document.data()["verificationFlag"] as? String ?? "",
                                           image: document.data()["imageName"] as! String,
                                           imageCaption: document.data()["imageCaption"] as? String ?? "",
@@ -539,7 +683,7 @@ class MainViewController: UIViewController {
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedStringKey.foregroundColor: UIColor.black, NSAttributedStringKey.font: customFont ]
+            navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
         }
     }
     func showLoader(view: UIView) -> UIActivityIndicatorView {
@@ -550,7 +694,7 @@ class MainViewController: UIViewController {
         spinner.layer.cornerRadius = 3.0
         spinner.clipsToBounds = true
         spinner.hidesWhenStopped = true
-        spinner.activityIndicatorViewStyle = UIActivityIndicatorViewStyle.gray
+        spinner.style = UIActivityIndicatorView.Style.gray
         spinner.center = view.center
         view.addSubview(spinner)
         spinner.startAnimating()
@@ -648,7 +792,7 @@ extension MainViewController: MKMapViewDelegate {
         }
         
         // And finally add it to your MKMapView
-        mapView.add(tileOverlay)
+        mapView.addOverlay(tileOverlay)
     }
    
 }

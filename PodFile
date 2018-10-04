@@ -1,13 +1,13 @@
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '11.4'
+platform :ios, '12.0'
 use_frameworks!
 target 'FunFactTest' do
-	pod 'FontAwesome.swift'
 	pod 'Firebase/Core'
 	pod 'Firebase/Firestore'
 	pod 'FirebaseUI'
     pod 'FBSDKLoginKit'
-    pod 'Bolts'
+    pod 'Bolts-Swift'
     pod 'FBSDKCoreKit'
     pod 'MapKitGoogleStyler'
+    pod 'FontAwesome.swift', '1.4.4'
 end

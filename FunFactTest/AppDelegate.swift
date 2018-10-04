@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var listOfLandmarks = ListOfLandmarks(listOfLandmarks: [])
     var listOfFunFacts = ListOfFunFacts(listOfFunFacts: [])
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         FirebaseApp.configure()
@@ -76,14 +76,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         var handled = false
         
         if url.absoluteString.contains("fb") {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
             
         } else {
-            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: options[UIApplicationOpenURLOptionsKey.sourceApplication] as? String, annotation: [:])
+            handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: [:])
         }
         
         return handled
@@ -98,8 +98,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                     let funFact = FunFact(landmarkId: document.data()["landmarkId"] as! String,
                                           id: document.data()["id"] as! String,
                                           description: document.data()["description"] as! String,
-                                          likes: document.data()["likes"] as! String,
-                                          dislikes: document.data()["dislikes"] as! String,
+                                          likes: document.data()["likes"] as! Int,
+                                          dislikes: document.data()["dislikes"] as! Int,
                                           verificationFlag: document.data()["verificationFlag"] as? String ?? "",
                                           image: document.data()["imageName"] as! String,
                                           imageCaption: document.data()["imageCaption"] as? String ?? "",
@@ -164,7 +164,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 let imageName = "\(funFact.image).jpeg"
                 let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
                 if imageFromCache != nil {
-                    let imageData = UIImageJPEGRepresentation(imageFromCache!, 1.0)
+                    let imageData = imageFromCache!.jpegData(compressionQuality: 1.0)
                     guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: "\(funFact.image).jpeg", data: imageData! as NSData, options: nil) else { return  }
                     content.attachments = [attachment]
                     break
@@ -187,7 +187,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
         }
-        content.sound = UNNotificationSound.default()
+        content.sound = UNNotificationSound.default
         notificationCount += 1
         
         // when the notification will be triggered

@@ -48,7 +48,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         navigationController?.navigationBar.tintColor = .darkGray
 
         scrollView.scrollIndicatorInsets = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 2)
-        scrollView.autoresizingMask = UIViewAutoresizing(rawValue: UIViewAutoresizing.RawValue(UInt8(UIViewAutoresizing.flexibleWidth.rawValue) | UInt8(UIViewAutoresizing.flexibleHeight.rawValue)))
+        scrollView.autoresizingMask = UIView.AutoresizingMask(rawValue: UIView.AutoresizingMask.RawValue(UInt8(UIView.AutoresizingMask.flexibleWidth.rawValue) | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
         scrollView.isUserInteractionEnabled = true
         
         addressBtn.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
@@ -179,18 +179,21 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         performSegue(withIdentifier: "addressDetail", sender: nil)
     }
     @objc func viewImagePicker(recognizer: UITapGestureRecognizer) {
-        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary){
+        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerController.SourceType.photoLibrary){
             let imag = UIImagePickerController()
             imag.delegate = self
-            imag.sourceType = UIImagePickerControllerSourceType.photoLibrary
+            imag.sourceType = UIImagePickerController.SourceType.photoLibrary
             //imag.mediaTypes = [kUTTypeImage];
             imag.allowsEditing = false
             self.present(imag, animated: true, completion: nil)
         }
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        let selectedImage = info[UIImagePickerControllerOriginalImage] as! UIImage
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+// Local variable inserted by Swift 4.2 migrator.
+let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
+
+        let selectedImage = info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as! UIImage
         //var tempImage:UIImage = editingInfo[UIImagePickerControllerOriginalImage] as UIImage
         landmarkImage.image = selectedImage
         self.dismiss(animated: true, completion: nil)
@@ -215,7 +218,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         }
         
         let data = pickerData[row]
-        let title = NSAttributedString(string: data, attributes: [NSAttributedStringKey.font: UIFont(name: "Avenir Next", size: 14)!])
+        let title = NSAttributedString(string: data, attributes: [NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 14)!])
         label?.attributedText = title
         label?.textAlignment = .center
         return label!
@@ -362,6 +365,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
                 }
                 uploadImage(imageName: fid + ".jpeg")
                 addHashtags(funFactID: fid, hashtags: funFactDescription.text.hashtags())
+                addUserSubmitted(funFactID: fid, userID: Auth.auth().currentUser?.uid ?? "")
                 return
             }
             else {
@@ -415,6 +419,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
             }
             uploadImage(imageName: newid + "-001.jpeg")
             addHashtags(funFactID: newid + "-001", hashtags: funFactDescription.text.hashtags())
+            addUserSubmitted(funFactID: newid + "-001", userID: Auth.auth().currentUser?.uid ?? "")
         }
     }
     
@@ -423,9 +428,8 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         let funFactRef = db.collection("funFacts").document(funFactID)
         
         for hashtag in hashtags {
-            db.collection("hashtags").document(hashtag).setData([
-                funFactID: funFactRef,
-                "count": 1
+            db.collection("hashtags").document(hashtag).collection("funFacts").document(funFactID).setData([
+                "funFactID": funFactRef
             ], merge: true){ err in
                 if let err = err {
                     print("Error writing document: \(err)")
@@ -435,14 +439,28 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
             }
         }
     }
+    func addUserSubmitted(funFactID: String, userID: String) {
+        let db = Firestore.firestore()
+        let funFactRef = db.collection("funFacts").document(funFactID)
+        
+        db.collection("users").document(userID).collection("funFactsSubmitted").document(funFactID).setData([
+            "funFactID": funFactRef
+        ], merge: true){ err in
+            if let err = err {
+                print("Error writing document: \(err)")
+            } else {
+                print("Document successfully written!")
+            }
+        }
+    }
     
     func validatePage() -> Bool {
         var errors = false
         let title = "Error"
         var message = ""
         let image = UIImage.fontAwesomeIcon(name: .camera, style: .solid, textColor: .darkGray, size: CGSize(width: landmarkImage.bounds.width, height: landmarkImage.bounds.height), backgroundColor: .clear)
-        let imageData = UIImageJPEGRepresentation(image, 1.0)
-        let formImageData = UIImageJPEGRepresentation(landmarkImage.image!, 1.0)
+        let imageData = image.jpegData(compressionQuality: 1.0)
+        let formImageData = landmarkImage.image!.jpegData(compressionQuality: 1.0)
         if (addressTextField?.text?.isEmpty)! {
             errors = true
             message += "Please enter a street address"
@@ -477,7 +495,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
     }
     func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: Any, type: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel,handler: {_ in
+        let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel,handler: {_ in
             switch(type) {
             case "textfield":
                 (toFocus as! UITextField).becomeFirstResponder()
@@ -523,7 +541,7 @@ class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPick
         do {
             try landmarkImage.image?.compressImage(300, completion: { (image, compressRatio) in
                 print(image.size)
-                data = UIImageJPEGRepresentation(image, compressRatio)!
+                data = image.jpegData(compressionQuality: compressRatio)!
             })
         } catch {
             print("Error")
@@ -576,7 +594,7 @@ extension UIImage {
         var imgRatio : CGFloat = actualWidth/actualHeight
         let maxRatio : CGFloat = maxWidth/maxHeight
         var compressionQuality : CGFloat = 1
-        var imageData:Data = UIImageJPEGRepresentation(imageToBeHandled, compressionQuality)!
+        var imageData:Data = imageToBeHandled.jpegData(compressionQuality: compressionQuality)!
         while imageData.count > expectedSizeBytes {
             
             if (actualHeight > maxHeight || actualWidth > maxWidth){
@@ -601,7 +619,7 @@ extension UIImage {
             imageToBeHandled.draw(in: rect)
             let img = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
-            if let imgData = UIImageJPEGRepresentation(img!, compressionQuality) {
+            if let imgData = img!.jpegData(compressionQuality: compressionQuality) {
                 if imgData.count > expectedSizeBytes {
                     if compressionQuality > minimalCompressRate {
                         compressionQuality -= 0.1
@@ -631,4 +649,14 @@ extension String
         
         return []
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKeyDictionary(_ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map {key, value in (key.rawValue, value)})
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromUIImagePickerControllerInfoKey(_ input: UIImagePickerController.InfoKey) -> String {
+	return input.rawValue
 }

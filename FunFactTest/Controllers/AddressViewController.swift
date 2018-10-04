@@ -39,7 +39,7 @@ class AddressViewController: UIViewController {
         super.viewDidLoad()
         self.hideKeyboardWhenTappedAround() 
         submitButton.backgroundColor = Constants.redColor
-        mapView.bringSubview(toFront: submitButton)
+        mapView.bringSubviewToFront(submitButton)
         
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
         
@@ -115,7 +115,7 @@ extension AddressViewController : CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
-            let span = MKCoordinateSpanMake(0.05, 0.05)
+            let span = MKCoordinateSpan.init(latitudeDelta: 0.05, longitudeDelta: 0.05)
             let region = MKCoordinateRegion(center: location.coordinate, span: span)
             mapView.setRegion(region, animated: true)
         }
@@ -139,8 +139,8 @@ extension AddressViewController: HandleMapSearch {
             annotation.subtitle = "\(city) \(state)"
         }
         mapView.addAnnotation(annotation)
-        let span = MKCoordinateSpanMake(0.05, 0.05)
-        let region = MKCoordinateRegionMake(placemark.coordinate, span)
+        let span = MKCoordinateSpan.init(latitudeDelta: 0.05, longitudeDelta: 0.05)
+        let region = MKCoordinateRegion.init(center: placemark.coordinate, span: span)
         mapView.setRegion(region, animated: true)
         resultSearchController?.searchBar.text = placemark.name
         

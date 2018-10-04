@@ -10,6 +10,7 @@ import UIKit
 import FontAwesome_swift
 import FirebaseStorage
 import FirebaseFirestore
+import FirebaseAuth
 
 class ContentViewController: UIViewController {
     @IBOutlet var textLabel: UILabel!
@@ -31,6 +32,7 @@ class ContentViewController: UIViewController {
     var headingObject: AnyObject?
     var dateObject: AnyObject?
     var funFactID: String = ""
+    var funFactDesc: String = ""
     var address: String = ""
     var verifiedFlag: String = ""
     var disputeFlag: String = ""
@@ -38,27 +40,167 @@ class ContentViewController: UIViewController {
     var funFactDict = [String: [FunFact]]()
     var listOfLandmarks = ListOfLandmarks.init(listOfLandmarks: [])
     var listOfFunFacts = ListOfFunFacts(listOfFunFacts: [])
+    var userProfile = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
     
     @IBAction func likeIt(_ sender: Any) {
-//        if (likeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsOUp) &&  dislikeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsDown))
-//        || (likeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsOUp) &&  dislikeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsODown)) {
-//            likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-//            dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsODown), for: .normal)
-//        } else if (likeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsUp) &&  dislikeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsODown)) {
-//            likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsOUp), for: .normal)
-//        }
-        
+        if (Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray) &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: Constants.redColor)) {
+            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+            likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+            likeHeart.setTitleColor(Constants.greenColor, for: .normal)
+            
+            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .regular)
+            dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+            dislikeHeart.setTitleColor(.lightGray, for: .normal)
+            addLikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+            deleteDislikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+        }
+        else if (Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray) &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray)) {
+            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+            likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+            likeHeart.setTitleColor(Constants.greenColor, for: .normal)
+            addLikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+            
+        } else if (Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Constants.greenColor) && Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray)) {
+            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .regular)
+            likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+            likeHeart.setTitleColor(.lightGray, for: .normal)
+            deleteLikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+        }
     }
     
     @IBAction func dislikeIt(_ sender: Any) {
-//        if (dislikeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsODown) &&  likeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsUp))
-//        || (likeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsOUp) &&  dislikeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsODown)) {
-//            dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-//            likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsOUp), for: .normal)
-//        } else if (dislikeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsDown) && likeHeart.currentTitle == String.fontAwesomeIcon(name: .thumbsOUp)) {
-//            dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsODown), for: .normal)
-//        }
+        if (Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray) &&  Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Constants.greenColor)) {
+            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .regular)
+            likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+            likeHeart.setTitleColor(.lightGray, for: .normal)
+            
+            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+            dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+            dislikeHeart.setTitleColor(Constants.redColor, for: .normal)
+            addDislikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+            deleteLikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+        }
+        else if (Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray) &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray)) {
+            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+            dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+            dislikeHeart.setTitleColor(Constants.redColor, for: .normal)
+            addDislikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+        } else if (Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: Constants.redColor) && Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray)) {
+            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .regular)
+            dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+            dislikeHeart.setTitleColor(.lightGray, for: .normal)
+            deleteDislikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+        }
     }
+    
+    func addLikes(funFactID: String, userID: String) {
+        let db = Firestore.firestore()
+        let funFactRef = db.collection("funFacts").document(funFactID)
+        funFactRef.getDocument { (snapshot, error) in
+            if let document = snapshot {
+                let likeCount = document.data()?["likes"] as! Int
+                funFactRef.setData([
+                    "likes": likeCount + 1
+                ], merge: true) { err in
+                    if let err = err {
+                        print("Error writing document: \(err)")
+                    } else {
+                        print("Document successfully written!")
+                    }
+                }
+            } else {
+                print ("Error getting document")
+            }
+        }
+        
+        db.collection("users").document(userID).collection("funFactsLiked").document(funFactID).setData([
+            "funFactID": funFactRef
+        ], merge: true){ err in
+            if let err = err {
+                print("Error writing document: \(err)")
+            } else {
+                print("Document successfully written!")
+            }
+        }
+    }
+    func addDislikes(funFactID: String, userID: String) {
+        let db = Firestore.firestore()
+        let funFactRef = db.collection("funFacts").document(funFactID)
+        
+        funFactRef.getDocument { (snapshot, error) in
+            if let document = snapshot {
+                let dislikeCount = document.data()?["dislikes"] as! Int
+                funFactRef.setData([
+                    "dislikes": dislikeCount + 1
+                ], merge: true) { err in
+                    if let err = err {
+                        print("Error writing document: \(err)")
+                    } else {
+                        print("Document successfully written!")
+                    }
+                }
+            } else {
+                print ("Error getting document")
+            }
+        }
+        
+        db.collection("users").document(userID).collection("funFactsDisliked").document(funFactID).setData([
+            "funFactID": funFactRef
+        ], merge: true){ err in
+            if let err = err {
+                print("Error writing document: \(err)")
+            } else {
+                print("Document successfully written!")
+            }
+        }
+    }
+    
+    func deleteLikes(funFactID: String, userID: String) {
+        let db = Firestore.firestore()
+        let funFactRef = db.collection("funFacts").document(funFactID)
+        funFactRef.getDocument { (snapshot, error) in
+            if let document = snapshot {
+                let likeCount = document.data()?["likes"] as! Int
+                funFactRef.setData([
+                    "likes": likeCount - 1
+                ], merge: true) { err in
+                    if let err = err {
+                        print("Error writing document: \(err)")
+                    } else {
+                        print("Document successfully written!")
+                    }
+                }
+            } else {
+                print ("Error getting document")
+            }
+        }
+        
+        db.collection("users").document(userID).collection("funFactsLiked").document(funFactID).delete()
+    }
+    func deleteDislikes(funFactID: String, userID: String) {
+        let db = Firestore.firestore()
+        let funFactRef = db.collection("funFacts").document(funFactID)
+        
+        funFactRef.getDocument { (snapshot, error) in
+            if let document = snapshot {
+                let dislikeCount = document.data()?["dislikes"] as! Int
+                funFactRef.setData([
+                    "dislikes": dislikeCount - 1
+                ], merge: true) { err in
+                    if let err = err {
+                        print("Error writing document: \(err)")
+                    } else {
+                        print("Document successfully written!")
+                    }
+                }
+            } else {
+                print ("Error getting document")
+            }
+        }
+        
+        db.collection("users").document(userID).collection("funFactsDisliked").document(funFactID).delete()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.hideKeyboardWhenTappedAround()
@@ -126,7 +268,7 @@ class ContentViewController: UIViewController {
         attributedString.append(sourceAtt1)
         attributedString.append(sourceAtt2)
         
-        let funFactDescAttr = NSMutableAttributedString(string: (dataObject as! String))
+        let funFactDescAttr = NSMutableAttributedString(string: funFactDesc)
         let unverifiedAttr = NSMutableAttributedString(string: " (This fact needs verification)", attributes: Constants.attribute14ItalicsDG)
         
         let searchPattern = "#\\w+"
@@ -151,9 +293,9 @@ class ContentViewController: UIViewController {
         sourceURL.attributedText = attributedString
         likes.text = likesObject as? String
         
-        likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+        likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .regular)
         likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-        dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+        dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .regular)
         dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
         sourceURL.isEditable = false
         sourceURL.dataDetectorTypes = .link
@@ -161,9 +303,8 @@ class ContentViewController: UIViewController {
         sourceURL.textContainer.lineFragmentPadding = 0
         sourceURL.textAlignment = .center
         
-        let disAttribute = [ NSAttributedStringKey.foregroundColor: Constants.blueColor,
-                             NSAttributedStringKey.font: UIFont(name: "Avenir Next", size: 12.0)!,
-                             NSAttributedStringKey.underlineStyle: NSUnderlineStyle.patternSolid.rawValue] as [NSAttributedStringKey : Any]
+        let disAttribute = [ NSAttributedString.Key.foregroundColor: Constants.blueColor,
+                             NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!] as [NSAttributedString.Key : Any]
         let dispute1 = "See something wrong? Dispute this fact "
         let disAttrString1 = NSAttributedString(string: dispute1, attributes: Constants.attribute12RegDG)
         
@@ -183,6 +324,21 @@ class ContentViewController: UIViewController {
         disputeGesture.numberOfTapsRequired = 1
         dispute.addGestureRecognizer(disputeGesture)
         dispute.isUserInteractionEnabled = true
+        
+        for id in (userProfile.funFactsLiked) {
+            if id.documentID == funFactID {
+                likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+                likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+                likeHeart.setTitleColor(Constants.greenColor, for: .normal)
+            }
+        }
+        for id in (userProfile.funFactsDisliked) {
+            if id.documentID == funFactID {
+                dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+                dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+                dislikeHeart.setTitleColor(Constants.redColor, for: .normal)
+            }
+        }
         
     }
     func setupImage() {
@@ -287,9 +443,9 @@ extension UILabel {
         let range = (strNumber).range(of: changeText)
         
         let attribute = NSMutableAttributedString.init(string: fullText)
-        attribute.addAttribute(NSAttributedStringKey.backgroundColor, value: UIColor.lightGray , range: range)
-        attribute.addAttribute(NSAttributedStringKey.foregroundColor, value: Constants.blueColor , range: range)
-        attribute.addAttribute(NSAttributedStringKey.font, value: UIFont(name: "Avenir Next", size: 12.0)! , range: range)
+        attribute.addAttribute(NSAttributedString.Key.backgroundColor, value: UIColor.lightGray , range: range)
+        attribute.addAttribute(NSAttributedString.Key.foregroundColor, value: Constants.blueColor , range: range)
+        attribute.addAttribute(NSAttributedString.Key.font, value: UIFont(name: "Avenir Next", size: 12.0)! , range: range)
         self.attributedText = attribute
     }
 }

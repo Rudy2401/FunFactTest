@@ -55,7 +55,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         navigationController?.navigationBar.tintColor = .darkGray
         if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
             if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedStringKey.foregroundColor: UIColor.black, NSAttributedStringKey.font: customFont ]
+                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
             } else {
                 // Fallback on earlier versions
             }
@@ -140,8 +140,6 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
             }
         }
         let disputeRef = db.collection("funFacts").document(funFactID)
-        
-        // Set the "capital" field of the city 'DC'
         disputeRef.updateData([
             "disputeFlag": "Y"
         ]) { err in
@@ -149,6 +147,22 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
                 print("Error updating document: \(err)")
             } else {
                 print("Document successfully updated")
+            }
+        }
+        addDisputes(disputeID: did, userID: Auth.auth().currentUser?.uid ?? "")
+    }
+    
+    func addDisputes(disputeID: String, userID: String) {
+        let db = Firestore.firestore()
+        let disputeRef = db.collection("disputes").document(disputeID)
+        
+        db.collection("users").document(userID).collection("funFactsDisputed").document(disputeID).setData([
+            "disputeID": disputeRef
+        ], merge: true){ err in
+            if let err = err {
+                print("Error writing document: \(err)")
+            } else {
+                print("Document successfully written!")
             }
         }
     }
@@ -191,7 +205,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     
     func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: UITextView) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel,handler: {_ in
+        let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel,handler: {_ in
             toFocus.becomeFirstResponder()
         })
         alert.addAction(action)
@@ -199,7 +213,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     }
     func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: UIPickerView) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel,handler: {_ in
+        let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel,handler: {_ in
             toFocus.becomeFirstResponder()
         })
         alert.addAction(action)
@@ -247,7 +261,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         }
         
         let data = pickerData[row]
-        let title = NSAttributedString(string: data, attributes: [NSAttributedStringKey.font: UIFont(name: "Avenir Next", size: 14)!])
+        let title = NSAttributedString(string: data, attributes: [NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 14)!])
         label?.attributedText = title
         label?.textAlignment = .center
         return label!

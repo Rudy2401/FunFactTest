@@ -16,8 +16,8 @@ struct FunFact  {
     let landmarkId: String
     let id: String
     let description: String
-    let likes: String
-    let dislikes: String
+    let likes: Int
+    let dislikes: Int
     let verificationFlag: String
     let image: String
     let imageCaption: String

@@ -115,7 +115,11 @@ class SignUpViewController: UIViewController {
                 "name": name,
                 "provider": Auth.auth().currentUser?.providerData[0].providerID ?? "",
                 "photoURL": Auth.auth().currentUser?.photoURL?.absoluteString ?? "",
-                "phoneNumber": Auth.auth().currentUser?.phoneNumber ?? ""
+                "phoneNumber": Auth.auth().currentUser?.phoneNumber ?? "",
+                "disputeCount": 0,
+                "submittedCount": 0,
+                "likeCount": 0,
+                "dislikeCount": 0
             ]){ err in
                 if let err = err {
                     print("Error writing document: \(err)")

@@ -8,8 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */; };
+		D80F6CA02163140A00AF2E8D /* FontAwesome_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */; };
+		D80F6CA421631ABA00AF2E8D /* BoltsSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */; };
 		D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */ = {isa = PBXBuildFile; fileRef = D834DFF720F677690091CA40 /* ListOfFunFacts.json */; };
 		D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */; };
+		D83F06022161BD0700B37FED /* UserStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83F06012161BD0700B37FED /* UserStruct.swift */; };
 		D848BD3621343FAF00C31CD0 /* ButtonWithShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD3521343FAF00C31CD0 /* ButtonWithShadow.swift */; };
 		D848BD3A2134909E00C31CD0 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD392134909E00C31CD0 /* SignInViewController.swift */; };
 		D848BD3C213490D100C31CD0 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD3B213490D100C31CD0 /* SignUpViewController.swift */; };
@@ -23,7 +26,6 @@
 		D88DBE7F212EFC48009A2CC2 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE7E212EFC48009A2CC2 /* Constants.swift */; };
 		D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE80212F3727009A2CC2 /* CacheManager.swift */; };
 		D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE83212F68F9009A2CC2 /* FancyButton.swift */; };
-		D8B26C4221568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json in Resources */ = {isa = PBXBuildFile; fileRef = D8B26C4121568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json */; };
 		D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */; };
 		D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18572212A1E510093B66C /* LandmarkStruct.swift */; };
 		D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18574212A1F2F0093B66C /* FunFactStruct.swift */; };
@@ -57,15 +59,17 @@
 		D8FE7FAA20E45083007B4550 /* ContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7FA920E45082007B4550 /* ContentViewController.swift */; };
 		D8FE7FAC20E4671C007B4550 /* FunFactPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */; };
 		D8FE7FAE20EAE747007B4550 /* PodFile in Resources */ = {isa = PBXBuildFile; fileRef = D8FE7FAD20EAE746007B4550 /* PodFile */; };
-		D8FE7FB020EAEBAE007B4550 /* FontAwesome_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8FE7FAF20EAEBAE007B4550 /* FontAwesome_swift.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunFactTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A9A8A65C29502B3DDAE2E25 /* Pods-FunFactTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunFactTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.debug.xcconfig"; sourceTree = "<group>"; };
 		8583EE7FC03419D00EFF4C12 /* Pods-FunFactTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunFactTest.release.xcconfig"; path = "Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.release.xcconfig"; sourceTree = "<group>"; };
+		D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FontAwesome_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = BoltsSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D834DFF720F677690091CA40 /* ListOfFunFacts.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ListOfFunFacts.json; sourceTree = "<group>"; };
 		D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactJSONParser.swift; sourceTree = "<group>"; };
+		D83F06012161BD0700B37FED /* UserStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStruct.swift; sourceTree = "<group>"; };
 		D848BD3521343FAF00C31CD0 /* ButtonWithShadow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonWithShadow.swift; sourceTree = "<group>"; };
 		D848BD392134909E00C31CD0 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
 		D848BD3B213490D100C31CD0 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
@@ -80,7 +84,6 @@
 		D88DBE80212F3727009A2CC2 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FunFactTest.entitlements; sourceTree = "<group>"; };
 		D88DBE83212F68F9009A2CC2 /* FancyButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FancyButton.swift; sourceTree = "<group>"; };
-		D8B26C4121568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json"; sourceTree = "<group>"; };
 		D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConnection.swift; sourceTree = "<group>"; };
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
 		D8D18574212A1F2F0093B66C /* FunFactStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactStruct.swift; sourceTree = "<group>"; };
@@ -116,7 +119,6 @@
 		D8FE7FA920E45082007B4550 /* ContentViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewController.swift; sourceTree = "<group>"; };
 		D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactPageViewController.swift; sourceTree = "<group>"; };
 		D8FE7FAD20EAE746007B4550 /* PodFile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = PodFile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		D8FE7FAF20EAEBAE007B4550 /* FontAwesome_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FontAwesome_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,10 +126,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D80F6CA421631ABA00AF2E8D /* BoltsSwift.framework in Frameworks */,
+				D80F6CA02163140A00AF2E8D /* FontAwesome_swift.framework in Frameworks */,
 				D8E78FF5214310E5006F03B9 /* MapKitGoogleStyler.framework in Frameworks */,
 				D8F76AF72112812400A039D2 /* FirebaseCore.framework in Frameworks */,
 				D8F76AF92112812400A039D2 /* FirebaseFirestore.framework in Frameworks */,
-				D8FE7FB020EAEBAE007B4550 /* FontAwesome_swift.framework in Frameworks */,
 				8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -147,10 +150,11 @@
 		D569FB58055CD1C61272A23D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */,
+				D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */,
 				D8E78FF4214310E5006F03B9 /* MapKitGoogleStyler.framework */,
 				D8F76AF62112812400A039D2 /* FirebaseCore.framework */,
 				D8F76AF82112812400A039D2 /* FirebaseFirestore.framework */,
-				D8FE7FAF20EAEBAE007B4550 /* FontAwesome_swift.framework */,
 				1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */,
 			);
 			name = Frameworks;
@@ -198,6 +202,7 @@
 				D8D18574212A1F2F0093B66C /* FunFactStruct.swift */,
 				D8D18572212A1E510093B66C /* LandmarkStruct.swift */,
 				D8FE7FA120DC4237007B4550 /* Utils.swift */,
+				D83F06012161BD0700B37FED /* UserStruct.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -242,7 +247,6 @@
 		D8FE7F8120DB2712007B4550 /* FunFactTest */ = {
 			isa = PBXGroup;
 			children = (
-				D8B26C4121568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json */,
 				D87ED7BB2151BF5400B14B5F /* functions */,
 				D87ED7B92151BF3C00B14B5F /* firebase.json */,
 				D8FE7F8220DB2712007B4550 /* AppDelegate.swift */,
@@ -299,6 +303,7 @@
 				TargetAttributes = {
 					D8FE7F7E20DB2712007B4550 = {
 						CreatedOnToolsVersion = 9.4.1;
+						LastSwiftMigration = 1000;
 						SystemCapabilities = {
 							com.apple.Keychain = {
 								enabled = 1;
@@ -345,7 +350,6 @@
 				D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */,
 				D8E78FF721432A19006F03B9 /* overlay-brightcolors.json in Resources */,
 				D8E78FFF214349CE006F03B9 /* overlay-sharp.json in Resources */,
-				D8B26C4221568CF900508B1B /* funfacts-5b1a9-firebase-adminsdk-fdu6c-7774875946.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -378,6 +382,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
+				"${BUILT_PRODUCTS_DIR}/Bolts-Swift/BoltsSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
@@ -400,6 +405,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BoltsSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
@@ -489,6 +495,7 @@
 				D848BD3E2134F05800C31CD0 /* CustomTextField.swift in Sources */,
 				D8FE7F8320DB2712007B4550 /* AppDelegate.swift in Sources */,
 				D8FE7FAA20E45083007B4550 /* ContentViewController.swift in Sources */,
+				D83F06022161BD0700B37FED /* UserStruct.swift in Sources */,
 				D848BD452136F50C00C31CD0 /* DisputeStruct.swift in Sources */,
 				D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */,
 			);
@@ -636,17 +643,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FunFactTest/FunFactTest.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XQECAX5M82;
 				INFOPLIST_FILE = FunFactTest/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.rushi.FunFacts;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -657,17 +666,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = FunFactTest/FunFactTest.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = XQECAX5M82;
 				INFOPLIST_FILE = FunFactTest/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.rushi.FunFacts;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

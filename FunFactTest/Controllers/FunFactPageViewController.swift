@@ -26,31 +26,23 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     var totalPages = 0
     var funFactDict = [String: [FunFact]]()
     var listOfLandmarks = ListOfLandmarks.init(listOfLandmarks: [])
+    var userProfile = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
-        var index = indexOfViewController(viewController: viewController
-            as! ContentViewController)
-        
-        if (index == 0) || (index == NSNotFound) {
+        if (currentIndex == 0) || (currentIndex == NSNotFound) {
             return nil
         }
-        
-        index -= 1
-        return viewControllerAtIndex(index)
+        return viewControllerAtIndex(currentIndex-1)
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        var index = indexOfViewController(viewController: viewController as! ContentViewController)
-        if index == NSNotFound {
+        if currentIndex == NSNotFound {
             return nil
         }
-        index += 1
-        
-        if index == pageContent.count {
+        if currentIndex+1 == totalPages {
             return nil
         }
-        
-        return viewControllerAtIndex(index)
+        return viewControllerAtIndex(currentIndex+1)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -75,19 +67,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         } else {
             // Fallback on earlier versions
         }
-//        configurePageControl()
         self.setViewControllers([viewControllerAtIndex(0)] as? [UIViewController], direction: .forward, animated: true, completion: nil)
-    }
-    
-    func configurePageControl() {
-        
-        self.pageControl.numberOfPages = self.pageContent.count
-        
-        self.pageControl.alpha = 0.5
-        self.pageControl.tintColor = UIColor.black
-        self.pageControl.pageIndicatorTintColor = UIColor.gray
-        self.pageControl.currentPageIndicatorTintColor = UIColor.black
-        self.view.addSubview(pageControl)
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
@@ -103,8 +83,8 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
                 let pageNum = UILabel()
                 pageNum.font = UIFont(name: "Avenir Next", size: 15.0)
                 pageNum.text = "Fact (\(currentIndex+1)/\(totalPages))"
-                let searchBarBtn = UIBarButtonItem(customView: pageNum)
-                navigationItem.setRightBarButtonItems([searchBarBtn], animated: false)
+                let pageNumBarBtn = UIBarButtonItem(customView: pageNum)
+                navigationItem.setRightBarButtonItems([pageNumBarBtn], animated: false)
             }
         }
     }
@@ -128,7 +108,8 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         
         let dataViewController = self.storyboard?.instantiateViewController(withIdentifier: "contentView") as! ContentViewController
         navigationItem.title = headingContent
-        dataViewController.dataObject = funFactDict[landmarkID]![index].description as AnyObject
+        dataViewController.dataObject = funFactDict[landmarkID]![index].id as AnyObject
+        dataViewController.funFactDesc = funFactDict[landmarkID]![index].description as String
         dataViewController.imageObject = funFactDict[landmarkID]![index].image as AnyObject
         dataViewController.submittedByObject = funFactDict[landmarkID]![index].submittedBy as AnyObject
         dataViewController.dateObject = funFactDict[landmarkID]![index].dateSubmitted as AnyObject
@@ -137,17 +118,18 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         dataViewController.disputeFlag = funFactDict[landmarkID]![index].disputeFlag
         dataViewController.imageCaption = funFactDict[landmarkID]![index].imageCaption
         dataViewController.tags = funFactDict[landmarkID]![index].tags
-        if (Int(funFactDict[landmarkID]![index].likes)! + Int(funFactDict[landmarkID]![index].dislikes)!) == 0 {
+        if (funFactDict[landmarkID]![index].likes + funFactDict[landmarkID]![index].dislikes) == 0 {
             dataViewController.likesObject = " 0%" as AnyObject
         }
         else {
-            dataViewController.likesObject = (String(Int(funFactDict[landmarkID]![index].likes)! * 100 / (Int(funFactDict[landmarkID]![index].likes)! + Int(funFactDict[landmarkID]![index].dislikes)!)) + "% found this interesting") as AnyObject
+            dataViewController.likesObject = (String(funFactDict[landmarkID]![index].likes * 100 / (funFactDict[landmarkID]![index].likes + funFactDict[landmarkID]![index].dislikes)) + "% found this interesting") as AnyObject
         }
         dataViewController.funFactID = funFactDict[landmarkID]![index].id
         dataViewController.address = address
         dataViewController.headingObject = headingContent as AnyObject
         dataViewController.listOfFunFacts = listOfFunFacts
         dataViewController.listOfLandmarks = listOfLandmarks
+        dataViewController.userProfile = userProfile
         return dataViewController
     }
     
@@ -160,16 +142,16 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     func setupToolbarAndNavigationbar () {
-        let toolBarAttrImage = [ NSAttributedStringKey.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
-                                 NSAttributedStringKey.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
-        let toolBarAttrLabel = [ NSAttributedStringKey.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
-                                 NSAttributedStringKey.font: UIFont(name: "Avenir Next", size: 10.0)!]
+        let toolBarAttrImage = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+                                 NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
+        let toolBarAttrLabel = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+                                 NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
         
-        let toolBarAttrImageClicked = [ NSAttributedStringKey.foregroundColor: Constants.redColor,
-                                 NSAttributedStringKey.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
-        let toolBarAttrLabelClicked = [ NSAttributedStringKey.foregroundColor: Constants.redColor,
-                                 NSAttributedStringKey.font: UIFont(name: "Avenir Next", size: 10.0)!]
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.flexibleSpace, target: nil, action: nil)
+        let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: Constants.redColor,
+                                 NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
+        let toolBarAttrLabelClicked = [ NSAttributedString.Key.foregroundColor: Constants.redColor,
+                                 NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         
         let addFactLabel1 = String.fontAwesomeIcon(name: .plus)
         let addFactLabelAttr1 = NSAttributedString(string: addFactLabel1, attributes: toolBarAttrImage)

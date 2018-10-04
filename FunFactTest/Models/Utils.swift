@@ -56,7 +56,7 @@ class Utils {
     
     static func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: Any, type: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel,handler: {_ in
+        let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel,handler: {_ in
             switch(type) {
             case "textfield":
                 (toFocus as! UITextField).becomeFirstResponder()
@@ -73,5 +73,23 @@ class Utils {
         })
         alert.addAction(action)
         viewController.present(alert, animated: true, completion:nil)
+    }
+    static func compareColors (c1:UIColor, c2:UIColor) -> Bool{
+        // some kind of weird rounding made the colors unequal so had to compare like this
+        
+        var red:CGFloat = 0
+        var green:CGFloat  = 0
+        var blue:CGFloat = 0
+        var alpha:CGFloat  = 0
+        c1.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        var red2:CGFloat = 0
+        var green2:CGFloat  = 0
+        var blue2:CGFloat = 0
+        var alpha2:CGFloat  = 0
+        c2.getRed(&red2, green: &green2, blue: &blue2, alpha: &alpha2)
+        
+        return (Int(green*255) == Int(green2*255))
+        
     }
 }

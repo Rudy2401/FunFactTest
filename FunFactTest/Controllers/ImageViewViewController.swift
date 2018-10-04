@@ -26,9 +26,9 @@ class ImageViewViewController: UIViewController, UIScrollViewDelegate{
         scrollView.delegate = self
         imageView.image = image
         imageCaption?.text = imageCaptionText
-        scrollView.autoresizingMask = UIViewAutoresizing(rawValue: UIViewAutoresizing.RawValue(UInt8(UIViewAutoresizing.flexibleWidth.rawValue) | UInt8(UIViewAutoresizing.flexibleHeight.rawValue)))
+        scrollView.autoresizingMask = UIView.AutoresizingMask(rawValue: UIView.AutoresizingMask.RawValue(UInt8(UIView.AutoresizingMask.flexibleWidth.rawValue) | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
         navigationController?.navigationBar.backItem?.title = ""
-        view.bringSubview(toFront: imageCaption!)
+        view.bringSubviewToFront(imageCaption!)
         setupGestureRecognizer()
     }
 
