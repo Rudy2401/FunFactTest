@@ -16,19 +16,24 @@ class ContentViewController: UIViewController {
     @IBOutlet var textLabel: UILabel!
     @IBOutlet var landmarkImage: UIImageView!
     @IBOutlet var submittedBy: UILabel!
-    @IBOutlet var likes: UILabel!
     @IBOutlet var likeHeart: UIButton!
     @IBOutlet var dislikeHeart: UIButton!
     @IBOutlet var sourceURL: UITextView!
     @IBOutlet weak var dispute: UILabel!
+    @IBOutlet weak var likeCount: UILabel!
+    @IBOutlet weak var dislikeCount: UILabel!
+    @IBOutlet weak var pageNumber: UILabel!
     
     let util = Utils()
     var dataObject: AnyObject?
     var imageObject: AnyObject?
     var imageCaption = ""
+    var landmarkType = ""
+    var landmarkID = ""
     var submittedByObject: AnyObject?
     var sourceObject: AnyObject?
     var likesObject: AnyObject?
+    var dislikesObject: AnyObject?
     var headingObject: AnyObject?
     var dateObject: AnyObject?
     var funFactID: String = ""
@@ -37,9 +42,8 @@ class ContentViewController: UIViewController {
     var verifiedFlag: String = ""
     var disputeFlag: String = ""
     var tags: [String] = [""]
-    var funFactDict = [String: [FunFact]]()
-    var listOfLandmarks = ListOfLandmarks.init(listOfLandmarks: [])
-    var listOfFunFacts = ListOfFunFacts(listOfFunFacts: [])
+    var currPageNumberText = ""
+    var totalPageNumberText = ""
     var userProfile = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
     
     @IBAction func likeIt(_ sender: Any) {
@@ -203,16 +207,16 @@ class ContentViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.hideKeyboardWhenTappedAround()
-        let addFactGesture = UITapGestureRecognizer(target: self, action: #selector(viewAddFactForLandmark))
-        addFactGesture.numberOfTapsRequired = 1
-        let button = navigationController?.toolbar.items?[2].customView as! UIButton
-        button.addGestureRecognizer(addFactGesture)
         
-        let imageGesture = UITapGestureRecognizer(target: self, action: #selector(viewImageViewer))
-        imageGesture.numberOfTapsRequired = 1
-        landmarkImage.isUserInteractionEnabled = true
-        landmarkImage.addGestureRecognizer(imageGesture)
+        if ((self.navigationController?.presentingViewController as? FunFactPageViewController) != nil) {
+            let addFactGesture = UITapGestureRecognizer(target: self, action: #selector(viewAddFactForLandmark))
+            addFactGesture.numberOfTapsRequired = 1
+            let button = navigationController?.toolbar.items?[2].customView as! UIButton
+            button.addGestureRecognizer(addFactGesture)
+        }
+        else {
+            navigationItem.title = headingObject as? String
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -221,6 +225,21 @@ class ContentViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if Auth.auth().currentUser == nil {
+            likeHeart.isEnabled = false
+            dislikeHeart.isEnabled = false
+        }
+        else {
+            likeHeart.isEnabled = true
+            dislikeHeart.isEnabled = true
+        }
+        pageNumber.text = "Fact (\(currPageNumberText)/\(totalPageNumberText))"
+        
+        let imageGesture = UITapGestureRecognizer(target: self, action: #selector(viewImageViewer))
+        imageGesture.numberOfTapsRequired = 1
+        landmarkImage.isUserInteractionEnabled = true
+        landmarkImage.addGestureRecognizer(imageGesture)
         
         let submittedBy1 = "Submitted By: "
         let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Constants.attribute12BoldDG)
@@ -291,12 +310,15 @@ class ContentViewController: UIViewController {
         setupImage()
 
         sourceURL.attributedText = attributedString
-        likes.text = likesObject as? String
         
         likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .regular)
         likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+        likeCount.text = "\(likesObject as! Int)" + " likes"
+        
         dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .regular)
         dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+        dislikeCount.text = "\(dislikesObject as! Int)" + " dislikes"
+        
         sourceURL.isEditable = false
         sourceURL.dataDetectorTypes = .link
         sourceURL.textContainerInset = UIEdgeInsets.zero
@@ -350,8 +372,7 @@ class ContentViewController: UIViewController {
             self.landmarkImage.image = imageFromCache
             self.landmarkImage.layer.cornerRadius = 5
         } else {
-            let s = funFactID
-            let imageName = "\(s).jpeg"
+            let imageName = "\(funFactID).jpeg"
             
             let storage = Storage.storage()
             let storageRef = storage.reference()
@@ -397,12 +418,32 @@ class ContentViewController: UIViewController {
         let addFactVC = segue.destination as? AddNewFactViewController
         addFactVC?.address = address
         addFactVC?.landmarkName = headingObject as? String
-        addFactVC?.listOfLandmarks = listOfLandmarks
-        addFactVC?.listOfFunFacts = listOfFunFacts
+        
+        if sender as? String == "edit" {
+            addFactVC?.mode = "edit"
+            addFactVC?.funFactID = funFactID
+            addFactVC?.landmarkTypeText = landmarkType
+            addFactVC?.imageCaptionText = imageCaption
+            addFactVC?.funFactDesc = textLabel.text!
+            addFactVC?.landmarkID = landmarkID
+            addFactVC?.verificationFlag = verifiedFlag
+            addFactVC?.disputeFlag = disputeFlag
+            addFactVC?.likes = likesObject as! Int
+            addFactVC?.dislikes = dislikesObject as! Int
+            addFactVC?.source = sourceObject as! String
+        }
         
         let imageViewVC = segue.destination as? ImageViewViewController
         imageViewVC?.image = landmarkImage.image
         imageViewVC?.imageCaptionText = imageCaption 
+    }
+    
+    @IBAction func editFunFact(_ sender: Any) {
+        performSegue(withIdentifier: "addFactDetailForLandmark", sender: "edit")
+    }
+    
+    @IBAction func deleteFunFact(_ sender: Any) {
+        
     }
 }
 extension UITapGestureRecognizer {

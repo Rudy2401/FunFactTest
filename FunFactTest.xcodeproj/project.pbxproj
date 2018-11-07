@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */; };
 		D80F6CA02163140A00AF2E8D /* FontAwesome_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */; };
-		D80F6CA421631ABA00AF2E8D /* BoltsSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */; };
 		D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */ = {isa = PBXBuildFile; fileRef = D834DFF720F677690091CA40 /* ListOfFunFacts.json */; };
 		D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */; };
 		D83F06022161BD0700B37FED /* UserStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83F06012161BD0700B37FED /* UserStruct.swift */; };
@@ -21,11 +20,16 @@
 		D848BD4321358BF200C31CD0 /* CustomViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */; };
 		D848BD452136F50C00C31CD0 /* DisputeStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD442136F50C00C31CD0 /* DisputeStruct.swift */; };
 		D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD462137838B00C31CD0 /* ImageViewViewController.swift */; };
+		D865045F216AC58600B65AAB /* HashtagCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D865045E216AC58600B65AAB /* HashtagCell.swift */; };
+		D8650461216BED5F00B65AAB /* IQKeyboardManagerSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */; };
+		D86DA75D21741BA6001F7B5C /* UserSubsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */; };
+		D86DA75F217424A8001F7B5C /* UserSubsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75E217424A8001F7B5C /* UserSubsCell.swift */; };
 		D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7B92151BF3C00B14B5F /* firebase.json */; };
 		D87ED7BC2151BF5400B14B5F /* functions in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7BB2151BF5400B14B5F /* functions */; };
 		D88DBE7F212EFC48009A2CC2 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE7E212EFC48009A2CC2 /* Constants.swift */; };
 		D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE80212F3727009A2CC2 /* CacheManager.swift */; };
 		D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE83212F68F9009A2CC2 /* FancyButton.swift */; };
+		D8A2ADE521938268003C4EB1 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2ADE421938268003C4EB1 /* TabBarController.swift */; };
 		D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */; };
 		D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18572212A1E510093B66C /* LandmarkStruct.swift */; };
 		D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18574212A1F2F0093B66C /* FunFactStruct.swift */; };
@@ -78,12 +82,17 @@
 		D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewBackground.swift; sourceTree = "<group>"; };
 		D848BD442136F50C00C31CD0 /* DisputeStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisputeStruct.swift; sourceTree = "<group>"; };
 		D848BD462137838B00C31CD0 /* ImageViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewViewController.swift; sourceTree = "<group>"; };
+		D865045E216AC58600B65AAB /* HashtagCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashtagCell.swift; sourceTree = "<group>"; };
+		D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = IQKeyboardManagerSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSubsTableViewController.swift; sourceTree = "<group>"; };
+		D86DA75E217424A8001F7B5C /* UserSubsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSubsCell.swift; sourceTree = "<group>"; };
 		D87ED7B92151BF3C00B14B5F /* firebase.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = firebase.json; sourceTree = "<group>"; };
 		D87ED7BB2151BF5400B14B5F /* functions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = functions; sourceTree = "<group>"; };
 		D88DBE7E212EFC48009A2CC2 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D88DBE80212F3727009A2CC2 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FunFactTest.entitlements; sourceTree = "<group>"; };
 		D88DBE83212F68F9009A2CC2 /* FancyButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FancyButton.swift; sourceTree = "<group>"; };
+		D8A2ADE421938268003C4EB1 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConnection.swift; sourceTree = "<group>"; };
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
 		D8D18574212A1F2F0093B66C /* FunFactStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactStruct.swift; sourceTree = "<group>"; };
@@ -126,7 +135,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D80F6CA421631ABA00AF2E8D /* BoltsSwift.framework in Frameworks */,
+				D8650461216BED5F00B65AAB /* IQKeyboardManagerSwift.framework in Frameworks */,
 				D80F6CA02163140A00AF2E8D /* FontAwesome_swift.framework in Frameworks */,
 				D8E78FF5214310E5006F03B9 /* MapKitGoogleStyler.framework in Frameworks */,
 				D8F76AF72112812400A039D2 /* FirebaseCore.framework in Frameworks */,
@@ -150,6 +159,7 @@
 		D569FB58055CD1C61272A23D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */,
 				D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */,
 				D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */,
 				D8E78FF4214310E5006F03B9 /* MapKitGoogleStyler.framework */,
@@ -188,6 +198,8 @@
 				D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */,
 				D88DBE83212F68F9009A2CC2 /* FancyButton.swift */,
 				D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */,
+				D865045E216AC58600B65AAB /* HashtagCell.swift */,
+				D86DA75E217424A8001F7B5C /* UserSubsCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -222,6 +234,8 @@
 				D848BD392134909E00C31CD0 /* SignInViewController.swift */,
 				D848BD3B213490D100C31CD0 /* SignUpViewController.swift */,
 				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
+				D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */,
+				D8A2ADE421938268003C4EB1 /* TabBarController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -277,7 +291,7 @@
 				D8FE7F7C20DB2712007B4550 /* Frameworks */,
 				D8FE7F7D20DB2712007B4550 /* Resources */,
 				7A2B440DD41034D44BFFEF02 /* [CP] Embed Pods Frameworks */,
-				C94BB9B8944481857F037B07 /* [CP] Copy Pods Resources */,
+				255FA292C28F7F34B0989643 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -356,6 +370,38 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		255FA292C28F7F34B0989643 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseAnonymousAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseFacebookAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseGoogleAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebasePhoneAuthUI.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseTwitterAuthUI.bundle",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+				"${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseAnonymousAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseFacebookAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseGoogleAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebasePhoneAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseTwitterAuthUI.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TwitterKitResources.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		49249414AD3E55BE8BFD2B91 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -390,12 +436,15 @@
 				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/IQKeyboardManagerSwift/IQKeyboardManagerSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/MapKitGoogleStyler/MapKitGoogleStyler.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 				"${PODS_ROOT}/TwitterCore/iOS/TwitterCore.framework",
 				"${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC/GRPCClient.framework",
+				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-ProtoRPC/ProtoRPC.framework",
 				"${BUILT_PRODUCTS_DIR}/gRPC-RxLibrary/RxLibrary.framework",
@@ -413,12 +462,15 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IQKeyboardManagerSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapKitGoogleStyler.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TwitterCore.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TwitterKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRPCClient.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProtoRPC.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxLibrary.framework",
@@ -428,36 +480,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C94BB9B8944481857F037B07 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseFacebookAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseGoogleAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebasePhoneAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseTwitterAuthUI.bundle",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-				"${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseFacebookAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseGoogleAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebasePhoneAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseTwitterAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TwitterKitResources.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -470,6 +492,7 @@
 				D848BD3A2134909E00C31CD0 /* SignInViewController.swift in Sources */,
 				D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */,
 				D88DBE7F212EFC48009A2CC2 /* Constants.swift in Sources */,
+				D86DA75F217424A8001F7B5C /* UserSubsCell.swift in Sources */,
 				D848BD4121357F3F00C31CD0 /* CustomUINavigation.swift in Sources */,
 				D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */,
 				D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */,
@@ -479,10 +502,12 @@
 				D848BD3C213490D100C31CD0 /* SignUpViewController.swift in Sources */,
 				D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */,
 				D8DF6A5E210634800031A153 /* DisputeViewController.swift in Sources */,
+				D865045F216AC58600B65AAB /* HashtagCell.swift in Sources */,
 				D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */,
 				D8E78FED21409D26006F03B9 /* ProfileViewController.swift in Sources */,
 				D8FE7FA220DC4237007B4550 /* Utils.swift in Sources */,
 				D8F9012121304B9500D83F8E /* WelcomeViewController.swift in Sources */,
+				D8A2ADE521938268003C4EB1 /* TabBarController.swift in Sources */,
 				D8E78FF12141FC9B006F03B9 /* CustomButton.swift in Sources */,
 				D8FE7F8520DB2712007B4550 /* MainViewController.swift in Sources */,
 				D8FE7FA420DC491F007B4550 /* FunFactAnnotation.swift in Sources */,
@@ -495,6 +520,7 @@
 				D848BD3E2134F05800C31CD0 /* CustomTextField.swift in Sources */,
 				D8FE7F8320DB2712007B4550 /* AppDelegate.swift in Sources */,
 				D8FE7FAA20E45083007B4550 /* ContentViewController.swift in Sources */,
+				D86DA75D21741BA6001F7B5C /* UserSubsTableViewController.swift in Sources */,
 				D83F06022161BD0700B37FED /* UserStruct.swift in Sources */,
 				D848BD452136F50C00C31CD0 /* DisputeStruct.swift in Sources */,
 				D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */,

@@ -29,7 +29,22 @@ class WelcomeViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = true
-        if Auth.auth().currentUser != nil {
+        if let currentUser = Auth.auth().currentUser {
+            currentUser.getIDTokenForcingRefresh(true) { (con, error) in
+                if let error = error {
+                    do {
+                        try Auth.auth().signOut()
+                        print ("token error = \(error)")
+                    }
+                    catch let error as NSError {
+                        print (error.localizedDescription)
+                    }
+                    return
+                }
+            }
+        }
+        
+        if Auth.auth().currentUser != nil && (Auth.auth().currentUser?.isEmailVerified)! {
             // User is signed in.
             insideView.isHidden = true
             signedInView = UIView(frame: self.view.frame)
@@ -44,6 +59,12 @@ class WelcomeViewController: UIViewController {
             self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
         } else {
             // No user is signed in.
+            do {
+                try Auth.auth().signOut()
+            }
+            catch let error as NSError {
+                print (error.localizedDescription)
+            }
             insideView.isHidden = false
             signedInView?.isHidden = true
             GIDSignIn.sharedInstance().delegate = self
@@ -195,12 +216,10 @@ class WelcomeViewController: UIViewController {
                 print("Failed to login: \(error.localizedDescription)")
                 return
             }
-            
             guard let accessToken = FBSDKAccessToken.current() else {
                 print("Failed to get access token")
                 return
             }
-            
             let credential = FacebookAuthProvider.credential(withAccessToken: accessToken.tokenString)
             
             // Perform login by calling Firebase APIs
@@ -213,21 +232,6 @@ class WelcomeViewController: UIViewController {
                     self.present(alertController, animated: true, completion: nil)
                     
                     return
-                }
-                let db = Firestore.firestore()
-                db.collection("users").document((Auth.auth().currentUser?.uid)!).setData([
-                    "uid": Auth.auth().currentUser?.uid ?? "",
-                    "email": Auth.auth().currentUser?.email ?? "",
-                    "name": Auth.auth().currentUser?.displayName ?? "",
-                    "provider": Auth.auth().currentUser?.providerData[0].providerID ?? "",
-                    "photoURL": Auth.auth().currentUser?.photoURL?.absoluteString ?? "",
-                    "phoneNumber": Auth.auth().currentUser?.phoneNumber ?? ""
-                ]){ err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
                 }
                 print ("######## Auth successful")
                 // Present the main view
@@ -272,21 +276,7 @@ extension WelcomeViewController: GIDSignInDelegate, GIDSignInUIDelegate {
                 
                 return
             }
-            let db = Firestore.firestore()
-            db.collection("users").document((Auth.auth().currentUser?.uid)!).setData([
-                "uid": Auth.auth().currentUser?.uid ?? "",
-                "email": Auth.auth().currentUser?.email ?? "",
-                "name": Auth.auth().currentUser?.displayName ?? "",
-                "provider": Auth.auth().currentUser?.providerData[0].providerID ?? "",
-                "photoURL": Auth.auth().currentUser?.photoURL?.absoluteString ?? "",
-                "phoneNumber": Auth.auth().currentUser?.phoneNumber ?? ""
-            ]){ err in
-                if let err = err {
-                    print("Error writing document: \(err)")
-                } else {
-                    print("Document successfully written!")
-                }
-            }
+
             print ("######## Auth successful")
             // Present the main view
             self.performSegue(withIdentifier: "mainViewSegue", sender: nil)

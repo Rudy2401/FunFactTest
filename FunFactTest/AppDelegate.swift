@@ -13,6 +13,7 @@ import GoogleSignIn
 import CoreLocation
 import UserNotifications
 import FirebaseFirestore
+import IQKeyboardManagerSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -48,6 +49,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 print("Permission not granted")
             }
         }
+        //Enabling IQKeyboard manager
+        IQKeyboardManager.shared.enable = true
         
         let db = Firestore.firestore()
         downloadLandmarks(db)
@@ -129,8 +132,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                                             zipcode: document.data()["zipcode"] as! String ,
                                             country: document.data()["country"] as! String,
                                             type: document.data()["type"] as! String,
-                                            latitude: document.data()["latitude"] as! String,
-                                            longitude: document.data()["longitude"] as! String,
+                                            coordinates: document.data()["coordinates"] as! GeoPoint,
                                             image: document.data()["image"] as! String)
                     self.listOfLandmarks.listOfLandmarks.append(landmark)
 //                    self.setupGeoFences(lat: Double(document.data()["latitude"] as! String)!,

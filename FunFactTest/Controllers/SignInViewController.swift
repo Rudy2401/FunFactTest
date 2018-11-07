@@ -104,6 +104,8 @@ class SignInViewController: UIViewController {
                     
                     return
             }
+            let db = Firestore.firestore()
+            db.collection("users").document(Auth.auth().currentUser?.uid ?? "").setData(["name": Auth.auth().currentUser?.displayName], merge: true)
             
             // Dismiss keyboard
             self.view.endEditing(true)

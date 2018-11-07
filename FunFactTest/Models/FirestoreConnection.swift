@@ -50,34 +50,7 @@ class FirestoreConnection {
             }
         }
     }
-    
-    func downloadLandmarks(completion: @escaping ([Landmark]?, Error?) -> Void) {
-        db.collection("landmarks").getDocuments() { (querySnapshot, err) in
-            var listOfLandmarks = [Landmark]()
-            if let err = err {
-                print("Error getting documents: \(err)")
-                completion(listOfLandmarks, err)
-                return
-            } else {
-                for document in querySnapshot!.documents {
-                    let landmark = Landmark(id: document.data()["id"] as! String,
-                                            name: document.data()["name"] as! String,
-                                            address: document.data()["address"] as! String,
-                                            city:  document.data()["city"] as! String,
-                                            state:  document.data()["state"] as! String,
-                                            zipcode: document.data()["zipcode"] as! String ,
-                                            country: document.data()["country"] as! String,
-                                            type: document.data()["type"] as! String,
-                                            latitude: document.data()["latitude"] as! String,
-                                            longitude: document.data()["longitude"] as! String,
-                                            image: document.data()["image"] as! String)
-                    listOfLandmarks.append(landmark)
-                }
-                completion(listOfLandmarks, nil)
-            }
-        }
-    }
-    
+   
     func createFunFactAnnotations(completion: @escaping ([FunFactAnnotation], Error?) -> Void) {
         db.collection("landmarks").getDocuments() { (querySnapshot, err) in
             var annotations = [FunFactAnnotation]()
@@ -87,8 +60,8 @@ class FirestoreConnection {
             } else {
                 for document in querySnapshot!.documents {
                     var annotation: FunFactAnnotation
-                    let coordinates = CLLocationCoordinate2D(latitude: CLLocationDegrees(document.data()["latitude"] as! String)!,
-                                                             longitude: CLLocationDegrees(document.data()["longitude"] as! String)!)
+                    let coordinates = CLLocationCoordinate2D(latitude: (document.data()["coordinates"] as! GeoPoint).latitude,
+                                                             longitude: (document.data()["coordinates"] as! GeoPoint).longitude)
                     
                     annotation = FunFactAnnotation(landmarkID: document.data()["id"] as! String,
                                                    title: document.data()["name"] as! String,
@@ -101,29 +74,7 @@ class FirestoreConnection {
             }
         }
     }
-    
-    func downloadLandmarksIntoCache(_ completion: (_ listOfLandmarks: ListOfLandmarks?)->()) {
-        db.collection("landmarks").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let landmark = Landmark(id: document.data()["id"] as! String,
-                                            name: document.data()["name"] as! String,
-                                            address: document.data()["address"] as! String,
-                                            city:  document.data()["city"] as! String,
-                                            state:  document.data()["state"] as! String,
-                                            zipcode: document.data()["zipcode"] as! String ,
-                                            country: document.data()["country"] as! String,
-                                            type: document.data()["type"] as! String,
-                                            latitude: document.data()["latitude"] as! String,
-                                            longitude: document.data()["longitude"] as! String,
-                                            image: document.data()["image"] as! String)
-                    self.listOfLandmarks?.listOfLandmarks.append(landmark)
-                }
-            }
-        }
-    }
+
     func downloadFunFactsIntoCache(_ completion: (_ listOfLandmarks: ListOfFunFacts?)->()) {
         db.collection("funFacts").getDocuments() { (querySnapshot, err) in
             if let err = err {

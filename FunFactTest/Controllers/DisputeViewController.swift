@@ -24,10 +24,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.tintColor = UIColor.darkGray
-        let db = Firestore.firestore()
-        downloadDisputes(db)
 
-        self.hideKeyboardWhenTappedAround() 
         pickerData = ["--- Select a reason ---", "Factually incorrect", "Fact belongs to another landmark", "Derogatory/Offensive text", "Other"]
         self.reasonPicker.delegate = self
         self.reasonPicker.dataSource = self
@@ -74,24 +71,6 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         print(funFactID)
     }
     
-    func downloadDisputes(_ db: Firestore) {
-        db.collection("disputes").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let dispute = Dispute(disputeID: document.data()["disputeID"] as! String,
-                                          funFactID: document.data()["funFactID"] as! String,
-                                          reason: document.data()["reason"] as! String,
-                                          description: document.data()["description"] as! String,
-                                          user: document.data()["user"] as! String,
-                                          dateSubmitted: document.data()["dateSubmitted"] as! String)
-                    self.disputeDict[self.funFactID] = dispute
-                }
-            }
-        }
-    }
-    
     @objc func cancelAction(_ sender: Any) {
         navigationController?.popViewController(animated: true)
     }
@@ -110,18 +89,8 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         let yourDate = formatter.date(from: myString)
         formatter.dateFormat = "MMM dd, yyyy"
         let myStringafd = formatter.string(from: yourDate!)
-        let delimiter = "-"
         
-        var count = 0
-        for disputeID in self.disputeDict.keys {
-            let dis = disputeID.components(separatedBy: delimiter)
-            let fid = dis[0] + "-" + dis[1]
-            if funFactID == fid {
-                count += 1
-            }
-        }
-        
-        let did = funFactID + "-" + String(count+1)
+        let did = db.collection("disputes").document().documentID
         
         db.collection("disputes").document(did).setData([
             "disputeID": did,

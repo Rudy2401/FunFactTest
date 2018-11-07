@@ -40,7 +40,8 @@ class MainViewController: UIViewController {
     var annotations: [FunFactAnnotation]?
     var notificationCount = 0
     var profileToolButton: UIButton?
-    var userProfile: User?
+    var landmarkType = ""
+    var userProfile = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
     
     // 1. create locationManager
     let locationManager = CLLocationManager()
@@ -51,7 +52,6 @@ class MainViewController: UIViewController {
         typeColor.layer.cornerRadius = 2.5
 
         annotationBottomView.alpha = 0.0
-        self.hideKeyboardWhenTappedAround()
         setupToolbarAndNavigationbar()
         
         // 2. setup locationManager
@@ -62,6 +62,8 @@ class MainViewController: UIViewController {
 //        updateLikesDislikes()
 //        updateUsersDisputes()
 //        updateUserCounts()
+//        renameAndDeleteLandmarks()
+//        updateUsers()
         
         // 3. setup mapView
         mapView.delegate = self
@@ -73,7 +75,7 @@ class MainViewController: UIViewController {
 //        configureTileOverlay()
         
         // 4. setup Firestore data
-        loadDataFromFirestore()
+        loadDataFromFirestoreAndAddAnnotations()
     }
 
     @IBAction func showCurrentLocation(_ sender: Any) {
@@ -95,7 +97,7 @@ class MainViewController: UIViewController {
         annotationBottomView.layer.cornerRadius = 5
         let numOffAttr = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                            NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]
-        var landmark = Landmark(id: "", name: "", address: "", city: "", state: "", zipcode: "", country: "", type: "", latitude: "", longitude: "", image: "")
+        var landmark = Landmark(id: "", name: "", address: "", city: "", state: "", zipcode: "", country: "", type: "", coordinates: GeoPoint(latitude: 0, longitude: 0), image: "")
         
         for lm in listOfLandmarks {
             if lm.id == annotationClicked.landmarkID {
@@ -106,12 +108,13 @@ class MainViewController: UIViewController {
         landmarkTitle = (annotationClicked.title)!
         landmarkID = annotationClicked.landmarkID
         
-        setupImage(landmark)
+//        setupImage(landmark)
         
         titleAnnotationLabel.text = landmark.name
         typeLabel.text = landmark.type
+        landmarkType = landmark.type
         addressLabel.text = landmark.address + ", " + landmark.city + ", " + landmark.state + ", " + landmark.country + ", " + landmark.zipcode
-        let coordinate₁ = CLLocation(latitude: Double(landmark.latitude)!, longitude: Double(landmark.longitude)!)
+        let coordinate₁ = CLLocation(latitude: landmark.coordinates.latitude, longitude: landmark.coordinates.longitude) 
         let distanceInMeters = CLLocation(latitude: currentLocationCoordinate.latitude, longitude: currentLocationCoordinate.longitude).distance(from: coordinate₁)
         
         distanceLabel.font = UIFont.fontAwesome(ofSize: 12, style: .solid)
@@ -140,60 +143,25 @@ class MainViewController: UIViewController {
         }
     }
     
-    func downloadUserProfile(completionHandler: @escaping (User) -> ())  {
-        let db = Firestore.firestore()
-        var user = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
-        db.collection("users").document(Auth.auth().currentUser?.uid ?? "").getDocument { (snapshot, error) in
-            if let document = snapshot {
-                user.dislikeCount = document.data()?["dislikeCount"] as! Int
-                user.likeCount = document.data()?["likeCount"] as! Int
-                user.disputeCount = document.data()?["disputeCount"] as! Int
-                user.submittedCount = document.data()?["submittedCount"] as! Int
-                user.email = document.data()?["email"] as! String
-                user.name = document.data()?["name"] as! String
-                user.phoneNumber = document.data()?["phoneNumber"] as! String
-                user.photoURL = document.data()?["photoURL"] as! String
-                user.provider = document.data()?["provider"] as! String
-                user.uid = document.data()?["uid"] as! String
-                
-                self.downloadOtherUserData(collection: "funFactsLiked", completionHandler: { (ref) in
-                    self.userProfile?.funFactsLiked = ref
-                })
-                self.downloadOtherUserData(collection: "funFactsDisliked", completionHandler: { (ref) in
-                    self.userProfile?.funFactsDisliked = ref
-                })
-                self.downloadOtherUserData(collection: "funFactsSubmitted", completionHandler: { (ref) in
-                    self.userProfile?.funFactsSubmitted = ref
-                })
-                self.downloadOtherUserData(collection: "funFactsDisputed", completionHandler: { (ref) in
-                    self.userProfile?.funFactsDisputed = ref
-                })
-                
-                completionHandler(user)
-            }
-            else {
-                let err = error
-                print("Error getting documents: \(String(describing: err))")
-            }
-        }
-    }
-    
-    func downloadOtherUserData(collection: String, completionHandler: @escaping ([DocumentReference]) -> ()) {
-        var refs = [DocumentReference]()
-        let db = Firestore.firestore()
-        db.collection("users").document(Auth.auth().currentUser?.uid ?? "").collection(collection).getDocuments() { (snap, error) in
-            if let err = error {
-                print("Error getting documents: \(err)")
-            } else {
-                for doc in snap!.documents {
-                    if collection == "funFactsDisputed" {
-                        refs.append(doc.data()["disputeID"] as! DocumentReference)
-                    } else {
-                        refs.append(doc.data()["funFactID"] as! DocumentReference)
-                    }
-                }
-            }
-            completionHandler(refs)
+    func setupImage(_ funFact: FunFact) {
+        print(funFact.image)
+        let imageId = funFact.image
+        let imageName = "\(imageId).jpeg"
+        let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
+        if imageFromCache != nil {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
+                // Put your code which should be executed with a delay here
+              self.landmarkImageView.image = imageFromCache
+//            })
+            self.landmarkImageView!.layer.cornerRadius = 5
+        } else {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
+                let storage = Storage.storage()
+                let storageRef = storage.reference()
+                let gsReference = storageRef.child("images/\(imageName)")
+                self.landmarkImageView.sd_setImage(with: gsReference, placeholderImage: UIImage())
+                self.landmarkImageView.layer.cornerRadius = 5
+//            })
         }
     }
     
@@ -317,6 +285,21 @@ class MainViewController: UIViewController {
         }
     }
     
+    func renameAndDeleteLandmarks() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let funFactID = document.documentID
+                    let data = ["id": funFactID]
+                    db.collection("funFacts").document(funFactID).setData(data, merge: true)
+                }
+            }
+        }
+    }
+    
     func updateImageMetadata() {
         // Create reference to the file whose metadata we want to change
         let storage = Storage.storage()
@@ -346,8 +329,6 @@ class MainViewController: UIViewController {
                 }
             }
         }
-        
-        
     }
     
     func setupFunFactDetailsBottomView(annotationClicked: FunFactAnnotation, listOfFunFacts: [FunFact]) {
@@ -360,6 +341,8 @@ class MainViewController: UIViewController {
         var count = 0
         for funFact in listOfFunFacts {
             if funFact.landmarkId == annotationClicked.landmarkID {
+                self.setupImage(funFact)
+                
                 like += funFact.likes
                 dislike += funFact.dislikes
                 count += 1
@@ -416,19 +399,12 @@ class MainViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        downloadUserProfile() { (user) in
-            self.userProfile = user
-        }
+        profileToolButton?.addTarget(self, action: #selector(viewProfile), for: .touchUpInside)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if Auth.auth().currentUser != nil {
-            profileToolButton?.addTarget(self, action: #selector(viewProfile), for: .touchUpInside)
-        }
-        else {
-
-        }
+        
         self.navigationController!.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 10.0)
         // 1. status is not determined
         if CLLocationManager.authorizationStatus() == .notDetermined {
@@ -463,15 +439,14 @@ class MainViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func loadDataFromFirestore() {
+    func loadDataFromFirestoreAndAddAnnotations() {
         //4. Getting data from Firestore
         let firestore: FirestoreConnection = FirestoreConnection()
         let db = Firestore.firestore()
         downloadLandmarks(db)
         downloadFunFacts(db)
         
-        
-        let spinner = showLoader(view: self.view)
+        let spinner = self.showLoader(view: self.view)
         firestore.downloadImagesIntoCache()
         firestore.createFunFactAnnotations() { annotations, error in
             if let error = error as Error? {
@@ -488,7 +463,7 @@ class MainViewController: UIViewController {
             
             // 2. region data
             let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-            let regionRadius = 300.0
+            let regionRadius = 100.0
             
             // 3. setup region
             let region = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lat,
@@ -532,14 +507,11 @@ class MainViewController: UIViewController {
         destinationVC?.pageContent = pageContent as NSArray
         destinationVC?.headingContent = landmarkTitle
         destinationVC?.landmarkID = landmarkID
+        destinationVC?.landmarkType = landmarkType
         destinationVC?.listOfFunFacts = listOfFunFacts
         destinationVC?.listOfLandmarks = listOfLandmarks
         destinationVC?.address = address
-        destinationVC?.userProfile = userProfile!
-        
-        let destinationAddFactVC = segue.destination as? AddNewFactViewController
-        destinationAddFactVC?.listOfLandmarks.listOfLandmarks = listOfLandmarks.listOfLandmarks
-        destinationAddFactVC?.listOfFunFacts.listOfFunFacts = listOfFunFacts.listOfFunFacts
+        destinationVC?.userProfile = userProfile
         
         let profileViewVC = segue.destination as? ProfileViewController
         profileViewVC?.userProfile = userProfile
@@ -582,15 +554,14 @@ class MainViewController: UIViewController {
                                             address: document.data()["address"] as! String,
                                             city:  document.data()["city"] as! String,
                                             state:  document.data()["state"] as! String,
-                                            zipcode: document.data()["zipcode"] as! String ,
+                                            zipcode: document.data()["zipcode"] as! String,
                                             country: document.data()["country"] as! String,
                                             type: document.data()["type"] as! String,
-                                            latitude: document.data()["latitude"] as! String,
-                                            longitude: document.data()["longitude"] as! String,
+                                            coordinates: document.data()["coordinates"] as! GeoPoint,
                                             image: document.data()["image"] as! String)
                     self.listOfLandmarks.listOfLandmarks.append(landmark)
-                    self.setupGeoFences(lat: Double(document.data()["latitude"] as! String)!,
-                                        lon: Double(document.data()["longitude"] as! String)!,
+                    self.setupGeoFences(lat: (document.data()["coordinates"] as! GeoPoint).latitude,
+                                        lon: (document.data()["coordinates"] as! GeoPoint).longitude,
                                         title: document.data()["name"] as! String,
                                         landmarkID: document.data()["id"] as! String)
                     let source = (querySnapshot?.metadata.isFromCache)! ? "local cache" : "server"
@@ -601,6 +572,8 @@ class MainViewController: UIViewController {
     }
     
     func setupToolbarAndNavigationbar () {
+        
+        
         
         let addFactLabel1 = String.fontAwesomeIcon(name: .plus)
         let addFactLabelAttr1 = NSAttributedString(string: addFactLabel1, attributes: Constants.toolBarImageSolidAttribute)
@@ -673,11 +646,11 @@ class MainViewController: UIViewController {
         //        addFact.addTarget(self, action: #selector(tapppedToolBarBtn), for: .touchUpInside)
         let settingsBtn = UIBarButtonItem(customView: settings)
         
-        let toolBarItems: [UIBarButtonItem]
-        toolBarItems = [addFactBtn, Constants.flexibleSpace, profileBtn, Constants.flexibleSpace, settingsBtn]
-        self.setToolbarItems(toolBarItems, animated: true)
+//        let toolBarItems: [UIBarButtonItem]
+//        toolBarItems = [addFactBtn, Constants.flexibleSpace, profileBtn, Constants.flexibleSpace, settingsBtn]
+//        self.setToolbarItems(toolBarItems, animated: true)
         
-        navigationController?.setToolbarHidden(false, animated: true)
+//        navigationController?.setToolbarHidden(false, animated: true)
         
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
@@ -687,10 +660,9 @@ class MainViewController: UIViewController {
         }
     }
     func showLoader(view: UIView) -> UIActivityIndicatorView {
-        
-        //Customize as per your need
-        let spinner = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height:40))
+        let spinner = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
         spinner.backgroundColor = UIColor.clear
+        spinner.color = UIColor.black
         spinner.layer.cornerRadius = 3.0
         spinner.clipsToBounds = true
         spinner.hidesWhenStopped = true
@@ -698,7 +670,7 @@ class MainViewController: UIViewController {
         spinner.center = view.center
         view.addSubview(spinner)
         spinner.startAnimating()
-        UIApplication.shared.beginIgnoringInteractionEvents()
+//        UIApplication.shared.beginIgnoringInteractionEvents()
         
         return spinner
     }
@@ -714,9 +686,6 @@ extension MainViewController: MKMapViewDelegate {
         if let annotation = view.annotation as? FunFactAnnotation {
             setupBottomView(annotationClicked: annotation, listOfLandmarks: self.listOfLandmarks.listOfLandmarks)
             setupFunFactDetailsBottomView(annotationClicked: annotation, listOfFunFacts: self.listOfFunFacts.listOfFunFacts)
-        }
-        else {
-            
         }
     }
     
@@ -796,17 +765,6 @@ extension MainViewController: MKMapViewDelegate {
     }
    
 }
-extension UIViewController {
-    func hideKeyboardWhenTappedAround() {
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
-    }
-    
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
-    }
-}
 
 extension MainViewController: CLLocationManagerDelegate {
     // 1. user enter region
@@ -832,110 +790,4 @@ extension MainViewController: CLLocationManagerDelegate {
         let currentLocationCoordinate = location.coordinate
         self.currentLocationCoordinate = currentLocationCoordinate
     }
-    
-//    func showNotification(forRegion region: CLRegion!) {
-//
-//        // customize your notification content
-//        let content = UNMutableNotificationContent()
-//        content.title = "Near " + region.identifier + "?"
-//        content.subtitle = "Did you know?"
-//
-//        var tempLandmarkID = ""
-//        for landmark in listOfLandmarks.listOfLandmarks {
-//            if region.identifier == landmark.name {
-//                tempLandmarkID = landmark.id
-//                break
-//            }
-//        }
-//        for funFact in listOfFunFacts.listOfFunFacts {
-//            if funFact.landmarkId == tempLandmarkID {
-//                content.body = (self.listOfFunFacts.listOfFunFacts.first?.description)!
-//
-//                let imageName = "\(funFact.image).jpeg"
-//                let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
-//                if imageFromCache != nil {
-//                    let imageData = UIImageJPEGRepresentation(imageFromCache!, 1.0)
-//                    guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: "\(funFact.image).jpeg", data: imageData! as NSData, options: nil) else { return  }
-//                    content.attachments = [attachment]
-//                    break
-//                } else {
-//                    let s = funFact.id
-//                    let imageName = "\(s).jpeg"
-//
-//                    let storage = Storage.storage()
-//                    let gsReference = storage.reference(forURL: "gs://funfacts-5b1a9.appspot.com/images/\(imageName)")
-//
-//                    gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
-//                        if let error = error {
-//                            print("error = \(error)")
-//                        } else {
-//                            guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: "\(funFact.image).jpeg", data: data! as NSData, options: nil) else { return  }
-//                            content.attachments = [attachment]
-//                        }
-//                    }
-//                    break
-//                }
-//            }
-//        }
-//        content.sound = UNNotificationSound.default()
-//        notificationCount += 1
-//
-//        // when the notification will be triggered
-//        let timeInSeconds: TimeInterval = (6) // 60s * 15 = 15min
-//        // the actual trigger object
-//        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInSeconds,
-//                                                        repeats: false)
-//
-//        // notification unique identifier, for this example, same as the region to avoid duplicate notifications
-//        let identifier = region.identifier
-//
-//        // the notification request object
-//        let request = UNNotificationRequest(identifier: identifier,
-//                                            content: content,
-//                                            trigger: trigger)
-//
-//        // trying to add the notification request to notification center
-//        notificationCenter?.add(request, withCompletionHandler: { (error) in
-//            if error != nil {
-//                print("Error adding notification with identifier: \(identifier)")
-//            }
-//        })
-//    }
 }
-//extension UNNotificationAttachment {
-    
-    /// Save the image to disk
-//    static func create(imageFileIdentifier: String, data: NSData, options: [NSObject : AnyObject]?) -> UNNotificationAttachment? {
-//        let fileManager = FileManager.default
-//        let tmpSubFolderName = ProcessInfo.processInfo.globallyUniqueString
-//        let tmpSubFolderURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(tmpSubFolderName, isDirectory: true)
-//
-//        do {
-//            try fileManager.createDirectory(at: tmpSubFolderURL!, withIntermediateDirectories: true, attributes: nil)
-//            let fileURL = tmpSubFolderURL?.appendingPathComponent(imageFileIdentifier)
-//            try data.write(to: fileURL!, options: [])
-//            let imageAttachment = try UNNotificationAttachment.init(identifier: imageFileIdentifier, url: fileURL!, options: options)
-//            return imageAttachment
-//        } catch let error {
-//            print("error \(error)")
-//        }
-//        return nil
-//    }
-//
-//}
-
-//extension MainViewController: UNUserNotificationCenterDelegate {
-//    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-//        // when app is open and in foregroud
-//        completionHandler(.alert)
-//    }
-//    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-//
-//        // get the notification identifier to respond accordingly
-//        let identifier = response.notification.request.identifier
-//        print ("identifier = \(identifier)")
-//        // do what you need to do
-//
-//        // ...
-//    }
-//}

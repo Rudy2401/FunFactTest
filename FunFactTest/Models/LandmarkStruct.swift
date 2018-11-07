@@ -7,20 +7,21 @@
 //
 
 import Foundation
+import CoreLocation
+import FirebaseFirestore
 
 struct ListOfLandmarks  {
     var listOfLandmarks: [Landmark]
 }
 struct Landmark {
-    let id: String
-    let name: String
-    let address: String
-    let city: String
-    let state: String
-    let zipcode: String
-    let country: String
-    let type: String
-    let latitude: String
-    let longitude: String
-    let image: String
+    var id: String
+    var name: String
+    var address: String
+    var city: String
+    var state: String
+    var zipcode: String
+    var country: String
+    var type: String
+    var coordinates: GeoPoint
+    var image: String
 }

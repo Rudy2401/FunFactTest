@@ -108,32 +108,11 @@ class SignUpViewController: UIViewController {
             
             // Send verification email
             Auth.auth().currentUser?.sendEmailVerification(completion: nil)
-            let db = Firestore.firestore()
-            db.collection("users").document((Auth.auth().currentUser?.uid)!).setData([
-                "uid": Auth.auth().currentUser?.uid ?? "",
-                "email": Auth.auth().currentUser?.email ?? "",
-                "name": name,
-                "provider": Auth.auth().currentUser?.providerData[0].providerID ?? "",
-                "photoURL": Auth.auth().currentUser?.photoURL?.absoluteString ?? "",
-                "phoneNumber": Auth.auth().currentUser?.phoneNumber ?? "",
-                "disputeCount": 0,
-                "submittedCount": 0,
-                "likeCount": 0,
-                "dislikeCount": 0
-            ]){ err in
-                if let err = err {
-                    print("Error writing document: \(err)")
-                    self.showAlert(message: "success")
-                } else {
-                    print("Document successfully written!")
-                    self.showAlert(message: "fail")
-                }
-            }
             
             let alertController = UIAlertController(title: "Email Verification", message: "We've just sent a confirmation email to your email address. Please check your inbox and click the verification link in that email to complete the sign up.", preferredStyle: .alert)
             let okayAction = UIAlertAction(title: "OK", style: .cancel, handler: { (action) in
                 // Dismiss the current view controller
-                self.dismiss(animated: true, completion: nil)
+                return
             })
             alertController.addAction(okayAction)
             self.present(alertController, animated: true, completion: nil)

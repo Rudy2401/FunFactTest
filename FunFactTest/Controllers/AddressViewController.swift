@@ -21,8 +21,6 @@ class AddressViewController: UIViewController {
     let locationManager = CLLocationManager()
     var resultSearchController: UISearchController? = nil
     var selectedPin: MKPlacemark?
-    var listOfLandmarks = ListOfLandmarks.init(listOfLandmarks: [])
-    var listOfFunFacts = ListOfFunFacts.init(listOfFunFacts: [])
     var callback: ((addressData)->())?
     
     struct addressData {
@@ -36,8 +34,7 @@ class AddressViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        self.hideKeyboardWhenTappedAround() 
+        super.viewDidLoad() 
         submitButton.backgroundColor = Constants.redColor
         mapView.bringSubviewToFront(submitButton)
         

@@ -6,8 +6,9 @@ target 'FunFactTest' do
 	pod 'Firebase/Firestore'
 	pod 'FirebaseUI'
     pod 'FBSDKLoginKit'
-    pod 'Bolts-Swift'
+    pod 'Bolts-Swift', :git => 'https://github.com/BoltsFramework/Bolts-Swift.git'
     pod 'FBSDKCoreKit'
     pod 'MapKitGoogleStyler'
-    pod 'FontAwesome.swift', '1.4.4'
+    pod 'FontAwesome.swift'
+    pod 'IQKeyboardManagerSwift'
 end

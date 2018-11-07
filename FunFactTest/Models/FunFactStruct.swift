@@ -13,17 +13,17 @@ struct ListOfFunFacts  {
 }
 
 struct FunFact  {
-    let landmarkId: String
-    let id: String
-    let description: String
-    let likes: Int
-    let dislikes: Int
-    let verificationFlag: String
-    let image: String
-    let imageCaption: String
-    let disputeFlag: String
-    let submittedBy: String
-    let dateSubmitted: String
-    let source: String
-    let tags: [String]
+    var landmarkId: String
+    var id: String
+    var description: String
+    var likes: Int
+    var dislikes: Int
+    var verificationFlag: String
+    var image: String
+    var imageCaption: String
+    var disputeFlag: String
+    var submittedBy: String
+    var dateSubmitted: String
+    var source: String
+    var tags: [String]
 }
