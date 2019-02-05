@@ -17,7 +17,12 @@ class UserSubsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.tintColor = .darkGray
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
+            navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
+        }
         navigationItem.title = "User Submissions"
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -37,7 +42,7 @@ class UserSubsTableViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return (userProfile?.funFactsSubmitted.count)!
+        return funFactsSubmitted!.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -72,7 +77,6 @@ class UserSubsTableViewController: UITableViewController {
             contentVC!.likesObject = self.funFactsSubmitted![index].likes as AnyObject
             contentVC!.dislikesObject = self.funFactsSubmitted![index].dislikes as AnyObject
             contentVC!.funFactID = self.funFactsSubmitted![index].id
-            contentVC!.userProfile = userProfile!
             contentVC!.headingObject = self.landmarksDict?[self.funFactsSubmitted?[index].landmarkId ?? ""] as AnyObject
         }
     }

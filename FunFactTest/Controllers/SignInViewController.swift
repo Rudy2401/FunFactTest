@@ -31,8 +31,8 @@ class SignInViewController: UIViewController {
         passwordImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         passwordImageButton.setTitle(String.fontAwesomeIcon(name: .lock), for: .normal)
         
-        signInButton.layer.backgroundColor = Constants.redColor.cgColor
-        signUpButton.layer.backgroundColor = Constants.greenColor.cgColor
+        signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        signUpButton.layer.backgroundColor = Colors.greenColor.cgColor
         
         let cancelItem = UIBarButtonItem(
             title: "Cancel",

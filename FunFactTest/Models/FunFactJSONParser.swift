@@ -10,10 +10,8 @@ import Foundation
 import MapKit
 
 class FunFactJSONParser {
-    
     struct ListOfLandmarks: Decodable {
         var listOfLandmarks: [Landmark]
-        
         enum CodingKeys: String, CodingKey {
             case listOfLandmarks = "List_Of_Landmarks"
         }
@@ -30,7 +28,6 @@ class FunFactJSONParser {
         let latitude: String
         let longitude: String
         let listOfFunFacts: [FunFact]
-        
         enum CodingKeys: String, CodingKey {
             case landmarkID = "Landmark_ID"
             case landmarkName = "Landmark_Name"
@@ -57,7 +54,6 @@ class FunFactJSONParser {
         let submittedBy: String
         let dateSubmitted: String
         let source: String
-        
         enum CodingKeys: String, CodingKey {
             case funFactID = "Fun_fact_ID"
             case funFactDescription = "Fun_Fact_Description"
@@ -71,7 +67,6 @@ class FunFactJSONParser {
             case source = "Source"
         }
     }
-    
     func getData()  {
         do {
             let path = Bundle.main.path(forResource: "ListOfFunFacts", ofType: "json")
@@ -83,24 +78,20 @@ class FunFactJSONParser {
             print (error)
         }
     }
-    
-    func getAddresses() -> [String]{
+    func getAddresses() -> [String] {
         var addressList = [String]()
         do {
             let path = Bundle.main.path(forResource: "ListOfFunFacts", ofType: "json")
             let data = try Data(contentsOf: URL(fileURLWithPath: path!), options: .mappedIfSafe)
             let listOfL = try JSONDecoder().decode(ListOfLandmarks.self, from: data)
-            
             for landmark in listOfL.listOfLandmarks {
                 addressList.append(landmark.landmarkAddress)
             }
-        }
-        catch {
+        } catch {
             print (error)
         }
         return addressList
     }
-    
     func createFunFactAnnotations() -> [FunFactAnnotation] {
         var funFactAnnotations = [FunFactAnnotation]()
         do {
@@ -108,9 +99,9 @@ class FunFactJSONParser {
             let data = try Data(contentsOf: URL(fileURLWithPath: path!), options: .mappedIfSafe)
             let listOfL = try JSONDecoder().decode(ListOfLandmarks.self, from: data)
             var annotation: FunFactAnnotation
-            
             for landmark in listOfL.listOfLandmarks {
-                let image = Utils.resizeImage(image: UIImage(named: landmark.listOfFunFacts[0].imageName)!, targetSize: CGSize(width: 70, height: 70))
+                _ = Utils.resizeImage(image: UIImage(named: landmark.listOfFunFacts[0].imageName)!,
+                                      targetSize: CGSize(width: 70, height: 70))
                 annotation = FunFactAnnotation(landmarkID: landmark.landmarkID,
                                                title: landmark.landmarkName,
                                                address: landmark.landmarkAddress,
@@ -118,16 +109,24 @@ class FunFactJSONParser {
                                                coordinate: CLLocationCoordinate2D(latitude: Double(landmark.latitude)!, longitude: Double(landmark.longitude)!))
                 funFactAnnotations.append(annotation)
             }
-        }
-        catch {
+        } catch {
             print (error)
         }
         return funFactAnnotations
-        
     }
     
     func getLandmark (forID: String) -> Landmark {
-        var landmark = Landmark(landmarkID: "", landmarkName: "", landmarkAddress: "", landmarkCity: "", landmarkState: "", landmarkZip: "", landmarkCountry: "", landmarkType: "", latitude: "", longitude: "", listOfFunFacts: [])
+        var landmark = Landmark(landmarkID: "",
+                                landmarkName: "",
+                                landmarkAddress: "",
+                                landmarkCity: "",
+                                landmarkState: "",
+                                landmarkZip: "",
+                                landmarkCountry: "",
+                                landmarkType: "",
+                                latitude: "",
+                                longitude: "",
+                                listOfFunFacts: [])
         do {
             let path = Bundle.main.path(forResource: "ListOfFunFacts", ofType: "json")
             let data = try Data(contentsOf: URL(fileURLWithPath: path!), options: .mappedIfSafe)

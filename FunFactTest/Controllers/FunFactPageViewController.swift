@@ -8,12 +8,12 @@
 
 import Foundation
 import UIKit
+import AVFoundation
+import FacebookShare
+import FirebaseStorage
 
 class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     
-    var pageControl: UIPageControl
-    var listOfFunFacts = ListOfFunFacts.init(listOfFunFacts: [])
-    var pageContent = NSArray()
     var imageContent = NSArray()
     var submittedByContent = NSArray()
     var sourceContent = NSArray()
@@ -25,9 +25,12 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     var currentIndex = 0
     var totalPages = 0
     var landmarkType = ""
+    var funFacts = [FunFact]()
     var funFactDict = [String: [FunFact]]()
-    var listOfLandmarks = ListOfLandmarks.init(listOfLandmarks: [])
-    var userProfile = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
+    var currentVC = ContentViewController()
+    var synth = AVSpeechSynthesizer()
+    var pageContent = NSArray()
+    let pageControl = UIPageControl()
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         if (currentIndex == 0) || (currentIndex == NSNotFound) {
@@ -37,6 +40,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        print (totalPages)
         if currentIndex == NSNotFound {
             return nil
         }
@@ -47,8 +51,12 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     required init?(coder aDecoder: NSCoder) {
-        pageControl = UIPageControl(frame: CGRect(x: 0,y: UIScreen.main.bounds.maxY - 50,width: UIScreen.main.bounds.width,height: 50))
+//        pageControl = UIPageControl(frame: CGRect(x: 0,y: UIScreen.main.bounds.maxY - 50,width: UIScreen.main.bounds.width,height: 50))
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.isHidden = false
     }
     
     override func viewDidLoad() {
@@ -56,12 +64,15 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         self.dataSource = self
         self.delegate = self
         
-        funFactDict = Dictionary(grouping: listOfFunFacts.listOfFunFacts, by: { $0.landmarkId })
+        self.totalPages = pageContent.count
+        self.view.backgroundColor = .white
+        setupPageControl()
         
         setupToolbarAndNavigationbar()
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.tintColor = .darkGray
+        
         if #available(iOS 11.0, *) {
             navigationController?.navigationBar.prefersLargeTitles = true
         } else {
@@ -71,8 +82,8 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        let pageContentViewController = pageViewController.viewControllers![0]
-        self.pageControl.currentPage = pageContent.index(of: pageContentViewController)
+        let pageContentViewController = pageViewController.viewControllers?.last
+        self.pageControl.currentPage = pageContent.index(of: pageContentViewController!)
         
         if (!completed && currentIndex==0) {
             
@@ -80,42 +91,40 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         if (completed && finished) {
             if let currentVC = pageViewController.viewControllers?.last {
                 currentIndex = indexOfViewController(viewController: currentVC as! ContentViewController)
-//                (currentVC as! ContentViewController).pageNumberText = "Fact (\(currentIndex+1)/\(totalPages))"
+                print ("currentIndex = \(currentIndex)")
+                self.pageControl.currentPage = currentIndex
             }
         }
     }
 
     
     func viewControllerAtIndex(_ index: Int) -> ContentViewController? {
-        
-        if ((funFactDict[landmarkID]?.count)! == 0) ||
-            (index >= (funFactDict[landmarkID]?.count)!) {
+        if (funFacts.count == 0) || (index >= funFacts.count) {
             return nil
         }
-        self.totalPages = (funFactDict[landmarkID]?.count)!
         
         let dataViewController = self.storyboard?.instantiateViewController(withIdentifier: "contentView") as! ContentViewController
         navigationItem.title = headingContent
-        dataViewController.dataObject = funFactDict[landmarkID]![index].id as AnyObject
-        dataViewController.funFactDesc = funFactDict[landmarkID]![index].description as String
-        dataViewController.imageObject = funFactDict[landmarkID]![index].image as AnyObject
-        dataViewController.submittedByObject = funFactDict[landmarkID]![index].submittedBy as AnyObject
-        dataViewController.dateObject = funFactDict[landmarkID]![index].dateSubmitted as AnyObject
-        dataViewController.sourceObject = funFactDict[landmarkID]![index].source as AnyObject
-        dataViewController.verifiedFlag = funFactDict[landmarkID]![index].verificationFlag
-        dataViewController.disputeFlag = funFactDict[landmarkID]![index].disputeFlag
-        dataViewController.imageCaption = funFactDict[landmarkID]![index].imageCaption
-        dataViewController.tags = funFactDict[landmarkID]![index].tags
-        dataViewController.likesObject = funFactDict[landmarkID]![index].likes as AnyObject
-        dataViewController.dislikesObject = funFactDict[landmarkID]![index].dislikes as AnyObject
-        dataViewController.funFactID = funFactDict[landmarkID]![index].id
+        dataViewController.dataObject = funFacts[index].id as AnyObject
+        dataViewController.funFactDesc = funFacts[index].description as String
+        dataViewController.imageObject = funFacts[index].image as AnyObject
+        dataViewController.submittedByObject = funFacts[index].submittedBy as AnyObject
+        dataViewController.dateObject = funFacts[index].dateSubmitted as AnyObject
+        dataViewController.sourceObject = funFacts[index].source as AnyObject
+        dataViewController.verifiedFlag = funFacts[index].verificationFlag
+        dataViewController.disputeFlag = funFacts[index].disputeFlag
+        dataViewController.imageCaption = funFacts[index].imageCaption
+        dataViewController.tags = funFacts[index].tags
+        dataViewController.likesObject = funFacts[index].likes as AnyObject
+        dataViewController.dislikesObject = funFacts[index].dislikes as AnyObject
+        dataViewController.funFactID = funFacts[index].id
         dataViewController.address = address
         dataViewController.headingObject = headingContent as AnyObject
-        dataViewController.userProfile = userProfile
         dataViewController.landmarkType = landmarkType
         dataViewController.landmarkID = landmarkID
         dataViewController.currPageNumberText = String(index+1)
         dataViewController.totalPageNumberText = String(totalPages)
+        currentVC = dataViewController
         return dataViewController
     }
     
@@ -133,36 +142,11 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         let toolBarAttrLabel = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                  NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
         
-        let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: Constants.redColor,
+        let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
                                  NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
-        let toolBarAttrLabelClicked = [ NSAttributedString.Key.foregroundColor: Constants.redColor,
+        let toolBarAttrLabelClicked = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
                                  NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
-        
-        let addFactLabel1 = String.fontAwesomeIcon(name: .plus)
-        let addFactLabelAttr1 = NSAttributedString(string: addFactLabel1, attributes: toolBarAttrImage)
-        let addFactLabelAttrClicked1 = NSAttributedString(string: addFactLabel1, attributes: toolBarAttrImageClicked)
-        
-        let addFactLabel2 = "\nAdd Fact"
-        let addFactLabelAttr2 = NSAttributedString(string: addFactLabel2, attributes: toolBarAttrLabel)
-        let addFactLabelAttrClicked2 = NSAttributedString(string: addFactLabel2, attributes: toolBarAttrLabelClicked)
-        
-        let completeAddFactLabel = NSMutableAttributedString()
-        completeAddFactLabel.append(addFactLabelAttr1)
-        completeAddFactLabel.append(addFactLabelAttr2)
-        
-        let completeAddFactLabelClicked = NSMutableAttributedString()
-        completeAddFactLabelClicked.append(addFactLabelAttrClicked1)
-        completeAddFactLabelClicked.append(addFactLabelAttrClicked2)
-        
-        let addFact = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
-        addFact.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-        addFact.setAttributedTitle(completeAddFactLabel, for: .normal)
-        addFact.setAttributedTitle(completeAddFactLabelClicked, for: .selected)
-        addFact.setAttributedTitle(completeAddFactLabelClicked, for: .highlighted)
-        addFact.titleLabel?.textAlignment = .center
-
-        let addFactBtn = UIBarButtonItem(customView: addFact)
         
         let prevLabel1 = String.fontAwesomeIcon(name: .arrowLeft)
         let prevLabelAttr1 = NSAttributedString(string: prevLabel1, attributes: toolBarAttrImage)
@@ -215,7 +199,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         let nextBtn = UIBarButtonItem(customView: next)
         
         let shareLabel1 = String.fontAwesomeIcon(name: .shareAlt)
-        let shareAttr1 = NSAttributedString(string: shareLabel1, attributes: toolBarAttrImage)
+        let shareAttr1 = NSAttributedString(string: shareLabel1, attributes: Attributes.navBarImageSolidAttribute)
         let shareAttrClicked1 = NSAttributedString(string: shareLabel1, attributes: toolBarAttrImageClicked)
         
 //        let shareLabel2 = "\nShare"
@@ -241,21 +225,15 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         let shareBtn = UIBarButtonItem(customView: share)
         
         
-        let menuLabel1 = String.fontAwesomeIcon(name: .ellipsisH)
-        let menuAttr1 = NSAttributedString(string: menuLabel1, attributes: toolBarAttrImage)
+        let menuLabel1 = String.fontAwesomeIcon(name: .angleDown)
+        let menuAttr1 = NSAttributedString(string: menuLabel1, attributes: Attributes.navBarImageSolidAttribute)
         let menuAttrClicked1 = NSAttributedString(string: menuLabel1, attributes: toolBarAttrImageClicked)
-        
-//        let menuLabel2 = "\nMore"
-//        let menuAttr2 = NSAttributedString(string: menuLabel2, attributes: toolBarAttrLabel)
-//        let menuAttrClicked2 = NSAttributedString(string: menuLabel2, attributes: toolBarAttrLabelClicked)
-        
+         
         let completemenuLabel = NSMutableAttributedString()
         completemenuLabel.append(menuAttr1)
-//        completemenuLabel.append(menuAttr2)
         
         let completemenuLabelClicked = NSMutableAttributedString()
         completemenuLabelClicked.append(menuAttrClicked1)
-//        completemenuLabelClicked.append(menuAttrClicked2)
         
         let menu = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
         menu.isUserInteractionEnabled = true
@@ -266,58 +244,157 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         menu.titleLabel?.textAlignment = .center
         menu.addTarget(self, action: #selector(menuAction), for: .touchUpInside)
         let menuBtn = UIBarButtonItem(customView: menu)
-        navigationItem.setRightBarButtonItems([menuBtn, flexibleSpace, shareBtn], animated: true)
         
+        let voiceLabel1 = String.fontAwesomeIcon(name: .volumeUp)
+        let voiceAttr1 = NSAttributedString(string: voiceLabel1, attributes: Attributes.navBarImageSolidAttribute)
+        let voiceAttrClicked1 = NSAttributedString(string: voiceLabel1, attributes: toolBarAttrImageClicked)
         
-//        let toolBarItems: [UIBarButtonItem]
-//        toolBarItems = [prevBtn, flexibleSpace, menuBtn, flexibleSpace, nextBtn ]
-//        self.setToolbarItems(toolBarItems, animated: true)
-//        navigationController?.setToolbarHidden(false, animated: true)
+        let completevoiceLabel = NSMutableAttributedString()
+        completevoiceLabel.append(voiceAttr1)
+        
+        let completevoiceLabelClicked = NSMutableAttributedString()
+        completevoiceLabelClicked.append(voiceAttrClicked1)
+        
+        let voice = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
+        voice.isUserInteractionEnabled = true
+        voice.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+        voice.setAttributedTitle(completevoiceLabel, for: .normal)
+        voice.setAttributedTitle(completevoiceLabelClicked, for: .highlighted)
+        voice.setAttributedTitle(completevoiceLabelClicked, for: .selected)
+        voice.titleLabel?.textAlignment = .center
+        voice.addTarget(self, action: #selector(voiceAction), for: .touchUpInside)
+        let voiceBtn = UIBarButtonItem(customView: voice)
+        
+        navigationItem.setRightBarButtonItems([menuBtn, flexibleSpace, shareBtn, flexibleSpace, voiceBtn], animated: true)
+    }
+    
+//    func presentationCount(for pageViewController: UIPageViewController) -> Int {
+//        setupPageControl()
+//        return pageContent.count
+//    }
+//
+//    func presentationIndex(for pageViewController: UIPageViewController) -> Int {
+//        return 0
+//    }
+    
+    private func setupPageControl() {
+        self.pageControl.frame = CGRect(x: 0, y: self.view.frame.size.height - 50, width: self.view.frame.size.width, height: 50)
+        self.pageControl.backgroundColor = .white
+        self.pageControl.currentPageIndicatorTintColor = UIColor(white: 0.2, alpha: 1.0)
+        self.pageControl.pageIndicatorTintColor = UIColor(white: 0.9, alpha: 1.0)
+        self.pageControl.hidesForSinglePage = true
+        self.view.addSubview(self.pageControl)
+        self.pageControl.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            self.pageControl.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            self.pageControl.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: 0),
+            self.pageControl.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            self.pageControl.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+            ])
+        self.pageControl.numberOfPages = pageContent.count
+    }
+
+    
+    @objc func voiceAction(sender: UIButton) {
+        if synth.isSpeaking {
+            synth.stopSpeaking(at: .word)
+            sender.isSelected = false
+        }
+        else {
+            sender.isSelected = true
+            let currentVC = viewControllerAtIndex(currentIndex)
+            let funFactDescWOHashtags = currentVC?.funFactDesc.replacingOccurrences(of: "\\s?#(?:\\S+)\\s?",
+                                                            with: "",
+                                                            options: .regularExpression,
+                                                            range: ((currentVC?.funFactDesc.startIndex)!..<(currentVC?.funFactDesc.endIndex)!)).trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
+            
+            let utterance = AVSpeechUtterance(string: funFactDescWOHashtags!)
+            var voiceToUse: AVSpeechSynthesisVoice?
+            print (AVSpeechSynthesisVoice.speechVoices())
+            for voice in AVSpeechSynthesisVoice.speechVoices() {
+                if voice.name == "Aaron" {
+                    voiceToUse = voice
+                }
+            }
+            utterance.voice = voiceToUse
+            
+            synth = AVSpeechSynthesizer()
+            synth.delegate = self
+            synth.speak(utterance)
+        }
     }
     
     @objc func menuAction(sender: UIButton) {
+        let currentVC = viewControllerAtIndex(currentIndex)!
         let actionSheetController: UIAlertController = UIAlertController(title: "Options", message: "Please select one of the following", preferredStyle: .actionSheet)
-        
+
         let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel) { _ in
             print("Cancel")
         }
         actionSheetController.addAction(cancelActionButton)
-        
+
         let addActionButton = UIAlertAction(title: "Add Fun Fact", style: .default)
         { _ in
             print("Save")
         }
         actionSheetController.addAction(addActionButton)
-        
-        let editActionButton = UIAlertAction(title: "Edit Fun Fact", style: .default)
-        { _ in
-            print("Save")
+
+        if currentVC.submittedByObject as? String == AppDataSingleton.appDataSharedInstance.userProfile.uid {
+            let editActionButton = UIAlertAction(title: "Edit Fun Fact", style: .default)
+            { _ in
+                guard let addFactVC  = self.storyboard?.instantiateViewController(withIdentifier: "addFactVC") as? AddNewFactViewController? else { return }
+                addFactVC?.mode = "edit"
+                addFactVC?.funFactID = currentVC.funFactID
+                addFactVC?.landmarkName = currentVC.headingObject as? String
+                addFactVC?.landmarkTypeText = currentVC.landmarkType
+                addFactVC?.type = currentVC.landmarkType
+                addFactVC?.imageCaptionText = currentVC.imageCaption
+                addFactVC?.funFactDesc = currentVC.funFactDesc
+                addFactVC?.landmarkID = currentVC.landmarkID
+                addFactVC?.verificationFlag = currentVC.verifiedFlag
+                addFactVC?.disputeFlag = currentVC.disputeFlag
+                addFactVC?.likes = currentVC.likesObject as! Int
+                addFactVC?.dislikes = currentVC.dislikesObject as! Int
+                addFactVC?.source = currentVC.sourceObject as! String
+                self.navigationController?.pushViewController(addFactVC!, animated: true)
+                
+            }
+            actionSheetController.addAction(editActionButton)
+            
+            let deleteActionButton = UIAlertAction(title: "Delete Fun Fact", style: .default)
+            { _ in
+                print("Delete")
+            }
+            actionSheetController.addAction(deleteActionButton)
         }
-        actionSheetController.addAction(editActionButton)
-        
-        let deleteActionButton = UIAlertAction(title: "Delete Fun Fact", style: .default)
-        { _ in
-            print("Delete")
-        }
-        actionSheetController.addAction(deleteActionButton)
-        
         self.present(actionSheetController, animated: true, completion: nil)
     }
     
     @objc func shareFactAction(sender : UIButton) {
         let activityController: UIActivityViewController
+        let currentVC = viewControllerAtIndex(currentIndex)!
+        var imageToShare = UIImage()
         
-        for ff in listOfFunFacts.listOfFunFacts {
-            if ff.landmarkId == landmarkID {
-                funFactDict[landmarkID]!.append(ff)
+        let imageFromCache = CacheManager.shared.getFromCache(key: "\(currentVC.funFactID).jpeg") as? UIImage
+        if imageFromCache != nil {
+            imageToShare = imageFromCache!
+        }
+        else {
+            let storage = Storage.storage()
+            let storageRef = storage.reference()
+            let gsReference = storageRef.child("images/\(currentVC.funFactID).jpeg)")
+            gsReference.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
+                if let error = error {
+                    print ("Error getting image \(error.localizedDescription)")
+                } else {
+                    imageToShare = UIImage(data: data!)!
+                }
             }
         }
-        let funFact = "Did you know this fun fact about " + headingContent + "? \n" + funFactDict[landmarkID]![currentIndex].description
-        if let imageToShare = UIImage(named: listOfFunFacts.listOfFunFacts[currentIndex].image) {
-            activityController = UIActivityViewController(activityItems: [funFact, imageToShare], applicationActivities: nil)
-        } else  {
-            activityController = UIActivityViewController(activityItems: [funFact], applicationActivities: nil)
-        }
+        
+        let funFact = "Did you know this fun fact about " + (currentVC.headingObject as! String) + "? \n" + currentVC.funFactDesc
+        activityController = UIActivityViewController(activityItems: [funFact, imageToShare], applicationActivities: nil)
+        activityController.excludedActivityTypes = [.airDrop, .addToReadingList, .assignToContact, .markupAsPDF, .openInIBooks, .postToFlickr]
         
         self.present(activityController, animated: true, completion: nil)
     }
@@ -350,13 +427,9 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         }
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        //         Get the new view controller using segue.destinationViewController.
-        //         Pass the selected object to the new view controller.
-//        let destinationVC = segue.destination as? AddFactViewController
-//        destinationVC?.address = address
-//        let backItem = UIBarButtonItem()
-//        backItem.title = ""
-//        navigationItem.backBarButtonItem = backItem
+        let addFactVC = segue.destination as? AddNewFactViewController
+        addFactVC?.address = currentVC.address
+        addFactVC?.landmarkName = currentVC.headingObject as? String
     }
     public func createIndex<Key, Element>(elms:[Element], extractKey:(Element) -> Key) -> [Key:Element] where Key : Hashable {
         var dict = [Key:Element]()
@@ -365,4 +438,13 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         }
         return dict
     }
+}
+extension FunFactPageViewController: AVSpeechSynthesizerDelegate {
+    
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        print ("Finished speaking")
+        let voiceBtn = navigationItem.rightBarButtonItems![4]
+        (voiceBtn.customView as! UIButton).isSelected = false
+    }
+    
 }

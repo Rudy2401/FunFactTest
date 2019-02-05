@@ -19,24 +19,18 @@ class SignUpViewController: UIViewController {
     @IBOutlet weak var emailImageButton: UIButton!
     @IBOutlet weak var passwordImageButton: UIButton!
     var popup = UIAlertController()
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addBackground()
         navigationController?.navigationBar.isHidden = false
-
         navigationController?.navigationBar.tintColor = UIColor.darkGray
         nameImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         nameImageButton.setTitle(String.fontAwesomeIcon(name: .idCard), for: .normal)
-        
         emailImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         emailImageButton.setTitle(String.fontAwesomeIcon(name: .envelope), for: .normal)
-        
         passwordImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         passwordImageButton.setTitle(String.fontAwesomeIcon(name: .lock), for: .normal)
-        
-        signUpButton.layer.backgroundColor = Constants.redColor.cgColor
-        
+        signUpButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         let cancelItem = UIBarButtonItem(
             title: "Cancel",
             style: .plain,
@@ -47,7 +41,6 @@ class SignUpViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         self.title = "Sign Up"
         nameTextField.becomeFirstResponder()
     }
@@ -63,36 +56,31 @@ class SignUpViewController: UIViewController {
         popup.dismiss(animated: true)
         navigationController?.popViewController(animated: true)
     }
-    
     @IBAction func registerAccount(sender: UIButton) {
-        
         // Validate the input
         guard let name = nameTextField.text, name != "",
             let emailAddress = emailTextField.text, emailAddress != "",
             let password = passwordTextField.text, password != "" else {
-                
                 let alertController = UIAlertController(title: "Registration Error", message: "Please make sure you provide your name, email address and password to complete the registration.", preferredStyle: .alert)
                 let okayAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
                 alertController.addAction(okayAction)
                 present(alertController, animated: true, completion: nil)
-                
                 return
         }
         
         // Register the user account on Firebase
-        Auth.auth().createUser(withEmail: emailAddress, password: password, completion: { (user, error) in
-            
+        Auth.auth().createUser(withEmail: emailAddress, password: password, completion: { (_, error) in
             if let error = error {
                 let code = (error as NSError).code
                 print(code)
-                let alertController = UIAlertController(title: "Registration Error", message: error.localizedDescription, preferredStyle: .alert)
+                let alertController = UIAlertController(title: "Registration Error",
+                                                        message: error.localizedDescription,
+                                                        preferredStyle: .alert)
                 let okayAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
                 alertController.addAction(okayAction)
                 self.present(alertController, animated: true, completion: nil)
-                
                 return
             }
-            
             // Save the name of the user
             if let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest() {
                 changeRequest.displayName = name
@@ -102,14 +90,13 @@ class SignUpViewController: UIViewController {
                     }
                 })
             }
-            
             // Dismiss keyboard
             self.view.endEditing(true)
-            
             // Send verification email
             Auth.auth().currentUser?.sendEmailVerification(completion: nil)
             
-            let alertController = UIAlertController(title: "Email Verification", message: "We've just sent a confirmation email to your email address. Please check your inbox and click the verification link in that email to complete the sign up.", preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Email Verification",
+                                                    message: "We've just sent a confirmation email to your email address. Please check your inbox and click the verification link in that email to complete the sign up.", preferredStyle: .alert)
             let okayAction = UIAlertAction(title: "OK", style: .cancel, handler: { (action) in
                 // Dismiss the current view controller
                 return
@@ -117,9 +104,7 @@ class SignUpViewController: UIViewController {
             alertController.addAction(okayAction)
             self.present(alertController, animated: true, completion: nil)
             self.navigationController?.popViewController(animated: true)
-            
         })
-        
     }
     func showAlert(message: String) {
         if message == "success" {
@@ -128,9 +113,7 @@ class SignUpViewController: UIViewController {
         if message == "fail" {
             popup = UIAlertController(title: "Error", message: "Error while creating user", preferredStyle: .alert)
         }
-        
         self.present(popup, animated: true, completion: nil)
         Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(self.dismissAlert), userInfo: nil, repeats: false)
     }
-
 }

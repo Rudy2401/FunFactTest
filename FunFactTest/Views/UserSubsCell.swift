@@ -15,7 +15,10 @@ class UserSubsCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+        funFactImage.layer.masksToBounds = true
+        funFactImage.clipsToBounds = true
+        funFactImage.contentMode = .scaleAspectFill
+        funFactImage.layer.cornerRadius = funFactImage.frame.width/2
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

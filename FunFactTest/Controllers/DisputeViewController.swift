@@ -67,7 +67,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         notesText.layer.borderColor = UIColor.gray.cgColor
         notesText.layer.cornerRadius = 5
         
-        submitButton.layer.backgroundColor = Constants.redColor.cgColor
+        submitButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         print(funFactID)
     }
     

@@ -9,6 +9,11 @@ target 'FunFactTest' do
     pod 'Bolts-Swift', :git => 'https://github.com/BoltsFramework/Bolts-Swift.git'
     pod 'FBSDKCoreKit'
     pod 'MapKitGoogleStyler'
-    pod 'FontAwesome.swift'
     pod 'IQKeyboardManagerSwift'
+    pod 'FacebookCore'
+    pod 'FacebookLogin'
+    pod 'FacebookShare'
+    pod 'InstantSearchClient', '~> 6.0'
+    pod 'InstantSearch', '~> 3.0'
+    #pod 'SwiftLint'
 end

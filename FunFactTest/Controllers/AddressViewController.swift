@@ -10,20 +10,18 @@ import UIKit
 import MapKit
 
 protocol HandleMapSearch {
-    func dropPinZoomIn(placemark:MKPlacemark)
+    func dropPinZoomIn(placemark: MKPlacemark)
 }
 
 class AddressViewController: UIViewController {
-    
     @IBOutlet weak var mapView: MKMapView!
     @IBOutlet weak var submitButton: CustomButton!
-    
     let locationManager = CLLocationManager()
-    var resultSearchController: UISearchController? = nil
+    var resultSearchController: UISearchController?
     var selectedPin: MKPlacemark?
-    var callback: ((addressData)->())?
+    var callback: ((AddressData) -> Void)?
     
-    struct addressData {
+    struct AddressData {
         var address: String?
         var landmarkName: String?
         var coordinate: CLLocationCoordinate2D?
@@ -32,35 +30,29 @@ class AddressViewController: UIViewController {
         var country: String?
         var zipcode: String?
     }
-    
     override func viewDidLoad() {
-        super.viewDidLoad() 
-        submitButton.backgroundColor = Constants.redColor
+        super.viewDidLoad()
+        submitButton.backgroundColor = Colors.seagreenColor
         mapView.bringSubviewToFront(submitButton)
-        
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
-        
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.tintColor = .darkGray
         navigationController?.navigationBar.prefersLargeTitles = false
-        
         locationManager.delegate = self as CLLocationManagerDelegate
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
-        
-        let locationSearchTable = storyboard!.instantiateViewController(withIdentifier: "LocationSearchTable") as! LocationSearchTableViewController
+        let locationSearchTable = storyboard!.instantiateViewController(withIdentifier: "LocationSearchTable")
+            as! LocationSearchTableViewController // swiftlint:disable:this force_cast
         resultSearchController = UISearchController(searchResultsController: locationSearchTable)
         resultSearchController?.searchResultsUpdater = locationSearchTable
-        
         let searchBar = resultSearchController!.searchBar
         let textFieldInsideUISearchBar = searchBar.value(forKey: "searchField") as? UITextField
         textFieldInsideUISearchBar?.font = UIFont(name: "Avenir Next", size: 14.0)
         searchBar.sizeToFit()
         searchBar.placeholder = "Search for places"
         navigationItem.titleView = resultSearchController?.searchBar
-        
         resultSearchController?.hidesNavigationBarDuringPresentation = false
         resultSearchController?.dimsBackgroundDuringPresentation = true
         definesPresentationContext = true
@@ -74,20 +66,18 @@ class AddressViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         // Hide the navigation bar on the this view controller
-        self.navigationController?.toolbar.isHidden = true
+        self.tabBarController?.tabBar.isHidden = true
     }
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
         // Show the navigation bar on other view controllers
-        self.navigationController?.toolbar.isHidden = false
+        self.tabBarController?.tabBar.isHidden = false
     }
 
     @IBAction func submitAction(_ sender: Any) {
-        let add = addressData(address: (selectedPin?.subThoroughfare ?? "") + " " + (selectedPin?.thoroughfare ?? ""),
+        let add = AddressData(address: (selectedPin?.subThoroughfare ?? "") + " " + (selectedPin?.thoroughfare ?? ""),
                               landmarkName: selectedPin!.name ?? "",
                               coordinate: selectedPin!.coordinate,
                               city: selectedPin!.locality ?? "",
@@ -97,19 +87,16 @@ class AddressViewController: UIViewController {
         callback?(add)
         navigationController?.popViewController(animated: true)
     }
-    
     @IBAction func cancelAction(_ sender: Any) {
         navigationController?.popViewController(animated: true)
     }
-    
 }
-extension AddressViewController : CLLocationManagerDelegate {
+extension AddressViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse {
             locationManager.requestLocation()
         }
     }
-    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
             let span = MKCoordinateSpan.init(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -117,13 +104,12 @@ extension AddressViewController : CLLocationManagerDelegate {
             mapView.setRegion(region, animated: true)
         }
     }
-    
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("error:: \(error)")
     }
 }
 extension AddressViewController: HandleMapSearch {
-    func dropPinZoomIn(placemark: MKPlacemark){
+    func dropPinZoomIn(placemark: MKPlacemark) {
         // cache the pin
         selectedPin = placemark
         // clear existing pins
@@ -140,7 +126,5 @@ extension AddressViewController: HandleMapSearch {
         let region = MKCoordinateRegion.init(center: placemark.coordinate, span: span)
         mapView.setRegion(region, animated: true)
         resultSearchController?.searchBar.text = placemark.name
-        
     }
 }
-

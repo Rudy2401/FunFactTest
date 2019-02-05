@@ -126,15 +126,15 @@ class WelcomeViewController: UIViewController {
     
     func setupButtons() {
         fbSignInButton.layer.cornerRadius = 25
-        fbSignInButton.layer.backgroundColor = Constants.fbBlueColor.cgColor
+        fbSignInButton.layer.backgroundColor = Colors.fbBlueColor.cgColor
         
         let fbSignInLabel1 = String.fontAwesomeIcon(name: .facebook)
-        let fbSignInLabelAttr1 = NSAttributedString(string: fbSignInLabel1, attributes: Constants.loginButtonImageBrandAttribute)
-        let fbSignInLabelAttrClicked1 = NSAttributedString(string: fbSignInLabel1, attributes: Constants.loginButtonImageBrandClickedAttribute)
+        let fbSignInLabelAttr1 = NSAttributedString(string: fbSignInLabel1, attributes: Attributes.loginButtonImageBrandAttribute)
+        let fbSignInLabelAttrClicked1 = NSAttributedString(string: fbSignInLabel1, attributes: Attributes.loginButtonImageBrandClickedAttribute)
         
         let fbSignInLabel2 = " \tSign in with Facebook"
-        let fbSignInLabelAttr2 = NSAttributedString(string: fbSignInLabel2, attributes: Constants.loginButtonAttribute)
-        let fbSignInLabelAttrClicked2 = NSAttributedString(string: fbSignInLabel2, attributes: Constants.loginButtonClickedAttribute)
+        let fbSignInLabelAttr2 = NSAttributedString(string: fbSignInLabel2, attributes: Attributes.loginButtonAttribute)
+        let fbSignInLabelAttrClicked2 = NSAttributedString(string: fbSignInLabel2, attributes: Attributes.loginButtonClickedAttribute)
         
         let completefbSignInLabel = NSMutableAttributedString()
         completefbSignInLabel.append(fbSignInLabelAttr1)
@@ -151,8 +151,8 @@ class WelcomeViewController: UIViewController {
         googleSignInButton.layer.backgroundColor = UIColor(white: 0.9, alpha: 1.0).cgColor
         
         let googleSignInLabel2 = "  Sign in with Google"
-        let googleSignInLabelAttr2 = NSAttributedString(string: googleSignInLabel2, attributes: Constants.googleLoginButtonAttribute)
-        let googleSignInLabelAttrClicked2 = NSAttributedString(string: googleSignInLabel2, attributes: Constants.googleLoginButtonClickedAttribute)
+        let googleSignInLabelAttr2 = NSAttributedString(string: googleSignInLabel2, attributes: Attributes.googleLoginButtonAttribute)
+        let googleSignInLabelAttrClicked2 = NSAttributedString(string: googleSignInLabel2, attributes: Attributes.googleLoginButtonClickedAttribute)
         
         let completegoogleSignInLabel = NSMutableAttributedString()
         completegoogleSignInLabel.append(googleSignInLabelAttr2)
@@ -167,12 +167,12 @@ class WelcomeViewController: UIViewController {
         emailSignInButton.layer.backgroundColor = UIColor(displayP3Red: 180/255, green: 70/255, blue: 25/255, alpha: 1.0).cgColor
         
         let emailSignInLabel1 = String.fontAwesomeIcon(name: .envelope)
-        let emailSignInLabelAttr1 = NSAttributedString(string: emailSignInLabel1, attributes: Constants.loginButtonImageSolidAttribute)
-        let emailSignInLabelAttrClicked1 = NSAttributedString(string: emailSignInLabel1, attributes: Constants.loginButtonImageSolidClickedAttribute)
+        let emailSignInLabelAttr1 = NSAttributedString(string: emailSignInLabel1, attributes: Attributes.loginButtonImageSolidAttribute)
+        let emailSignInLabelAttrClicked1 = NSAttributedString(string: emailSignInLabel1, attributes: Attributes.loginButtonImageSolidClickedAttribute)
         
         let emailSignInLabel2 = " \tSign in with Email"
-        let emailSignInLabelAttr2 = NSAttributedString(string: emailSignInLabel2, attributes: Constants.loginButtonAttribute)
-        let emailSignInLabelAttrClicked2 = NSAttributedString(string: emailSignInLabel2, attributes: Constants.loginButtonClickedAttribute)
+        let emailSignInLabelAttr2 = NSAttributedString(string: emailSignInLabel2, attributes: Attributes.loginButtonAttribute)
+        let emailSignInLabelAttrClicked2 = NSAttributedString(string: emailSignInLabel2, attributes: Attributes.loginButtonClickedAttribute)
         
         let completeemailSignInLabel = NSMutableAttributedString()
         completeemailSignInLabel.append(emailSignInLabelAttr1)
@@ -189,12 +189,12 @@ class WelcomeViewController: UIViewController {
         guestButton.layer.backgroundColor = UIColor.darkGray.cgColor
         
         let createAccountLabel1 = String.fontAwesomeIcon(name: .user)
-        let createAccountLabelAttr1 = NSAttributedString(string: createAccountLabel1, attributes: Constants.loginButtonImageSolidAttribute)
-        let createAccountLabelAttrClicked1 = NSAttributedString(string: createAccountLabel1, attributes: Constants.loginButtonImageSolidClickedAttribute)
+        let createAccountLabelAttr1 = NSAttributedString(string: createAccountLabel1, attributes: Attributes.loginButtonImageSolidAttribute)
+        let createAccountLabelAttrClicked1 = NSAttributedString(string: createAccountLabel1, attributes: Attributes.loginButtonImageSolidClickedAttribute)
         
         let createAccountLabel2 = " \tContinue as Guest"
-        let createAccountLabelAttr2 = NSAttributedString(string: createAccountLabel2, attributes: Constants.loginButtonAttribute)
-        let createAccountLabelAttrClicked2 = NSAttributedString(string: createAccountLabel2, attributes: Constants.loginButtonClickedAttribute)
+        let createAccountLabelAttr2 = NSAttributedString(string: createAccountLabel2, attributes: Attributes.loginButtonAttribute)
+        let createAccountLabelAttrClicked2 = NSAttributedString(string: createAccountLabel2, attributes: Attributes.loginButtonClickedAttribute)
         
         let completecreateAccountLabel = NSMutableAttributedString()
         completecreateAccountLabel.append(createAccountLabelAttr1)

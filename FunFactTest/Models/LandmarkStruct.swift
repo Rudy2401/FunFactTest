@@ -11,9 +11,9 @@ import CoreLocation
 import FirebaseFirestore
 
 struct ListOfLandmarks  {
-    var listOfLandmarks: [Landmark]
+    var listOfLandmarks: Set<Landmark>
 }
-struct Landmark {
+struct Landmark: Hashable {
     var id: String
     var name: String
     var address: String
@@ -24,4 +24,7 @@ struct Landmark {
     var type: String
     var coordinates: GeoPoint
     var image: String
+    var numOfFunFacts: Int
+    var likes: Int
+    var dislikes: Int
 }

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */; };
-		D80F6CA02163140A00AF2E8D /* FontAwesome_swift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */; };
 		D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */ = {isa = PBXBuildFile; fileRef = D834DFF720F677690091CA40 /* ListOfFunFacts.json */; };
 		D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */; };
 		D83F06022161BD0700B37FED /* UserStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83F06012161BD0700B37FED /* UserStruct.swift */; };
@@ -30,6 +29,28 @@
 		D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE80212F3727009A2CC2 /* CacheManager.swift */; };
 		D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE83212F68F9009A2CC2 /* FancyButton.swift */; };
 		D8A2ADE521938268003C4EB1 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2ADE421938268003C4EB1 /* TabBarController.swift */; };
+		D8A2AE2F2195FF42003C4EB1 /* Font Awesome 5 Pro-Solid-900.otf in Resources */ = {isa = PBXBuildFile; fileRef = D8A2AE292195FF40003C4EB1 /* Font Awesome 5 Pro-Solid-900.otf */; };
+		D8A2AE302195FF42003C4EB1 /* Font Awesome 5 Free-Solid-900.otf in Resources */ = {isa = PBXBuildFile; fileRef = D8A2AE2A2195FF41003C4EB1 /* Font Awesome 5 Free-Solid-900.otf */; };
+		D8A2AE312195FF42003C4EB1 /* Font Awesome 5 Free-Regular-400.otf in Resources */ = {isa = PBXBuildFile; fileRef = D8A2AE2B2195FF41003C4EB1 /* Font Awesome 5 Free-Regular-400.otf */; };
+		D8A2AE322195FF42003C4EB1 /* Font Awesome 5 Pro-Regular-400.otf in Resources */ = {isa = PBXBuildFile; fileRef = D8A2AE2C2195FF41003C4EB1 /* Font Awesome 5 Pro-Regular-400.otf */; };
+		D8A2AE332195FF42003C4EB1 /* Font Awesome 5 Brands-Regular-400.otf in Resources */ = {isa = PBXBuildFile; fileRef = D8A2AE2D2195FF41003C4EB1 /* Font Awesome 5 Brands-Regular-400.otf */; };
+		D8A2AE342195FF42003C4EB1 /* Font Awesome 5 Pro-Light-300.otf in Resources */ = {isa = PBXBuildFile; fileRef = D8A2AE2E2195FF42003C4EB1 /* Font Awesome 5 Pro-Light-300.otf */; };
+		D8A2AE412195FF97003C4EB1 /* FontAwesomeBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE352195FF94003C4EB1 /* FontAwesomeBarButtonItem.swift */; };
+		D8A2AE422195FF97003C4EB1 /* FontAwesomeImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE362195FF94003C4EB1 /* FontAwesomeImageView.swift */; };
+		D8A2AE432195FF97003C4EB1 /* FontAwesomeTabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE372195FF94003C4EB1 /* FontAwesomeTabBarItem.swift */; };
+		D8A2AE442195FF97003C4EB1 /* FontAwesomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE382195FF95003C4EB1 /* FontAwesomeView.swift */; };
+		D8A2AE452195FF97003C4EB1 /* FontAwesomeExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE392195FF95003C4EB1 /* FontAwesomeExtension.swift */; };
+		D8A2AE462195FF97003C4EB1 /* FontAwesomeStateRequirement.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE3A2195FF95003C4EB1 /* FontAwesomeStateRequirement.swift */; };
+		D8A2AE472195FF97003C4EB1 /* FontAwesomeTextRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE3B2195FF95003C4EB1 /* FontAwesomeTextRepresentable.swift */; };
+		D8A2AE482195FF97003C4EB1 /* FontAwesomeImageRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE3C2195FF96003C4EB1 /* FontAwesomeImageRepresentable.swift */; };
+		D8A2AE492195FF97003C4EB1 /* Enum.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE3D2195FF96003C4EB1 /* Enum.swift */; };
+		D8A2AE4A2195FF97003C4EB1 /* FontAwesome.h in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE3E2195FF96003C4EB1 /* FontAwesome.h */; };
+		D8A2AE4B2195FF97003C4EB1 /* FontAwesomeSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE3F2195FF96003C4EB1 /* FontAwesomeSegmentedControl.swift */; };
+		D8A2AE4C2195FF97003C4EB1 /* FontAwesome.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2AE402195FF97003C4EB1 /* FontAwesome.swift */; };
+		D8B3103821CADFD600E85148 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103721CADFD600E85148 /* SearchViewController.swift */; };
+		D8B3103A21CAEAA500E85148 /* SearchCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */; };
+		D8B3103C21E2E7F900E85148 /* AppDataSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103B21E2E7F900E85148 /* AppDataSingleton.swift */; };
+		D8CBADCE21C295C900C42F91 /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CBADCD21C295C900C42F91 /* NotificationController.swift */; };
 		D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */; };
 		D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18572212A1E510093B66C /* LandmarkStruct.swift */; };
 		D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18574212A1F2F0093B66C /* FunFactStruct.swift */; };
@@ -46,6 +67,7 @@
 		D8ED8FF8210A49480010EF7C /* AddFactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */; };
 		D8ED8FFA210A49780010EF7C /* AddressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FF9210A49780010EF7C /* AddressViewController.swift */; };
 		D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */; };
+		D8F0078521ED5E7E0031325F /* SearchLandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F0078421ED5E7E0031325F /* SearchLandmarkStruct.swift */; };
 		D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F76AF0210E1A3100A039D2 /* AddressCell.swift */; };
 		D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */; };
 		D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */ = {isa = PBXBuildFile; fileRef = D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */; };
@@ -64,6 +86,23 @@
 		D8FE7FAC20E4671C007B4550 /* FunFactPageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */; };
 		D8FE7FAE20EAE747007B4550 /* PodFile in Resources */ = {isa = PBXBuildFile; fileRef = D8FE7FAD20EAE746007B4550 /* PodFile */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D8B3104321E58B2E00E85148 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FBA358BC19655FED00A86282;
+			remoteInfo = GeoFire;
+		};
+		D8B3104521E58B2E00E85148 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = FBA358CC19655FED00A86282;
+			remoteInfo = GeoFireTests;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunFactTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,6 +132,44 @@
 		D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FunFactTest.entitlements; sourceTree = "<group>"; };
 		D88DBE83212F68F9009A2CC2 /* FancyButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FancyButton.swift; sourceTree = "<group>"; };
 		D8A2ADE421938268003C4EB1 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		D8A2AE292195FF40003C4EB1 /* Font Awesome 5 Pro-Solid-900.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Pro-Solid-900.otf"; sourceTree = "<group>"; };
+		D8A2AE2A2195FF41003C4EB1 /* Font Awesome 5 Free-Solid-900.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Free-Solid-900.otf"; sourceTree = "<group>"; };
+		D8A2AE2B2195FF41003C4EB1 /* Font Awesome 5 Free-Regular-400.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Free-Regular-400.otf"; sourceTree = "<group>"; };
+		D8A2AE2C2195FF41003C4EB1 /* Font Awesome 5 Pro-Regular-400.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Pro-Regular-400.otf"; sourceTree = "<group>"; };
+		D8A2AE2D2195FF41003C4EB1 /* Font Awesome 5 Brands-Regular-400.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Brands-Regular-400.otf"; sourceTree = "<group>"; };
+		D8A2AE2E2195FF42003C4EB1 /* Font Awesome 5 Pro-Light-300.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Pro-Light-300.otf"; sourceTree = "<group>"; };
+		D8A2AE352195FF94003C4EB1 /* FontAwesomeBarButtonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeBarButtonItem.swift; sourceTree = "<group>"; };
+		D8A2AE362195FF94003C4EB1 /* FontAwesomeImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeImageView.swift; sourceTree = "<group>"; };
+		D8A2AE372195FF94003C4EB1 /* FontAwesomeTabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeTabBarItem.swift; sourceTree = "<group>"; };
+		D8A2AE382195FF95003C4EB1 /* FontAwesomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeView.swift; sourceTree = "<group>"; };
+		D8A2AE392195FF95003C4EB1 /* FontAwesomeExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeExtension.swift; sourceTree = "<group>"; };
+		D8A2AE3A2195FF95003C4EB1 /* FontAwesomeStateRequirement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeStateRequirement.swift; sourceTree = "<group>"; };
+		D8A2AE3B2195FF95003C4EB1 /* FontAwesomeTextRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeTextRepresentable.swift; sourceTree = "<group>"; };
+		D8A2AE3C2195FF96003C4EB1 /* FontAwesomeImageRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeImageRepresentable.swift; sourceTree = "<group>"; };
+		D8A2AE3D2195FF96003C4EB1 /* Enum.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enum.swift; sourceTree = "<group>"; };
+		D8A2AE3E2195FF96003C4EB1 /* FontAwesome.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FontAwesome.h; sourceTree = "<group>"; };
+		D8A2AE3F2195FF96003C4EB1 /* FontAwesomeSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesomeSegmentedControl.swift; sourceTree = "<group>"; };
+		D8A2AE402195FF97003C4EB1 /* FontAwesome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontAwesome.swift; sourceTree = "<group>"; };
+		D8B3103721CADFD600E85148 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCellTableViewCell.swift; sourceTree = "<group>"; };
+		D8B3103B21E2E7F900E85148 /* AppDataSingleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDataSingleton.swift; sourceTree = "<group>"; };
+		D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GeoFire.xcodeproj; path = "geofire-objc/GeoFire.xcodeproj"; sourceTree = "<group>"; };
+		D8B3105F21E58D4D00E85148 /* GeoFire-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GeoFire-Prefix.pch"; sourceTree = "<group>"; };
+		D8B3106121E58D4D00E85148 /* GFBase32Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFBase32Utils.h; sourceTree = "<group>"; };
+		D8B3106221E58D4D00E85148 /* GFGeoHashQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFGeoHashQuery.h; sourceTree = "<group>"; };
+		D8B3106321E58D4D00E85148 /* GFGeoHash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFGeoHash.h; sourceTree = "<group>"; };
+		D8B3106421E58D4D00E85148 /* GFQuery+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GFQuery+Private.h"; sourceTree = "<group>"; };
+		D8B3106521E58D4D00E85148 /* GFBase32Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GFBase32Utils.m; sourceTree = "<group>"; };
+		D8B3106621E58D4D00E85148 /* GeoFire+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GeoFire+Private.h"; sourceTree = "<group>"; };
+		D8B3106721E58D4D00E85148 /* GeoFire.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GeoFire.m; sourceTree = "<group>"; };
+		D8B3106821E58D4D00E85148 /* GFGeoHashQuery.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GFGeoHashQuery.m; sourceTree = "<group>"; };
+		D8B3106921E58D4D00E85148 /* GFQuery.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GFQuery.m; sourceTree = "<group>"; };
+		D8B3106A21E58D4D00E85148 /* GFGeoHash.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GFGeoHash.m; sourceTree = "<group>"; };
+		D8B3106C21E58D4D00E85148 /* GFRegionQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFRegionQuery.h; sourceTree = "<group>"; };
+		D8B3106D21E58D4D00E85148 /* GeoFire.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeoFire.h; sourceTree = "<group>"; };
+		D8B3106E21E58D4D00E85148 /* GFQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFQuery.h; sourceTree = "<group>"; };
+		D8B3106F21E58D4D00E85148 /* GFCircleQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFCircleQuery.h; sourceTree = "<group>"; };
+		D8CBADCD21C295C900C42F91 /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NotificationController.swift; path = "../../../../My Playground/FunFactTest/FunFactTest/Controllers/NotificationController.swift"; sourceTree = "<group>"; };
 		D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConnection.swift; sourceTree = "<group>"; };
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
 		D8D18574212A1F2F0093B66C /* FunFactStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactStruct.swift; sourceTree = "<group>"; };
@@ -109,6 +186,7 @@
 		D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactViewController.swift; sourceTree = "<group>"; };
 		D8ED8FF9210A49780010EF7C /* AddressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressViewController.swift; sourceTree = "<group>"; };
 		D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchTableViewController.swift; sourceTree = "<group>"; };
+		D8F0078421ED5E7E0031325F /* SearchLandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLandmarkStruct.swift; sourceTree = "<group>"; };
 		D8F76AF0210E1A3100A039D2 /* AddressCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressCell.swift; sourceTree = "<group>"; };
 		D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ListOfLandmarks.json; sourceTree = "<group>"; };
@@ -136,7 +214,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D8650461216BED5F00B65AAB /* IQKeyboardManagerSwift.framework in Frameworks */,
-				D80F6CA02163140A00AF2E8D /* FontAwesome_swift.framework in Frameworks */,
 				D8E78FF5214310E5006F03B9 /* MapKitGoogleStyler.framework in Frameworks */,
 				D8F76AF72112812400A039D2 /* FirebaseCore.framework in Frameworks */,
 				D8F76AF92112812400A039D2 /* FirebaseFirestore.framework in Frameworks */,
@@ -159,6 +236,7 @@
 		D569FB58055CD1C61272A23D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */,
 				D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */,
 				D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */,
 				D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */,
@@ -186,6 +264,78 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		D8A2AE4D21960132003C4EB1 /* FontAwesome */ = {
+			isa = PBXGroup;
+			children = (
+				D8A2AE3D2195FF96003C4EB1 /* Enum.swift */,
+				D8A2AE3E2195FF96003C4EB1 /* FontAwesome.h */,
+				D8A2AE402195FF97003C4EB1 /* FontAwesome.swift */,
+				D8A2AE352195FF94003C4EB1 /* FontAwesomeBarButtonItem.swift */,
+				D8A2AE392195FF95003C4EB1 /* FontAwesomeExtension.swift */,
+				D8A2AE3C2195FF96003C4EB1 /* FontAwesomeImageRepresentable.swift */,
+				D8A2AE362195FF94003C4EB1 /* FontAwesomeImageView.swift */,
+				D8A2AE3F2195FF96003C4EB1 /* FontAwesomeSegmentedControl.swift */,
+				D8A2AE3A2195FF95003C4EB1 /* FontAwesomeStateRequirement.swift */,
+				D8A2AE372195FF94003C4EB1 /* FontAwesomeTabBarItem.swift */,
+				D8A2AE3B2195FF95003C4EB1 /* FontAwesomeTextRepresentable.swift */,
+				D8A2AE382195FF95003C4EB1 /* FontAwesomeView.swift */,
+				D8A2AE2D2195FF41003C4EB1 /* Font Awesome 5 Brands-Regular-400.otf */,
+				D8A2AE2B2195FF41003C4EB1 /* Font Awesome 5 Free-Regular-400.otf */,
+				D8A2AE2A2195FF41003C4EB1 /* Font Awesome 5 Free-Solid-900.otf */,
+				D8A2AE2E2195FF42003C4EB1 /* Font Awesome 5 Pro-Light-300.otf */,
+				D8A2AE2C2195FF41003C4EB1 /* Font Awesome 5 Pro-Regular-400.otf */,
+				D8A2AE292195FF40003C4EB1 /* Font Awesome 5 Pro-Solid-900.otf */,
+			);
+			path = FontAwesome;
+			sourceTree = "<group>";
+		};
+		D8B3103E21E58B2E00E85148 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D8B3104421E58B2E00E85148 /* libGeoFire.a */,
+				D8B3104621E58B2E00E85148 /* GeoFireTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D8B3105E21E58D4D00E85148 /* GeoFire */ = {
+			isa = PBXGroup;
+			children = (
+				D8B3105F21E58D4D00E85148 /* GeoFire-Prefix.pch */,
+				D8B3106021E58D4D00E85148 /* Implementation */,
+				D8B3106B21E58D4D00E85148 /* API */,
+			);
+			path = GeoFire;
+			sourceTree = "<group>";
+		};
+		D8B3106021E58D4D00E85148 /* Implementation */ = {
+			isa = PBXGroup;
+			children = (
+				D8B3106121E58D4D00E85148 /* GFBase32Utils.h */,
+				D8B3106221E58D4D00E85148 /* GFGeoHashQuery.h */,
+				D8B3106321E58D4D00E85148 /* GFGeoHash.h */,
+				D8B3106421E58D4D00E85148 /* GFQuery+Private.h */,
+				D8B3106521E58D4D00E85148 /* GFBase32Utils.m */,
+				D8B3106621E58D4D00E85148 /* GeoFire+Private.h */,
+				D8B3106721E58D4D00E85148 /* GeoFire.m */,
+				D8B3106821E58D4D00E85148 /* GFGeoHashQuery.m */,
+				D8B3106921E58D4D00E85148 /* GFQuery.m */,
+				D8B3106A21E58D4D00E85148 /* GFGeoHash.m */,
+			);
+			path = Implementation;
+			sourceTree = "<group>";
+		};
+		D8B3106B21E58D4D00E85148 /* API */ = {
+			isa = PBXGroup;
+			children = (
+				D8B3106C21E58D4D00E85148 /* GFRegionQuery.h */,
+				D8B3106D21E58D4D00E85148 /* GeoFire.h */,
+				D8B3106E21E58D4D00E85148 /* GFQuery.h */,
+				D8B3106F21E58D4D00E85148 /* GFCircleQuery.h */,
+			);
+			path = API;
+			sourceTree = "<group>";
+		};
 		D8D1856D2129EDD70093B66C /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -200,6 +350,7 @@
 				D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */,
 				D865045E216AC58600B65AAB /* HashtagCell.swift */,
 				D86DA75E217424A8001F7B5C /* UserSubsCell.swift */,
+				D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -215,6 +366,8 @@
 				D8D18572212A1E510093B66C /* LandmarkStruct.swift */,
 				D8FE7FA120DC4237007B4550 /* Utils.swift */,
 				D83F06012161BD0700B37FED /* UserStruct.swift */,
+				D8B3103B21E2E7F900E85148 /* AppDataSingleton.swift */,
+				D8F0078421ED5E7E0031325F /* SearchLandmarkStruct.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -236,6 +389,8 @@
 				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
 				D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */,
 				D8A2ADE421938268003C4EB1 /* TabBarController.swift */,
+				D8CBADCD21C295C900C42F91 /* NotificationController.swift */,
+				D8B3103721CADFD600E85148 /* SearchViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -243,6 +398,8 @@
 		D8FE7F7620DB2712007B4550 = {
 			isa = PBXGroup;
 			children = (
+				D8B3105E21E58D4D00E85148 /* GeoFire */,
+				D8A2AE4D21960132003C4EB1 /* FontAwesome */,
 				D8FE7F8120DB2712007B4550 /* FunFactTest */,
 				D8FE7F8020DB2712007B4550 /* Products */,
 				270B60A5492612E273CC8201 /* Pods */,
@@ -292,6 +449,7 @@
 				D8FE7F7D20DB2712007B4550 /* Resources */,
 				7A2B440DD41034D44BFFEF02 /* [CP] Embed Pods Frameworks */,
 				255FA292C28F7F34B0989643 /* [CP] Copy Pods Resources */,
+				D800724A2208DBF300A20084 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -337,6 +495,12 @@
 			mainGroup = D8FE7F7620DB2712007B4550;
 			productRefGroup = D8FE7F8020DB2712007B4550 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = D8B3103E21E58B2E00E85148 /* Products */;
+					ProjectRef = D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				D8FE7F7E20DB2712007B4550 /* FunFactTest */,
@@ -344,11 +508,34 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXReferenceProxy section */
+		D8B3104421E58B2E00E85148 /* libGeoFire.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGeoFire.a;
+			remoteRef = D8B3104321E58B2E00E85148 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		D8B3104621E58B2E00E85148 /* GeoFireTests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = GeoFireTests.xctest;
+			remoteRef = D8B3104521E58B2E00E85148 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
 /* Begin PBXResourcesBuildPhase section */
 		D8FE7F7D20DB2712007B4550 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8A2AE2F2195FF42003C4EB1 /* Font Awesome 5 Pro-Solid-900.otf in Resources */,
+				D8A2AE302195FF42003C4EB1 /* Font Awesome 5 Free-Solid-900.otf in Resources */,
+				D8A2AE312195FF42003C4EB1 /* Font Awesome 5 Free-Regular-400.otf in Resources */,
+				D8A2AE322195FF42003C4EB1 /* Font Awesome 5 Pro-Regular-400.otf in Resources */,
+				D8A2AE332195FF42003C4EB1 /* Font Awesome 5 Brands-Regular-400.otf in Resources */,
+				D8A2AE342195FF42003C4EB1 /* Font Awesome 5 Pro-Light-300.otf in Resources */,
 				D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */,
 				D8E78FF921432BF4006F03B9 /* overlay-blue.json in Resources */,
 				D8E78FFB21432CBF006F03B9 /* overlay-dark.json in Resources */,
@@ -432,12 +619,18 @@
 				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
-				"${BUILT_PRODUCTS_DIR}/FontAwesome.swift/FontAwesome_swift.framework",
+				"${BUILT_PRODUCTS_DIR}/FBSDKShareKit/FBSDKShareKit.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
+				"${BUILT_PRODUCTS_DIR}/FacebookShare/FacebookShare.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/IQKeyboardManagerSwift/IQKeyboardManagerSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/InstantSearch/InstantSearch.framework",
+				"${BUILT_PRODUCTS_DIR}/InstantSearchClient/InstantSearchClient.framework",
+				"${BUILT_PRODUCTS_DIR}/InstantSearchCore/InstantSearchCore.framework",
 				"${BUILT_PRODUCTS_DIR}/MapKitGoogleStyler/MapKitGoogleStyler.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
@@ -458,12 +651,18 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FontAwesome_swift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKShareKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookShare.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IQKeyboardManagerSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/InstantSearch.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/InstantSearchClient.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/InstantSearchCore.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapKitGoogleStyler.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
@@ -482,6 +681,23 @@
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		D800724A2208DBF300A20084 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -489,12 +705,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8A2AE412195FF97003C4EB1 /* FontAwesomeBarButtonItem.swift in Sources */,
+				D8A2AE422195FF97003C4EB1 /* FontAwesomeImageView.swift in Sources */,
+				D8F0078521ED5E7E0031325F /* SearchLandmarkStruct.swift in Sources */,
+				D8A2AE432195FF97003C4EB1 /* FontAwesomeTabBarItem.swift in Sources */,
+				D8B3103C21E2E7F900E85148 /* AppDataSingleton.swift in Sources */,
+				D8A2AE442195FF97003C4EB1 /* FontAwesomeView.swift in Sources */,
+				D8A2AE452195FF97003C4EB1 /* FontAwesomeExtension.swift in Sources */,
+				D8A2AE462195FF97003C4EB1 /* FontAwesomeStateRequirement.swift in Sources */,
+				D8A2AE472195FF97003C4EB1 /* FontAwesomeTextRepresentable.swift in Sources */,
+				D8A2AE482195FF97003C4EB1 /* FontAwesomeImageRepresentable.swift in Sources */,
+				D8A2AE492195FF97003C4EB1 /* Enum.swift in Sources */,
+				D8A2AE4A2195FF97003C4EB1 /* FontAwesome.h in Sources */,
+				D8A2AE4B2195FF97003C4EB1 /* FontAwesomeSegmentedControl.swift in Sources */,
+				D8A2AE4C2195FF97003C4EB1 /* FontAwesome.swift in Sources */,
 				D848BD3A2134909E00C31CD0 /* SignInViewController.swift in Sources */,
 				D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */,
 				D88DBE7F212EFC48009A2CC2 /* Constants.swift in Sources */,
 				D86DA75F217424A8001F7B5C /* UserSubsCell.swift in Sources */,
 				D848BD4121357F3F00C31CD0 /* CustomUINavigation.swift in Sources */,
 				D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */,
+				D8CBADCE21C295C900C42F91 /* NotificationController.swift in Sources */,
 				D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */,
 				D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */,
 				D848BD3621343FAF00C31CD0 /* ButtonWithShadow.swift in Sources */,
@@ -513,12 +744,14 @@
 				D8FE7FA420DC491F007B4550 /* FunFactAnnotation.swift in Sources */,
 				D8FE7F9720DB2795007B4550 /* AnnotationBottomView.swift in Sources */,
 				D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */,
+				D8B3103A21CAEAA500E85148 /* SearchCellTableViewCell.swift in Sources */,
 				D8ED8FF8210A49480010EF7C /* AddFactViewController.swift in Sources */,
 				D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */,
 				D8FE7FAC20E4671C007B4550 /* FunFactPageViewController.swift in Sources */,
 				D8ED8FFA210A49780010EF7C /* AddressViewController.swift in Sources */,
 				D848BD3E2134F05800C31CD0 /* CustomTextField.swift in Sources */,
 				D8FE7F8320DB2712007B4550 /* AppDelegate.swift in Sources */,
+				D8B3103821CADFD600E85148 /* SearchViewController.swift in Sources */,
 				D8FE7FAA20E45083007B4550 /* ContentViewController.swift in Sources */,
 				D86DA75D21741BA6001F7B5C /* UserSubsTableViewController.swift in Sources */,
 				D83F06022161BD0700B37FED /* UserStruct.swift in Sources */,

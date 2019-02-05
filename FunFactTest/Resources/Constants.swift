@@ -9,24 +9,31 @@
 import Foundation
 import UIKit
 
-struct Constants {
+enum Colors {
     static let blueColor = UIColor(displayP3Red: 0, green: 122/255, blue: 1.0, alpha: 1.0)
-    static let redColor = UIColor(displayP3Red: 217/255, green: 84/255, blue: 61/255, alpha: 1.0)
+    static let seagreenColor = UIColor(displayP3Red: 46/255, green: 139/255, blue: 87/255, alpha: 1.0)
     static let fbBlueColor = UIColor(displayP3Red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
     static let greenColor = UIColor(displayP3Red: 46/255, green: 204/255, blue: 113/255, alpha: 1.0)
-    
+    static let redColor = UIColor(displayP3Red: 178/255, green: 34/255, blue: 34/255, alpha: 1.0)
+}
+
+enum Attributes {
     static let attribute12RegDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                     NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]
     static let attribute12BoldDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                      NSAttributedString.Key.font: UIFont(name: "AvenirNext-Bold", size: 12.0)!]
+    static let attribute12BoldBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
+                                       NSAttributedString.Key.font: UIFont(name: "AvenirNext-Bold", size: 12.0)!]
+    static let attribute12RegBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
+                                       NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]
     static let attribute10RegDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                     NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
     static let attribute14ItalicsDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                         NSAttributedString.Key.font: UIFont(name: "Avenir-BookOblique", size: 14.0)!]
     static let attribute14DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
                                         NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
-    static let attribute14DemiBlue = [ NSAttributedString.Key.foregroundColor: blueColor,
-                                        NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
+    static let attribute14DemiBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
+                                       NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
     
     static let smallImageAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
                                        NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 12, style: .solid)]
@@ -34,12 +41,18 @@ struct Constants {
     static let toolBarImageSolidAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
                                               NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
     
-    static let toolBarLabelAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+    static let navBarImageSolidAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                                             NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
+    
+    static let addFactButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
+                                          NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
+    
+    static let toolBarLabelAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                          NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
     
-    static let toolBarImageClickedAttribute = [ NSAttributedString.Key.foregroundColor: Constants.redColor,
+    static let toolBarImageClickedAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
                                                 NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
-    static let toolBarLabelClickedAttribute = [ NSAttributedString.Key.foregroundColor: Constants.redColor,
+    static let toolBarLabelClickedAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
                                                 NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
     
     static let loginButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
@@ -66,30 +79,58 @@ struct Constants {
     static let googleLoginButtonImageSolidClickedAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
                                                                NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
     
-    static let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
+    static let searchButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.1, alpha: 1.0),
+                                        NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 14.0)!]
+    static let searchButtonSelectedAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
+                                         NSAttributedString.Key.font: UIFont(name: "AvenirNext-Bold", size: 14.0)!]
+
+}
+
+struct AnnotationType {
+    var color: UIColor
+    var image: UIImage
+}
+
+struct Constants {
+    static let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace,
+                                               target: nil,
+                                               action: nil)
     
-    static let landmarkTypes = ["--- Select landmark type ---", "Apartment", "Office Building", "Stadium", "Museum", "Park", "Restaurant/Cafe", "Landmark"]
+    static let landmarkTypes = ["--- Select landmark type ---",
+                                "Apartment", "Office Building",
+                                "Stadium",
+                                "Museum",
+                                "Park",
+                                "Restaurant/Cafe",
+                                "Landmark"]
     
-    static func getColorFor(type: String) -> UIColor {
-        var color = UIColor()
+    static func getMarkerDetails(type: String) -> AnnotationType {
+        var annotationType = AnnotationType(color: UIColor(), image: UIImage())
         switch type {
         case Constants.landmarkTypes[1]:
-            color = .orange
+            annotationType.color = .orange
+            annotationType.image = UIImage.fontAwesomeIcon(name: .home, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
         case Constants.landmarkTypes[2]:
-            color = .blue
+            annotationType.color = .blue
+            annotationType.image = UIImage.fontAwesomeIcon(name: .building, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
         case Constants.landmarkTypes[3]:
-            color = .black
+            annotationType.color = .black
+            annotationType.image = UIImage.fontAwesomeIcon(name: .footballBall, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
         case Constants.landmarkTypes[4]:
-            color = .green
+            annotationType.color = .green
+            annotationType.image = UIImage.fontAwesomeIcon(name: .book, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
         case Constants.landmarkTypes[5]:
-            color = .cyan
+            annotationType.color = .cyan
+            annotationType.image = UIImage.fontAwesomeIcon(name: .tree, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
         case Constants.landmarkTypes[6]:
-            color = .gray
+            annotationType.color = .gray
+            annotationType.image = UIImage.fontAwesomeIcon(name: .utensils, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
         case Constants.landmarkTypes[7]:
-            color = .purple
+            annotationType.color = .purple
+            annotationType.image = UIImage.fontAwesomeIcon(name: .university, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
         default:
-            color = .red
+            annotationType.color = .red
         }
-        return color
+        return annotationType
     }
 }

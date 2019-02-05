@@ -20,18 +20,47 @@ class ProfileViewController: UIViewController {
     @IBOutlet weak var signInView: UIView!
     @IBOutlet weak var signInButton: CustomButton!
     
+    var uid = ""
+    var mode = ""
     var factsSubmitted = 0
     var disputesSubmitted = 0
-    var userProfile = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
     var funFactsSubmitted = [FunFact]()
     var landmarksDict = [String: String]()
+    var submittedCount = 0
+    var disputeCount = 0
+    var photoURL = ""
+    var name = ""
+    var email = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
+        submittedNum.textColor = Colors.blueColor
+        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
+            navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
+        }
         navigationItem.title = "User Profile"
+        var funFactsSubmitted = [DocumentReference]()
+        if mode == "other" {
+            funFactsSubmitted = AppDataSingleton.appDataSharedInstance.usersDict[uid]?.funFactsSubmitted ?? [DocumentReference]()
+        }
+        else {
+            funFactsSubmitted = AppDataSingleton.appDataSharedInstance.userProfile.funFactsSubmitted
+        }
+        
+        for ref in funFactsSubmitted {
+            downloadFunFactsSubmitted(ref: ref, completionHandler: { (funFact) in
+                let f = funFact
+                self.funFactsSubmitted.append(f)
+            })
+        }
+        
+        populateLandmarkDict() { (dict) in
+            self.landmarksDict = dict
+        }
     }
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -47,23 +76,40 @@ class ProfileViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        if mode == "other" {
+            submittedCount = AppDataSingleton.appDataSharedInstance.usersDict[uid]?.submittedCount ?? 0
+            disputeCount = AppDataSingleton.appDataSharedInstance.usersDict[uid]?.disputeCount ?? 0
+            photoURL = AppDataSingleton.appDataSharedInstance.usersDict[uid]?.photoURL ?? ""
+            name = AppDataSingleton.appDataSharedInstance.usersDict[uid]?.name ?? ""
+            email = AppDataSingleton.appDataSharedInstance.usersDict[uid]?.email ?? ""
+        }
+        else {
+            submittedCount = AppDataSingleton.appDataSharedInstance.userProfile.submittedCount
+            disputeCount = AppDataSingleton.appDataSharedInstance.userProfile.disputeCount
+            photoURL = AppDataSingleton.appDataSharedInstance.userProfile.photoURL
+            name = AppDataSingleton.appDataSharedInstance.userProfile.name
+            email = AppDataSingleton.appDataSharedInstance.userProfile.email
+        }
+        
         
         // Hide the navigation bar on the this view controller
         self.navigationController?.toolbar.isHidden = true
         if Auth.auth().currentUser != nil {
-            downloadUserProfile() { (user) in
-                self.userProfile = user
-            }
-//        }
         
 //        if self.userProfile.uid != nil && self.userProfile.uid != "" && Auth.auth().currentUser != nil {
-        
+//            let mainTab = self.tabBarController?.viewControllers?.first as? MainViewController
+//            self.userProfile = (mainTab?.userProfile)!
+//            print (mainTab?.listOfFunFacts.listOfFunFacts.count)
+            
+            self.submittedNum.text = String(submittedCount)
+            self.disputesNum.text = String(disputeCount)
+            
             let subGesture = UITapGestureRecognizer(target: self, action: #selector(subTapAction))
             subGesture.numberOfTapsRequired = 1
             submittedNum.isUserInteractionEnabled = true
             submittedNum.addGestureRecognizer(subGesture)
             
-            let photoUrl = URL(string: userProfile.photoURL ?? "")
+            let photoUrl = URL(string: photoURL )
             if photoUrl == URL(string: "") {
                 userImageView.image = UIImage.fontAwesomeIcon(name: .user, style: .solid, textColor: .black, size: CGSize(width: 100, height: 100))
             }
@@ -74,40 +120,19 @@ class ProfileViewController: UIViewController {
             }
             signInView.isHidden = true
             navigationController?.navigationBar.tintColor = UIColor.darkGray
-            userName.text = userProfile.name
-            userProfileName.text = userProfile.email.components(separatedBy: "@")[0]
+            userName.text = name
+            userProfileName.text = email.components(separatedBy: "@")[0]
             userImageView.layer.cornerRadius = userImageView.frame.height/2
-            signOutButton.layer.backgroundColor = Constants.redColor.cgColor
+            signOutButton.layer.backgroundColor = Colors.seagreenColor.cgColor
             userImageView.layer.borderWidth = 0.5
             userImageView.layer.borderColor = UIColor.gray.cgColor
             
-            let db = Firestore.firestore()
-            db.collection("users").document(Auth.auth().currentUser?.uid ?? "").getDocument { (snapshot, error) in
-                if let document = snapshot {
-                    self.factsSubmitted = document.data()?["submittedCount"] as! Int
-                    self.disputesSubmitted = document.data()?["disputeCount"] as! Int
-                    self.submittedNum.text = String(self.factsSubmitted)
-                    self.disputesNum.text = String(self.disputesSubmitted)
-                } else {
-                    print("Document does not exist")
-                }
-            }
             
-            for ref in (userProfile.funFactsSubmitted) {
-                downloadFunFactsSubmitted(ref: ref, completionHandler: { (funFact) in
-                    let f = funFact
-                    self.funFactsSubmitted.append(f)
-                })
-            }
-            
-            populateLandmarkDict() { (dict) in
-                self.landmarksDict = dict
-            }
         }
         else {
             signInView.isHidden = false
             view.bringSubviewToFront(signInView)
-            signInButton.layer.backgroundColor = Constants.redColor.cgColor
+            signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         }
     }
     
@@ -127,7 +152,13 @@ class ProfileViewController: UIViewController {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let subViewVC = segue.destination as? UserSubsTableViewController
-        subViewVC?.userProfile = userProfile
+        if mode == "other" {
+            subViewVC?.userProfile = AppDataSingleton.appDataSharedInstance.usersDict[uid]
+        }
+        else {
+            subViewVC?.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
+        }
+        
         subViewVC?.funFactsSubmitted = funFactsSubmitted
         subViewVC?.landmarksDict = landmarksDict
     }
@@ -170,65 +201,6 @@ class ProfileViewController: UIViewController {
             } else {
                 print("Document \(ref.documentID) does not exist")
             }
-        }
-    }
-    
-    func downloadUserProfile(completionHandler: @escaping (User) -> ())  {
-        if Auth.auth().currentUser == nil {
-            return
-        }
-        let db = Firestore.firestore()
-        var user = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", phoneNumber: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
-        db.collection("users").document(Auth.auth().currentUser?.uid ?? "").getDocument { (snapshot, error) in
-            if let document = snapshot {
-                user.dislikeCount = document.data()?["dislikeCount"] as! Int
-                user.likeCount = document.data()?["likeCount"] as! Int
-                user.disputeCount = document.data()?["disputeCount"] as! Int
-                user.submittedCount = document.data()?["submittedCount"] as! Int
-                user.email = document.data()?["email"] as! String
-                user.name = document.data()?["name"] as! String
-                user.phoneNumber = document.data()?["phoneNumber"] as! String
-                user.photoURL = document.data()?["photoURL"] as! String
-                user.provider = document.data()?["provider"] as! String
-                user.uid = document.data()?["uid"] as! String
-                
-                self.downloadOtherUserData(collection: "funFactsLiked", completionHandler: { (ref) in
-                    self.userProfile.funFactsLiked = ref
-                })
-                self.downloadOtherUserData(collection: "funFactsDisliked", completionHandler: { (ref) in
-                    self.userProfile.funFactsDisliked = ref
-                })
-                self.downloadOtherUserData(collection: "funFactsSubmitted", completionHandler: { (ref) in
-                    self.userProfile.funFactsSubmitted = ref
-                })
-                self.downloadOtherUserData(collection: "funFactsDisputed", completionHandler: { (ref) in
-                    self.userProfile.funFactsDisputed = ref
-                })
-                
-                completionHandler(user)
-            }
-            else {
-                let err = error
-                print("Error getting documents: \(String(describing: err))")
-            }
-        }
-    }
-    func downloadOtherUserData(collection: String, completionHandler: @escaping ([DocumentReference]) -> ()) {
-        var refs = [DocumentReference]()
-        let db = Firestore.firestore()
-        db.collection("users").document(Auth.auth().currentUser?.uid ?? "").collection(collection).getDocuments() { (snap, error) in
-            if let err = error {
-                print("Error getting documents: \(err)")
-            } else {
-                for doc in snap!.documents {
-                    if collection == "funFactsDisputed" {
-                        refs.append(doc.data()["disputeID"] as! DocumentReference)
-                    } else {
-                        refs.append(doc.data()["funFactID"] as! DocumentReference)
-                    }
-                }
-            }
-            completionHandler(refs)
         }
     }
 }

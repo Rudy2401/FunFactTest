@@ -20,7 +20,6 @@ struct User {
     var submittedCount: Int
     var email: String
     var name: String
-    var phoneNumber: String
     var photoURL: String
     var provider: String
     var funFactsDisputed: [DocumentReference]

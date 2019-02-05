@@ -9,10 +9,10 @@
 import Foundation
 
 struct ListOfFunFacts  {
-    var listOfFunFacts: [FunFact]
+    var listOfFunFacts: Set<FunFact>
 }
 
-struct FunFact  {
+struct FunFact: Hashable  {
     var landmarkId: String
     var id: String
     var description: String
