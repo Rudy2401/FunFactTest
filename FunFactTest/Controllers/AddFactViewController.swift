@@ -278,27 +278,17 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
                 print("Error getting documents: \(error)")
             } else {
                 for document in snapshot!.documents {
-                    // swiftlint:disable:next force_cast
                     let addr = ((document.data()["address"] as! String)
-                        // swiftlint:disable:next force_cast
                         + (document.data()["city"] as! String)
-                        // swiftlint:disable:next force_cast
                         + (document.data()["state"] as! String)
-                        // swiftlint:disable:next force_cast
                         + (document.data()["country"] as! String)
-                        // swiftlint:disable:next force_cast
                         + (document.data()["zipcode"] as! String)).lowercased()
                     if addr == address {
                         print ("!!!Landmark Exists!!!")
-                        // swiftlint:disable:next force_cast
                         landmarkID = document.data()["id"] as! String
-                        // swiftlint:disable:next force_cast
                         numOfFunFacts = document.data()["numOfFunFacts"] as! Int
-                        // swiftlint:disable:next force_cast
                         likes = document.data()["likes"] as! Int
-                        // swiftlint:disable:next force_cast
                         dislikes = document.data()["dislikes"] as! Int
-                        // swiftlint:disable:previous force_cast
                         completionHandler(landmarkID, numOfFunFacts, likes, dislikes)
                     } else {
                         completionHandler(landmarkID, numOfFunFacts, likes, dislikes)

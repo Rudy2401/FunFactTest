@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */; };
+		D800724D2209DBB500A20084 /* FirestoreRandomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */; };
 		D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */ = {isa = PBXBuildFile; fileRef = D834DFF720F677690091CA40 /* ListOfFunFacts.json */; };
 		D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */; };
 		D83F06022161BD0700B37FED /* UserStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83F06012161BD0700B37FED /* UserStruct.swift */; };
@@ -50,7 +51,7 @@
 		D8B3103821CADFD600E85148 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103721CADFD600E85148 /* SearchViewController.swift */; };
 		D8B3103A21CAEAA500E85148 /* SearchCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */; };
 		D8B3103C21E2E7F900E85148 /* AppDataSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103B21E2E7F900E85148 /* AppDataSingleton.swift */; };
-		D8CBADCE21C295C900C42F91 /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CBADCD21C295C900C42F91 /* NotificationController.swift */; };
+		D8CBADCE21C295C900C42F91 /* MainViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CBADCD21C295C900C42F91 /* MainViewControllerExtension.swift */; };
 		D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */; };
 		D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18572212A1E510093B66C /* LandmarkStruct.swift */; };
 		D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18574212A1F2F0093B66C /* FunFactStruct.swift */; };
@@ -108,6 +109,7 @@
 		1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FunFactTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A9A8A65C29502B3DDAE2E25 /* Pods-FunFactTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunFactTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.debug.xcconfig"; sourceTree = "<group>"; };
 		8583EE7FC03419D00EFF4C12 /* Pods-FunFactTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunFactTest.release.xcconfig"; path = "Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.release.xcconfig"; sourceTree = "<group>"; };
+		D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreRandomFunctions.swift; sourceTree = "<group>"; };
 		D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FontAwesome_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = BoltsSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D834DFF720F677690091CA40 /* ListOfFunFacts.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ListOfFunFacts.json; sourceTree = "<group>"; };
@@ -169,7 +171,7 @@
 		D8B3106D21E58D4D00E85148 /* GeoFire.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeoFire.h; sourceTree = "<group>"; };
 		D8B3106E21E58D4D00E85148 /* GFQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFQuery.h; sourceTree = "<group>"; };
 		D8B3106F21E58D4D00E85148 /* GFCircleQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFCircleQuery.h; sourceTree = "<group>"; };
-		D8CBADCD21C295C900C42F91 /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NotificationController.swift; path = "../../../../My Playground/FunFactTest/FunFactTest/Controllers/NotificationController.swift"; sourceTree = "<group>"; };
+		D8CBADCD21C295C900C42F91 /* MainViewControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewControllerExtension.swift; sourceTree = "<group>"; };
 		D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConnection.swift; sourceTree = "<group>"; };
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
 		D8D18574212A1F2F0093B66C /* FunFactStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactStruct.swift; sourceTree = "<group>"; };
@@ -379,18 +381,19 @@
 				D8ED8FF9210A49780010EF7C /* AddressViewController.swift */,
 				D8FE7FA920E45082007B4550 /* ContentViewController.swift */,
 				D8DF6A5D210634800031A153 /* DisputeViewController.swift */,
+				D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */,
 				D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */,
 				D848BD462137838B00C31CD0 /* ImageViewViewController.swift */,
 				D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */,
 				D8FE7F8420DB2712007B4550 /* MainViewController.swift */,
+				D8CBADCD21C295C900C42F91 /* MainViewControllerExtension.swift */,
 				D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */,
+				D8B3103721CADFD600E85148 /* SearchViewController.swift */,
 				D848BD392134909E00C31CD0 /* SignInViewController.swift */,
 				D848BD3B213490D100C31CD0 /* SignUpViewController.swift */,
-				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
-				D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */,
 				D8A2ADE421938268003C4EB1 /* TabBarController.swift */,
-				D8CBADCD21C295C900C42F91 /* NotificationController.swift */,
-				D8B3103721CADFD600E85148 /* SearchViewController.swift */,
+				D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */,
+				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -725,7 +728,7 @@
 				D86DA75F217424A8001F7B5C /* UserSubsCell.swift in Sources */,
 				D848BD4121357F3F00C31CD0 /* CustomUINavigation.swift in Sources */,
 				D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */,
-				D8CBADCE21C295C900C42F91 /* NotificationController.swift in Sources */,
+				D8CBADCE21C295C900C42F91 /* MainViewControllerExtension.swift in Sources */,
 				D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */,
 				D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */,
 				D848BD3621343FAF00C31CD0 /* ButtonWithShadow.swift in Sources */,
@@ -742,6 +745,7 @@
 				D8E78FF12141FC9B006F03B9 /* CustomButton.swift in Sources */,
 				D8FE7F8520DB2712007B4550 /* MainViewController.swift in Sources */,
 				D8FE7FA420DC491F007B4550 /* FunFactAnnotation.swift in Sources */,
+				D800724D2209DBB500A20084 /* FirestoreRandomFunctions.swift in Sources */,
 				D8FE7F9720DB2795007B4550 /* AnnotationBottomView.swift in Sources */,
 				D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */,
 				D8B3103A21CAEAA500E85148 /* SearchCellTableViewCell.swift in Sources */,

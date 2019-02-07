@@ -7,19 +7,21 @@
 //
 
 import UIKit
-import Firebase
 import FBSDKCoreKit
 import GoogleSignIn
 import CoreLocation
 import UserNotifications
 import IQKeyboardManagerSwift
+import Firebase
+import FirebaseFirestore
+import FirebaseStorage
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     let locationManager = CLLocationManager()
-    var notificationCenter: UNUserNotificationCenter?
+    var notificationCenter: UNUserNotificationCenter!
     var notificationCount = 0
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -30,11 +32,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Configure Google Sign in
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         
+        self.locationManager.delegate = self
         // get the singleton object
         notificationCenter = UNUserNotificationCenter.current()
         
         // define what do you need permission to use
         let options: UNAuthorizationOptions = [.alert, .sound]
+        notificationCenter.delegate = self
         
          //request permission
         notificationCenter?.requestAuthorization(options: options) { (granted, error) in
@@ -82,4 +86,104 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 }
 
-
+extension AppDelegate: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
+        if region is CLCircularRegion {
+            handleEvent(forRegion: region)
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
+        if region is CLCircularRegion {
+            //            handleEvent(forRegion: region)
+        }
+    }
+    func handleEvent(forRegion region: CLRegion!) {
+        if !region.identifier.contains("|") {
+            return
+        }
+        // customize your notification content
+        print ("region = \(region.identifier)")
+        let db = Firestore.firestore()
+        let title = region.identifier.components(separatedBy: "|").last
+        let landmarkID = region.identifier.components(separatedBy: "|").first
+        let content = UNMutableNotificationContent()
+        var imageId = ""
+        content.title = "Near " + title! + "?"
+        content.subtitle = "Did you know?"
+        
+        db.collection("funFacts")
+            .whereField("landmarkId", isEqualTo: landmarkID!)
+            .order(by: "likes", descending: true)
+            .getDocuments { (snapshot, error) in
+                if let error = error {
+                    print ("Error getting document \(error)")
+                } else {
+                    let document = snapshot?.documents.first
+                    content.body = document?.data()["description"] as! String
+                    imageId = document?.data()["imageName"] as! String
+                }
+                // Add image to notification
+                let imageName = "\(imageId).jpeg"
+                let imageFromCache = CacheManager.shared.getFromCache(key: imageId) as? UIImage
+                if imageFromCache != nil {
+                    let imageData = imageFromCache!.jpegData(compressionQuality: 1.0)
+                    guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: imageName, data: imageData! as NSData, options: nil) else { return  }
+                    content.attachments = [attachment]
+                } else {
+                    let storage = Storage.storage()
+                    let storageRef = storage.reference()
+                    let gsReference = storageRef.child("images/\(imageName)")
+                    gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
+                        if let error = error {
+                            print("error = \(error)")
+                        } else {
+                            guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: imageName, data: data! as NSData, options: nil) else { return  }
+                            print("attachment = \(attachment)")
+                            print("data = \(data)")
+                            content.attachments = [attachment]
+                            content.sound = UNNotificationSound.default
+                            self.notificationCount += 1
+                            
+                            // when the notification will be triggered
+                            let timeInSeconds: TimeInterval = 5 // 60s * 15 = 15min
+                            // the actual trigger object
+                            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInSeconds,
+                                                                            repeats: false)
+                            
+                            // notification unique identifier, for this example, same as the region to avoid duplicate notifications
+                            let identifier = region.identifier
+                            
+                            // the notification request object
+                            let request = UNNotificationRequest(identifier: identifier,
+                                                                content: content,
+                                                                trigger: trigger)
+                            
+                            // trying to add the notification request to notification center
+                            self.notificationCenter?.add(request, withCompletionHandler: { (error) in
+                                if error != nil {
+                                    print("Error adding notification with identifier: \(identifier)")
+                                }
+                            })
+                        }
+                    }
+                }
+        }
+        
+    }
+}
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        // when app is open and in foregroud
+        completionHandler(.alert)
+    }
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        // get the notification identifier to respond accordingly
+        let identifier = response.notification.request.identifier
+        print ("identifier = \(identifier)")
+    }
+}

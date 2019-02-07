@@ -296,9 +296,9 @@ class ContentViewController: UIViewController {
         let submittedBy1 = "Submitted By: "
         let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
         let completeSubmittedBy = NSMutableAttributedString()
-        let userID = AppDataSingleton.appDataSharedInstance.usersDict[submittedByObject as! String]?.email // swiftlint:disable:this force_cast
-        let submittedBy2 = userID!.components(separatedBy: "@")[0]
-        let myAttrString2 = NSAttributedString(string: submittedBy2, attributes: Attributes.attribute12RegBlue)
+        let userID: String = AppDataSingleton.appDataSharedInstance.usersDict[submittedByObject as! String]?.email ?? "" // swiftlint:disable:this force_cast
+        let submittedBy2 = userID.components(separatedBy: "@").first
+        let myAttrString2 = NSAttributedString(string: submittedBy2 ?? "", attributes: Attributes.attribute12RegBlue)
         let profileGesture = UITapGestureRecognizer(target: self, action: #selector(profileView))
         profileGesture.numberOfTapsRequired = 1
         submittedBy.isUserInteractionEnabled = true

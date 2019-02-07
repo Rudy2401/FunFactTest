@@ -267,16 +267,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         
         navigationItem.setRightBarButtonItems([menuBtn, flexibleSpace, shareBtn, flexibleSpace, voiceBtn], animated: true)
     }
-    
-//    func presentationCount(for pageViewController: UIPageViewController) -> Int {
-//        setupPageControl()
-//        return pageContent.count
-//    }
-//
-//    func presentationIndex(for pageViewController: UIPageViewController) -> Int {
-//        return 0
-//    }
-    
     private func setupPageControl() {
         self.pageControl.frame = CGRect(x: 0, y: self.view.frame.size.height - 50, width: self.view.frame.size.width, height: 50)
         self.pageControl.backgroundColor = .white

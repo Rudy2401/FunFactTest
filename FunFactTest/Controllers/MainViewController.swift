@@ -39,14 +39,12 @@ class MainViewController: UIViewController {
     let jsonObject = FunFactJSONParser()
     var landmarkImage = UIImage()
     var annotations: [FunFactAnnotation]?
-    var notificationCount = 0
     var landmarkType = ""
     var userProfile = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
     var boundingBox: GeoRect?
     
     // 1. create locationManager
     let locationManager = CLLocationManager()
-    var notificationCenter: UNUserNotificationCenter?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,27 +54,16 @@ class MainViewController: UIViewController {
         annotationBottomView.alpha = 0.0
         setupNavigationbar()
         
-        for landmark in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
-            self.setupGeoFences(lat: landmark.coordinates.latitude,
-                                lon: landmark.coordinates.longitude,
-                                title: landmark.name,
-                                landmarkID: landmark.id)
-        }
-        
-        downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user) in
-            AppDataSingleton.appDataSharedInstance.userProfile = user
-        }
-        downloadAllUserData()
         // 2. setup locationManager
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        
-        // register as it's delegate
-        notificationCenter?.delegate = self
-        // get the singleton object
-        notificationCenter = UNUserNotificationCenter.current()
+        downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user) in
+            AppDataSingleton.appDataSharedInstance.userProfile = user
+        }
+        downloadAllUserData()
+
         //        updateLikesDislikes()
         //        updateUsersDisputes()
         //        updateUserCounts()
@@ -138,7 +125,19 @@ class MainViewController: UIViewController {
         annotationBottomView.layer.cornerRadius = 5
         let numOffAttr = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                            NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]
-        var landmark = Landmark(id: "", name: "", address: "", city: "", state: "", zipcode: "", country: "", type: "", coordinates: GeoPoint(latitude: 0, longitude: 0), image: "", numOfFunFacts: 0, likes: 0, dislikes: 0 )
+        var landmark = Landmark(id: "",
+                                name: "",
+                                address: "",
+                                city: "",
+                                state: "",
+                                zipcode: "",
+                                country: "",
+                                type: "",
+                                coordinates: GeoPoint(latitude: 0, longitude: 0),
+                                image: "",
+                                numOfFunFacts: 0,
+                                likes: 0,
+                                dislikes: 0 )
         
         for lm in listOfLandmarks {
             if lm.id == annotationClicked.landmarkID {
@@ -201,7 +200,7 @@ class MainViewController: UIViewController {
         numOfFFComplete.append(attrString)
         noOfFunFactsLabel.attributedText = numOfFFComplete
         
-        let mytapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewBottomAnnotation))
+        let mytapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewFunFactDetailPage))
         mytapGestureRecognizer.numberOfTapsRequired = 1
         annotationBottomView.addGestureRecognizer(mytapGestureRecognizer)
         annotationBottomView.isUserInteractionEnabled = true
@@ -249,173 +248,6 @@ class MainViewController: UIViewController {
             self.landmarkImageView.sd_setImage(with: gsReference, placeholderImage: UIImage())
             self.landmarkImageView.layer.cornerRadius = 5
             //            })
-        }
-    }
-
-    
-    func updateData() {
-        let db = Firestore.firestore()
-        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    var description = document.data()["description"] as! String
-                    let tags = document.data()["tags"] as! [String]
-                    for tag in tags {
-                        description.append(" #\(tag)")
-                    }
-                    
-                    db.collection("funFacts").document(document.data()["id"] as! String).setData(["description": description], merge: true)
-                }
-            }
-        }
-    }
-    func updateTags() {
-        let db = Firestore.firestore()
-        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let id = document.data()["id"] as! String
-                    let tags = document.data()["tags"] as! [String]
-                    let funFactRef = db.collection("funFacts").document(id)
-                    for tag in tags {
-                        db.collection("hashtags").document(tag).collection("funFacts").document(id).setData(["funFactID": funFactRef], merge: true)
-                    }
-                }
-            }
-        }
-    }
-    
-    func updateUsers() {
-        let db = Firestore.firestore()
-        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let id = document.data()["id"] as! String
-                    let user = document.data()["submittedBy"] as! String
-                    let funFactRef = db.collection("funFacts").document(id)
-                    
-                    db.collection("users").document(user).collection("funFactsSubmitted").document(id).setData(["funFactID": funFactRef], merge: true)
-                    
-                }
-            }
-        }
-    }
-    func updateUsersDisputes() {
-        let db = Firestore.firestore()
-        db.collection("disputes").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let id = document.data()["disputeID"] as! String
-                    let user = document.data()["user"] as! String
-                    let disputeRef = db.collection("disputes").document(id)
-                    
-                    db.collection("users").document(user).collection("funFactsDisputed").document(id).setData(["disputeID": disputeRef], merge: true)
-                    
-                }
-            }
-        }
-    }
-    func updateLikesDislikes() {
-        let db = Firestore.firestore()
-        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let funFactId = document.data()["id"] as! String
-                    db.collection("funFacts").document(funFactId).setData(["likes": 0], merge: true)
-                    db.collection("funFacts").document(funFactId).setData(["dislikes": 0], merge: true)
-                }
-            }
-        }
-    }
-    
-    func updateUserCounts() {
-        let db = Firestore.firestore()
-        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-            var userCount = [String: Int]()
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let user = document.data()["submittedBy"] as! String
-                    userCount[user] = (userCount[user] ?? 0) + 1
-                }
-                print ("userCount = \(userCount)")
-                for user in userCount.keys {
-                    db.collection("users").document(user).setData(["submittedCount": userCount[user]!], merge: true)
-                }
-            }
-        }
-    }
-    
-    func deleteTags() {
-        let db = Firestore.firestore()
-        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let description = document.data()["description"] as! String
-                    let onlyDesc = description.components(separatedBy: "#")[0]
-                    
-                    db.collection("funFacts").document(document.data()["id"] as! String).setData(["description": onlyDesc], merge: true)
-                }
-            }
-        }
-    }
-    
-    func renameAndDeleteLandmarks() {
-        let db = Firestore.firestore()
-        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let funFactID = document.documentID
-                    let data = ["id": funFactID]
-                    db.collection("funFacts").document(funFactID).setData(data, merge: true)
-                }
-            }
-        }
-    }
-    
-    func updateImageMetadata() {
-        // Create reference to the file whose metadata we want to change
-        let storage = Storage.storage()
-        let storageRef = storage.reference()
-        let db = Firestore.firestore()
-        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in querySnapshot!.documents {
-                    let imageName = document.data()["imageName"] as! String
-                    let imageRef = storageRef.child("images/\(imageName).jpeg")
-                    
-                    // Create file metadata to update
-                    let newMetadata = StorageMetadata()
-                    newMetadata.cacheControl = "public,max-age=300"
-                    newMetadata.contentType = "image/jpeg"
-                    
-                    // Update metadata properties
-                    imageRef.updateMetadata(newMetadata) { metadata, error in
-                        if let error = error {
-                            print (error)
-                        } else {
-                            // Updated metadata for 'images/forest.jpg' is returned
-                        }
-                    }
-                }
-            }
         }
     }
     
@@ -476,7 +308,7 @@ class MainViewController: UIViewController {
         performSegue(withIdentifier: "profileSegue", sender: self)
     }
     
-    @objc func viewBottomAnnotation(recognizer: UITapGestureRecognizer) {
+    @objc func viewFunFactDetailPage(recognizer: UITapGestureRecognizer) {
         let db = Firestore.firestore()
         downloadFunFacts(for: landmarkID, db: db)
     }
@@ -501,20 +333,22 @@ class MainViewController: UIViewController {
             let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
             let regionRadius = 100.0
             
+            let identifier = landmarkID + "|" + title
+            print (identifier)
             // 3. setup region
             let region = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lat,
                                                                          longitude: lon),
                                           radius: regionRadius,
-                                          identifier: title)
-            region.notifyOnEntry = true
-            region.notifyOnExit = true
+                                          identifier: identifier)
+            
+//            region.notifyOnEntry = true
+//            region.notifyOnExit = true
             locationManager.startMonitoring(for: region)
             
             // 5. setup circle
             let circle = MKCircle(center: coordinate, radius: regionRadius)
             mapView.addOverlay(circle)
-        }
-        else {
+        } else {
             print("System can't track regions")
         }
     }
@@ -525,15 +359,6 @@ class MainViewController: UIViewController {
         
         
     }
-    func addLotOfStuff() {
-        let la = FunFact(landmarkId: "land", id: "qwe", description: "qwerty", likes: 0, dislikes: 0, verificationFlag: "Y", image: "QWE", imageCaption: "zc", disputeFlag: "N", submittedBy: "asdfc", dateSubmitted: "asd", source: "asd", tags: ["qwerty"])
-        
-        for _ in 0...1000000 {
-            AppDataSingleton.appDataSharedInstance.listOfFunFacts.listOfFunFacts.insert(la)
-        }
-    }
-    
-    
     func downloadUserProfile(_ uid: String, completionHandler: @escaping (User) -> ())  {
         if Auth.auth().currentUser == nil {
             return

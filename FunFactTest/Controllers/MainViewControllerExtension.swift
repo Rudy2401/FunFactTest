@@ -18,18 +18,6 @@ var mapChangedFromUserInteraction = false
 let db = Firestore.firestore()
 
 extension MainViewController: CLLocationManagerDelegate {
-    
-    func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        if region is CLCircularRegion {
-            handleEvent(forRegion: region)
-        }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        if region is CLCircularRegion {
-            //            handleEvent(forRegion: region)
-        }
-    }
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         guard let location = manager.location else{
@@ -68,20 +56,6 @@ extension UNNotificationAttachment {
             print("error \(error)")
         }
         return nil
-    }
-    
-}
-
-extension MainViewController: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        // when app is open and in foregroud
-        completionHandler(.alert)
-    }
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        
-        // get the notification identifier to respond accordingly
-        let identifier = response.notification.request.identifier
-        print ("identifier = \(identifier)")
     }
 }
 
@@ -136,6 +110,10 @@ extension MainViewController {
                                             numOfFunFacts: hit["numOfFunFacts"] as! Int,
                                             likes: hit["likes"] as! Int,
                                             dislikes: hit["dislikes"] as! Int)
+                    self.setupGeoFences(lat: landmark.coordinates.latitude,
+                                        lon: landmark.coordinates.longitude,
+                                        title: landmark.name,
+                                        landmarkID: landmark.id)
                     
                     AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks.insert(landmark)
                     
@@ -155,6 +133,7 @@ extension MainViewController {
     }
     
     func downloadFunFacts(for landmarkID: String, db: Firestore) {
+        let spinner = showLoader(view: self.mapView)
         var funFacts = [FunFact]()
         db.collection("funFacts").whereField("landmarkId", isEqualTo: landmarkID).getDocuments { (querySnapshot, err) in
             if let err = err {
@@ -196,75 +175,8 @@ extension MainViewController {
                 destinationVC.address = address
                 
                 self.navigationController?.pushViewController(destinationVC, animated: true)
+                spinner.dismissLoader()
             }
         }
-    }
-    
-    func handleEvent(forRegion region: CLRegion!) {
-        // customize your notification content
-        let content = UNMutableNotificationContent()
-        content.title = "Near " + region.identifier + "?"
-        content.subtitle = "Did you know?"
-        
-        var tempLandmarkID = ""
-        for landmark in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
-            if region.identifier == landmark.name {
-                tempLandmarkID = landmark.id
-                break
-            }
-        }
-        for funFact in AppDataSingleton.appDataSharedInstance.listOfFunFacts.listOfFunFacts {
-            if funFact.landmarkId == tempLandmarkID {
-                content.body = funFact.description
-                
-                let imageName = "\(funFact.image).jpeg"
-                let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
-                if imageFromCache != nil {
-                    let imageData = imageFromCache!.jpegData(compressionQuality: 1.0)
-                    guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: "\(funFact.image).jpeg", data: imageData! as NSData, options: nil) else { return  }
-                    content.attachments = [attachment]
-                    break
-                } else {
-                    let s = funFact.id
-                    let imageName = "\(s).jpeg"
-                    
-                    let storage = Storage.storage()
-                    let gsReference = storage.reference(forURL: "gs://funfacts-5b1a9.appspot.com/images/\(imageName)")
-                    
-                    gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
-                        if let error = error {
-                            print("error = \(error)")
-                        } else {
-                            guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: "\(funFact.image).jpeg", data: data! as NSData, options: nil) else { return  }
-                            content.attachments = [attachment]
-                        }
-                    }
-                    break
-                }
-            }
-        }
-        content.sound = UNNotificationSound.default
-        notificationCount += 1
-        
-        // when the notification will be triggered
-        let timeInSeconds: TimeInterval = (6) // 60s * 15 = 15min
-        // the actual trigger object
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInSeconds,
-                                                        repeats: false)
-        
-        // notification unique identifier, for this example, same as the region to avoid duplicate notifications
-        let identifier = region.identifier
-        
-        // the notification request object
-        let request = UNNotificationRequest(identifier: identifier,
-                                            content: content,
-                                            trigger: trigger)
-        
-        // trying to add the notification request to notification center
-        notificationCenter?.add(request, withCompletionHandler: { (error) in
-            if error != nil {
-                print("Error adding notification with identifier: \(identifier)")
-            }
-        })
     }
 }
