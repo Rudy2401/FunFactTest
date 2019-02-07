@@ -1,0 +1,321 @@
+const functions = require('firebase-functions');
+var admin = require("firebase-admin");
+var serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: "https://funfacts-5b1a9.firebaseio.com"
+});
+
+const db = admin.firestore()
+exports.numOfFunFacts = 0
+exports.numOfLandmarks = 0
+
+//Algolia Code
+const env = functions.config();
+const algoliasearch = require('algoliasearch');
+
+// Initialize Algolia Client
+const client = algoliasearch(env.algolia.appid, env.algolia.apikey);
+const index = client.initIndex('landmark_name');
+
+exports.indexLandmark = functions.firestore.document('/landmarks/{landmarkID}').onCreate((snap, context) => {
+
+    var _geoloc = {
+        lat: snap.data().coordinates.latitude,
+        lng: snap.data().coordinates.longitude
+    };
+
+    const name = snap.data().name;
+    const address = snap.data().address;
+    const city = snap.data().city;
+    const state = snap.data().state;
+    const country = snap.data().country;
+    const type = snap.data().type;
+    const zipcode = snap.data().zipcode;
+    const image = snap.data().image;
+    const numOfFunFacts = snap.data().numOfFunFacts;
+    const likes = snap.data().likes;
+    const dislikes = snap.data().dislikes;
+    const objectID = snap.id;
+
+    // Add data to algolia index
+    return index.addObject({
+        objectID,
+        name,
+        address,
+        _geoloc,
+        city,
+        state,
+        country,
+        type,
+        image,
+        numOfFunFacts,
+        likes,
+        dislikes,
+        zipcode
+    });
+});
+exports.unindexLandmark = functions.firestore.document('/landmarks/{landmarkID}').onDelete((snap, context) => {
+    const objectID = snap.id;
+
+    // Delete ID from index
+    return index.deleteObject(objectID);
+});
+
+// Create and Deploy Your First Cloud Functions
+// https://firebase.google.com/docs/functions/write-firebase-functions
+
+// exports.helloWorld = functions.https.onRequest((request, response) => {
+//     getNumOfLandmarks();
+//     getNumOfFunFacts();
+//     response.send("Number of Landmarks = " + numOfLandmarks + "\r\nNumber of Fun Facts = " + numOfFunFacts);
+// });
+
+function getNumOfFunFacts() {
+    db.collection('funFacts').get().then(snapshot => {
+        if (!snapshot.empty) {
+            numOfFunFacts = snapshot.size;
+        } else response.send('No docs found!')
+        return numOfFunFacts;
+    })
+        .catch(err => {
+            console.log(err);
+            response.status(500).send(error);
+            return 500;
+        })
+}
+function getNumOfLandmarks() {
+    db.collection('landmarks').get().then(snapshot => {
+        if (!snapshot.empty) {
+            numOfLandmarks = snapshot.size;
+        } else response.send('No docs found!')
+        return numOfLandmarks;
+    })
+        .catch(err => {
+            console.log(err);
+            response.status(500).send(error);
+            return 500;
+        })
+}
+
+exports.updateHashtagCount = functions.firestore.document('/hashtags/{tagID}/funFacts/{funFactID}').onCreate((change, context) => {
+    // New document Created : add one to count
+    const tagID = context.params.tagID
+    const docRef = admin.firestore().collection('hashtags').doc(tagID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        var tcount = 0;
+        if (!snap.exists) {
+            tcount = 0;
+        } else {
+            tcount = snap.data().hashtagcount;
+        }
+        const hashtagcount = tcount + 1;
+        const data = { hashtagcount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+exports.updateHashtagCountForDelete = functions.firestore.document('/hashtags/{tagID}/funFacts/{funFactID}').onDelete((change, context) => {
+    // Document Deleted : subtract one from count
+    const tagID = context.params.tagID
+    const docRef = admin.firestore().collection('hashtags').doc(tagID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        const hashtagcount = snap.data().hashtagcount - 1;
+        const data = { hashtagcount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+exports.updateDisputeCount = functions.firestore.document('/users/{userID}/funFactsDisputed/{disputeID}').onCreate((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        var count = 0;
+        if (isNaN(snap.data().disputeCount)) {
+            count = 0;
+        } else {
+            count = snap.data().disputeCount;
+        }
+        const disputeCount = count + 1;
+        const data = { disputeCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+exports.updateDisputeCountForDelete = functions.firestore.document('/users/{userID}/funFactsDisputed/{disputeID}').onDelete((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        console.log("Add Dispute Count = " + snap.data().count);
+        // get the total tag count and add one
+        const disputeCount = snap.data().disputeCount - 1;
+        const data = { disputeCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+
+exports.updateLikeCount = functions.firestore.document('/users/{userID}/funFactsLiked/{funFactID}').onCreate((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        var count = 0;
+        if (isNaN(snap.data().likeCount)) {
+            count = 0;
+        } else {
+            count = snap.data().likeCount;
+        }
+        const likeCount = count + 1;
+        const data = { likeCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+exports.updateLikeCountForDelete = functions.firestore.document('/users/{userID}/funFactsLiked/{funFactID}').onDelete((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        console.log("Add Dispute Count = " + snap.data().count);
+        // get the total tag count and add one
+        const likeCount = snap.data().likeCount - 1;
+        const data = { likeCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+
+exports.updateDislikeCount = functions.firestore.document('/users/{userID}/funFactsDisliked/{funFactID}').onCreate((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        var count = 0;
+        if (isNaN(snap.data().dislikeCount)) {
+            count = 0;
+        } else {
+            count = snap.data().dislikeCount;
+        }
+        const dislikeCount = count + 1;
+        const data = { dislikeCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+exports.updateDislikeCountForDelete = functions.firestore.document('/users/{userID}/funFactsDisliked/{funFactID}').onDelete((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        const dislikeCount = snap.data().dislikeCount - 1;
+        const data = { dislikeCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+
+exports.updateSubmittedCount = functions.firestore.document('/users/{userID}/funFactsSubmitted/{funFactID}').onCreate((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        var count = 0;
+        if (isNaN(snap.data().submittedCount)) {
+            count = 0;
+        } else {
+            count = snap.data().submittedCount;
+        }
+        const submittedCount = count + 1;
+        const data = { submittedCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+exports.updateSubmittedCountForDelete = functions.firestore.document('/users/{userID}/funFactsSubmitted/{funFactID}').onDelete((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        const submittedCount = snap.data().submittedCount - 1;
+        const data = { submittedCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+
+exports.updateAdditionalUserFields = functions.auth.user().onCreate((user) => {
+    const email = user.email; // The email of the user.
+    const uid = user.uid;
+    var provider = "";
+    var name = "";
+    var photoURL = "";
+    if (user.providerData !== undefined && user.providerData.length !== 0) {
+        provider = user.providerData[0].providerId;
+        name = user.displayName; // The display name of the user.
+        photoURL = user.photoURL;
+    }
+    const likeCount = 0;
+    const dislikeCount = 0;
+    const disputeCount = 0;
+    const submittedCount = 0;
+    const userData = { email, name, uid, provider, photoURL, likeCount, dislikeCount, disputeCount, submittedCount }
+    return admin.firestore().collection('users').doc(uid).create(userData);
+
+});
+
+exports.deleteUserFields = functions.auth.user().onDelete((user) => {
+    const uid = user.uid;
+    return admin.firestore().collection('users').doc(uid).delete();
+});
+
+exports.udpateNumOfFunFacts = functions.firestore.document('/funFacts/{funFactID}').onCreate((snap, context) => {
+    // New document Created : add one to count
+    const landmarkID = snap.data().landmarkId;
+    const docRef = admin.firestore().collection('landmarks').doc(landmarkID)
+
+    return docRef.get().then(snap => {
+        // get the total funFact count and add one
+        const funFactCount = snap.data().numOfFunFacts;
+        const numOfFunFacts = funFactCount + 1;
+        const data = { numOfFunFacts }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+
+exports.udpateNumOfFunFactsForDelete = functions.firestore.document('/funFacts/{funFactID}').onDelete((snap, context) => {
+    // Document Deleted : subtract one from count
+    const landmarkID = snap.data().landmarkId;
+    const docRef = admin.firestore().collection('landmarks').doc(landmarkID)
+
+    return docRef.get().then(snap => {
+        // get the total funFact count and subtract one
+        const funFactCount = snap.data().numOfFunFacts;
+        const numOfFunFacts = funFactCount - 1;
+        const data = { numOfFunFacts }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
