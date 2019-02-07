@@ -156,21 +156,6 @@
 		D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCellTableViewCell.swift; sourceTree = "<group>"; };
 		D8B3103B21E2E7F900E85148 /* AppDataSingleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDataSingleton.swift; sourceTree = "<group>"; };
 		D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GeoFire.xcodeproj; path = "geofire-objc/GeoFire.xcodeproj"; sourceTree = "<group>"; };
-		D8B3105F21E58D4D00E85148 /* GeoFire-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GeoFire-Prefix.pch"; sourceTree = "<group>"; };
-		D8B3106121E58D4D00E85148 /* GFBase32Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFBase32Utils.h; sourceTree = "<group>"; };
-		D8B3106221E58D4D00E85148 /* GFGeoHashQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFGeoHashQuery.h; sourceTree = "<group>"; };
-		D8B3106321E58D4D00E85148 /* GFGeoHash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFGeoHash.h; sourceTree = "<group>"; };
-		D8B3106421E58D4D00E85148 /* GFQuery+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GFQuery+Private.h"; sourceTree = "<group>"; };
-		D8B3106521E58D4D00E85148 /* GFBase32Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GFBase32Utils.m; sourceTree = "<group>"; };
-		D8B3106621E58D4D00E85148 /* GeoFire+Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GeoFire+Private.h"; sourceTree = "<group>"; };
-		D8B3106721E58D4D00E85148 /* GeoFire.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GeoFire.m; sourceTree = "<group>"; };
-		D8B3106821E58D4D00E85148 /* GFGeoHashQuery.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GFGeoHashQuery.m; sourceTree = "<group>"; };
-		D8B3106921E58D4D00E85148 /* GFQuery.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GFQuery.m; sourceTree = "<group>"; };
-		D8B3106A21E58D4D00E85148 /* GFGeoHash.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GFGeoHash.m; sourceTree = "<group>"; };
-		D8B3106C21E58D4D00E85148 /* GFRegionQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFRegionQuery.h; sourceTree = "<group>"; };
-		D8B3106D21E58D4D00E85148 /* GeoFire.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeoFire.h; sourceTree = "<group>"; };
-		D8B3106E21E58D4D00E85148 /* GFQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFQuery.h; sourceTree = "<group>"; };
-		D8B3106F21E58D4D00E85148 /* GFCircleQuery.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GFCircleQuery.h; sourceTree = "<group>"; };
 		D8CBADCD21C295C900C42F91 /* MainViewControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewControllerExtension.swift; sourceTree = "<group>"; };
 		D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConnection.swift; sourceTree = "<group>"; };
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
@@ -300,44 +285,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		D8B3105E21E58D4D00E85148 /* GeoFire */ = {
-			isa = PBXGroup;
-			children = (
-				D8B3105F21E58D4D00E85148 /* GeoFire-Prefix.pch */,
-				D8B3106021E58D4D00E85148 /* Implementation */,
-				D8B3106B21E58D4D00E85148 /* API */,
-			);
-			path = GeoFire;
-			sourceTree = "<group>";
-		};
-		D8B3106021E58D4D00E85148 /* Implementation */ = {
-			isa = PBXGroup;
-			children = (
-				D8B3106121E58D4D00E85148 /* GFBase32Utils.h */,
-				D8B3106221E58D4D00E85148 /* GFGeoHashQuery.h */,
-				D8B3106321E58D4D00E85148 /* GFGeoHash.h */,
-				D8B3106421E58D4D00E85148 /* GFQuery+Private.h */,
-				D8B3106521E58D4D00E85148 /* GFBase32Utils.m */,
-				D8B3106621E58D4D00E85148 /* GeoFire+Private.h */,
-				D8B3106721E58D4D00E85148 /* GeoFire.m */,
-				D8B3106821E58D4D00E85148 /* GFGeoHashQuery.m */,
-				D8B3106921E58D4D00E85148 /* GFQuery.m */,
-				D8B3106A21E58D4D00E85148 /* GFGeoHash.m */,
-			);
-			path = Implementation;
-			sourceTree = "<group>";
-		};
-		D8B3106B21E58D4D00E85148 /* API */ = {
-			isa = PBXGroup;
-			children = (
-				D8B3106C21E58D4D00E85148 /* GFRegionQuery.h */,
-				D8B3106D21E58D4D00E85148 /* GeoFire.h */,
-				D8B3106E21E58D4D00E85148 /* GFQuery.h */,
-				D8B3106F21E58D4D00E85148 /* GFCircleQuery.h */,
-			);
-			path = API;
-			sourceTree = "<group>";
-		};
 		D8D1856D2129EDD70093B66C /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -401,7 +348,6 @@
 		D8FE7F7620DB2712007B4550 = {
 			isa = PBXGroup;
 			children = (
-				D8B3105E21E58D4D00E85148 /* GeoFire */,
 				D8A2AE4D21960132003C4EB1 /* FontAwesome */,
 				D8FE7F8120DB2712007B4550 /* FunFactTest */,
 				D8FE7F8020DB2712007B4550 /* Products */,
