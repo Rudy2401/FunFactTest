@@ -176,10 +176,40 @@ extension MainViewController {
         }
     }
     func addLotOfStuff() {
-        let la = FunFact(landmarkId: "land", id: "qwe", description: "qwerty", likes: 0, dislikes: 0, verificationFlag: "Y", image: "QWE", imageCaption: "zc", disputeFlag: "N", submittedBy: "asdfc", dateSubmitted: "asd", source: "asd", tags: ["qwerty"])
-        
-        for _ in 0...1000000 {
-            AppDataSingleton.appDataSharedInstance.listOfFunFacts.listOfFunFacts.insert(la)
+//        let la = FunFact(landmarkId: "land",
+//                         id: "qwe",
+//                         description: "qwerty",
+//                         likes: 0, dislikes: 0,
+//                         verificationFlag: "Y",
+//                         image: "QWE",
+//                         imageCaption: "zc",
+//                         disputeFlag: "N",
+//                         submittedBy: "asdfc",
+//                         dateSubmitted: "asd",
+//                         source: "asd",
+//                         tags: ["qwerty"])
+//        
+//        for _ in 0...1000000 {
+//            AppDataSingleton.appDataSharedInstance.listOfFunFacts.listOfFunFacts.insert(la)
+//        }
+    }
+    func addVerificationFields() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments() { (querySnapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                for document in querySnapshot!.documents {
+                    let funFactID = document.documentID
+                    let approvalUsers = [String]()
+                    let rejectionUsers = [String]()
+                    let data = ["approvalCount": 0,
+                                "rejectionCount": 0,
+                                "approvalUsers": approvalUsers,
+                                "rejectionUsers": rejectionUsers] as [String : Any]
+                    db.collection("funFacts").document(funFactID).setData(data, merge: true)
+                }
+            }
         }
     }
 }

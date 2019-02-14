@@ -48,7 +48,7 @@ class MainViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         typeColor.layer.cornerRadius = 2.5
         
         annotationBottomView.alpha = 0.0
@@ -63,12 +63,6 @@ class MainViewController: UIViewController {
             AppDataSingleton.appDataSharedInstance.userProfile = user
         }
         downloadAllUserData()
-
-        //        updateLikesDislikes()
-        //        updateUsersDisputes()
-        //        updateUserCounts()
-        //        renameAndDeleteLandmarks()
-        //        updateUsers()
         
         // 3. setup mapView
         mapView.delegate = self
@@ -183,7 +177,8 @@ class MainViewController: UIViewController {
             likePer = " " + String (like * 100 / (like + dislike)) + "%"
         }
         
-        let attrStringLikePer = NSAttributedString(string: likePer, attributes: Attributes.attribute12RegDG)
+        let attrStringLikePer = NSAttributedString(string: likePer,
+                                                   attributes: Attributes.attribute12RegDG)
         let likePerComplete = NSMutableAttributedString()
         likePerComplete.append(NSAttributedString(string: String.fontAwesomeIcon(name: .heart)))
         likePerComplete.append(attrStringLikePer)
@@ -194,20 +189,23 @@ class MainViewController: UIViewController {
         
         let numOfFF = " " + String (landmark.numOfFunFacts)
         
-        let attrString = NSAttributedString(string: numOfFF, attributes: Attributes.attribute12RegDG)
+        let attrString = NSAttributedString(string: numOfFF,
+                                            attributes: Attributes.attribute12RegDG)
         let numOfFFComplete = NSMutableAttributedString()
         numOfFFComplete.append(NSAttributedString(string: String.fontAwesomeIcon(name: .file)))
         numOfFFComplete.append(attrString)
         noOfFunFactsLabel.attributedText = numOfFFComplete
         
-        let mytapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewFunFactDetailPage))
+        let mytapGestureRecognizer = UITapGestureRecognizer(target: self,
+                                                            action: #selector(viewFunFactDetailPage))
         mytapGestureRecognizer.numberOfTapsRequired = 1
         annotationBottomView.addGestureRecognizer(mytapGestureRecognizer)
         annotationBottomView.isUserInteractionEnabled = true
         
         setView(view: annotationBottomView,  alpha: 1.0)
         
-        let mapViewGesture = UITapGestureRecognizer(target: self, action: #selector(mapViewTap))
+        let mapViewGesture = UITapGestureRecognizer(target: self,
+                                                    action: #selector(mapViewTap))
         mapViewGesture.numberOfTapsRequired = 1
         mapView.addGestureRecognizer(mapViewGesture)
         mapView.isUserInteractionEnabled = true
@@ -230,24 +228,19 @@ class MainViewController: UIViewController {
     }
     
     func setupImage(_ funFact: FunFact) {
-        print(funFact.image)
         let imageId = funFact.image
         let imageName = "\(imageId).jpeg"
         let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
         if imageFromCache != nil {
-            //            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
             // Put your code which should be executed with a delay here
             self.landmarkImageView.image = imageFromCache
-            //            })
             self.landmarkImageView!.layer.cornerRadius = 5
         } else {
-            //            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
             let storage = Storage.storage()
             let storageRef = storage.reference()
             let gsReference = storageRef.child("images/\(imageName)")
             self.landmarkImageView.sd_setImage(with: gsReference, placeholderImage: UIImage())
             self.landmarkImageView.layer.cornerRadius = 5
-            //            })
         }
     }
     
@@ -310,7 +303,7 @@ class MainViewController: UIViewController {
     
     @objc func viewFunFactDetailPage(recognizer: UITapGestureRecognizer) {
         let db = Firestore.firestore()
-        downloadFunFacts(for: landmarkID, db: db)
+        downloadFunFactsAndSegue(for: landmarkID, db: db)
     }
     
     override func didReceiveMemoryWarning() {
@@ -334,15 +327,14 @@ class MainViewController: UIViewController {
             let regionRadius = 100.0
             
             let identifier = landmarkID + "|" + title
-            print (identifier)
             // 3. setup region
             let region = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lat,
                                                                          longitude: lon),
                                           radius: regionRadius,
                                           identifier: identifier)
             
-//            region.notifyOnEntry = true
-//            region.notifyOnExit = true
+            region.notifyOnEntry = true
+            region.notifyOnExit = false
             locationManager.startMonitoring(for: region)
             
             // 5. setup circle
@@ -356,8 +348,7 @@ class MainViewController: UIViewController {
     //
     //     In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        
+    
     }
     func downloadUserProfile(_ uid: String, completionHandler: @escaping (User) -> ())  {
         if Auth.auth().currentUser == nil {
@@ -543,6 +534,4 @@ extension MainViewController: MKMapViewDelegate {
         // And finally add it to your MKMapView
         mapView.addOverlay(tileOverlay)
     }
-    
 }
-

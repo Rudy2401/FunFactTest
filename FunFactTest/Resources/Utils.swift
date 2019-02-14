@@ -84,4 +84,57 @@ class Utils {
         return (Int(green*255) == Int(green2*255))
         
     }
+    static func showQuickHelp() -> UIAlertController{
+        let quickHelpView = UIAlertController(title: "Help", message: "", preferredStyle: .actionSheet)
+        let title = "How To Verify A Fact\n\n"
+        let titleString = NSMutableAttributedString(
+            string: title,
+            attributes: [
+                NSAttributedString.Key.font: UIFont(name: "AvenirNext-Bold", size: 16.0)!,
+                NSAttributedString.Key.foregroundColor: UIColor.black
+            ]
+        )
+        
+        let paragraphStyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
+        let message = NSMutableAttributedString()
+        message.normal("Thank you for helping us verify this fact! Given below are some tips on the verification process:\n")
+        .bold("\nStep 1").normal(": Ensure that the image and the landmark name are accurate for the fact.\n")
+        .bold("\nStep 2").normal(": Ensure that the source is a valid website.\n")
+        .bold("\nStep 3").normal(": Read the fact and ensure that the text is taken from the source.\n")
+        .bold("\nStep 4").normal("""
+        : Use your judgment and ensure that the fact is not inflammatory/derogatory in any way.\n
+        If all of the above hold true, please go ahead and click Approve, otherwise click Reject.\n
+        Click on the Help icon above to view this again.
+        """)
+        let string = message.string
+        
+        message.addAttributes([NSAttributedString.Key.paragraphStyle: paragraphStyle], range: NSMakeRange(0, string.count - 1))
+        let finalMessage = NSMutableAttributedString()
+        finalMessage.append(titleString)
+        finalMessage.append(message)
+        
+        quickHelpView.setValue(finalMessage, forKey: "attributedMessage")
+        let dismissAction = UIAlertAction(title: "Dismiss", style: .cancel) { (_) in
+            quickHelpView.dismiss(animated: true)
+        }
+        quickHelpView.addAction(dismissAction)
+        return quickHelpView
+    }
+}
+extension NSMutableAttributedString {
+    @discardableResult func bold(_ text: String) -> NSMutableAttributedString {
+        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont(name: "AvenirNext-Bold", size: 14)!]
+        let boldString = NSMutableAttributedString(string: text, attributes: attrs)
+        append(boldString)
+        
+        return self
+    }
+    
+    @discardableResult func normal(_ text: String) -> NSMutableAttributedString {
+        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont(name: "Avenir Next", size: 14)!]
+        let normal = NSAttributedString(string: text, attributes: attrs)
+        append(normal)
+        
+        return self
+    }
 }

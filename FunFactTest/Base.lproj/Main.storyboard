@@ -856,6 +856,37 @@
             </objects>
             <point key="canvasLocation" x="2807.1999999999998" y="1070.9145427286358"/>
         </scene>
+        <!--Verify View Controller-->
+        <scene sceneID="brE-ld-zeM">
+            <objects>
+                <viewController id="K3w-tz-0ti" customClass="VerifyViewController" customModule="FunFactTest" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Osh-HK-DaK">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EVL-lu-BnA">
+                                <rect key="frame" x="10" y="54.000000000000007" width="355" height="20.333333333333336"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="fDS-8p-Uzk" firstAttribute="trailing" secondItem="EVL-lu-BnA" secondAttribute="trailing" constant="10" id="2ZE-D6-ebq"/>
+                            <constraint firstItem="EVL-lu-BnA" firstAttribute="top" secondItem="fDS-8p-Uzk" secondAttribute="top" constant="10" id="DTN-WY-f2C"/>
+                            <constraint firstItem="EVL-lu-BnA" firstAttribute="leading" secondItem="fDS-8p-Uzk" secondAttribute="leading" constant="10" id="PYj-0g-o5l"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="fDS-8p-Uzk"/>
+                    </view>
+                    <connections>
+                        <outlet property="tipsLabel" destination="EVL-lu-BnA" id="sG9-aJ-kLH"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Pu1-Ak-Zhz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4078" y="1069"/>
+        </scene>
         <!--Content View Controller-->
         <scene sceneID="JLf-CZ-Pbm">
             <objects>
@@ -1020,6 +1051,7 @@
                         <segue destination="AcQ-Uy-Ylf" kind="show" identifier="disputeViewDetail" id="BpR-yh-gxL"/>
                         <segue destination="dBa-Yl-dUk" kind="show" identifier="imageSegue" id="s9S-Ku-JEG"/>
                         <segue destination="iN2-SA-052" kind="show" identifier="profileSegue" id="j6B-x3-8nM"/>
+                        <segue destination="K3w-tz-0ti" kind="show" identifier="verifySegue" id="3bP-Fc-nYx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0Dn-BD-i8J" userLabel="First Responder" sceneMemberID="firstResponder"/>

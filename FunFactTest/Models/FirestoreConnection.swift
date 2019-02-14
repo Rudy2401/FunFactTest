@@ -41,7 +41,11 @@ class FirestoreConnection {
                                           submittedBy: document.data()["submittedBy"] as! String,
                                           dateSubmitted: document.data()["dateSubmitted"] as! String,
                                           source: document.data()["source"] as! String,
-                                          tags: document.data()["tags"] as! [String])
+                                          tags: document.data()["tags"] as! [String],
+                                          approvalCount: document.data()["approvalCount"] as! Int,
+                                          rejectionCount: document.data()["rejectionCount"] as! Int,
+                                          approvalUsers: document.data()["approvalUsers"] as! [String],
+                                          rejectionUsers: document.data()["rejectionUsers"] as! [String])
                     listOfFunFacts.append(funFact)
                 }
                 completion(listOfFunFacts, nil)
@@ -90,7 +94,11 @@ class FirestoreConnection {
                                           submittedBy: document.data()["submittedBy"] as! String,
                                           dateSubmitted: document.data()["dateSubmitted"] as! String,
                                           source: document.data()["source"] as! String,
-                                          tags: document.data()["tags"] as! [String])
+                                          tags: document.data()["tags"] as! [String],
+                                          approvalCount: document.data()["approvalCount"] as! Int,
+                                          rejectionCount: document.data()["rejectionCount"] as! Int,
+                                          approvalUsers: document.data()["approvalUsers"] as! [String],
+                                          rejectionUsers: document.data()["rejectionUsers"] as! [String])
                     self.listOfFunFacts?.listOfFunFacts.insert(funFact)
                 }
             }

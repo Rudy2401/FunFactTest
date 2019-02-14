@@ -31,6 +31,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     var synth = AVSpeechSynthesizer()
     var pageContent = NSArray()
     let pageControl = UIPageControl()
+    var quickHelpView = UIAlertController()
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         if (currentIndex == 0) || (currentIndex == NSNotFound) {
@@ -63,7 +64,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         super.viewDidLoad()
         self.dataSource = self
         self.delegate = self
-        
         self.totalPages = pageContent.count
         self.view.backgroundColor = .white
         setupPageControl()
@@ -265,13 +265,38 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         voice.addTarget(self, action: #selector(voiceAction), for: .touchUpInside)
         let voiceBtn = UIBarButtonItem(customView: voice)
         
-        navigationItem.setRightBarButtonItems([menuBtn, flexibleSpace, shareBtn, flexibleSpace, voiceBtn], animated: true)
+        let helpLabel1 = String.fontAwesomeIcon(name: .questionCircle)
+        let helpAttr1 = NSAttributedString(string: helpLabel1, attributes: Attributes.navBarImageSolidAttribute)
+        let helpAttrClicked1 = NSAttributedString(string: helpLabel1, attributes: Attributes.toolBarImageClickedAttribute)
+        
+        let completehelpLabel = NSMutableAttributedString()
+        completehelpLabel.append(helpAttr1)
+        
+        let completehelpLabelClicked = NSMutableAttributedString()
+        completehelpLabelClicked.append(helpAttrClicked1)
+        
+        let help = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
+        help.isUserInteractionEnabled = true
+        help.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+        help.setAttributedTitle(completehelpLabel, for: .normal)
+        help.setAttributedTitle(completehelpLabelClicked, for: .highlighted)
+        help.setAttributedTitle(completehelpLabelClicked, for: .selected)
+        help.titleLabel?.textAlignment = .center
+        help.addTarget(self, action: #selector(showAlert), for: .touchUpInside)
+        let helpBtn = UIBarButtonItem(customView: help)
+        
+        navigationItem.setRightBarButtonItems([menuBtn, flexibleSpace, shareBtn, flexibleSpace, voiceBtn, flexibleSpace, helpBtn], animated: true)
+    }
+    @objc func showAlert() {
+        quickHelpView = Utils.showQuickHelp()
+        self.present(quickHelpView, animated: true, completion: nil)
     }
     private func setupPageControl() {
         self.pageControl.frame = CGRect(x: 0, y: self.view.frame.size.height - 50, width: self.view.frame.size.width, height: 50)
-        self.pageControl.backgroundColor = .white
-        self.pageControl.currentPageIndicatorTintColor = UIColor(white: 0.2, alpha: 1.0)
-        self.pageControl.pageIndicatorTintColor = UIColor(white: 0.9, alpha: 1.0)
+        self.pageControl.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
+        self.pageControl.backgroundColor = .clear
+        self.pageControl.currentPageIndicatorTintColor = UIColor(white: 0.4, alpha: 1.0)
+        self.pageControl.pageIndicatorTintColor = UIColor(white: 0.8, alpha: 1.0)
         self.pageControl.hidesForSinglePage = true
         self.view.addSubview(self.pageControl)
         self.pageControl.translatesAutoresizingMaskIntoConstraints = false
@@ -283,7 +308,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
             ])
         self.pageControl.numberOfPages = pageContent.count
     }
-
     
     @objc func voiceAction(sender: UIButton) {
         if synth.isSpeaking {
@@ -436,5 +460,4 @@ extension FunFactPageViewController: AVSpeechSynthesizerDelegate {
         let voiceBtn = navigationItem.rightBarButtonItems![4]
         (voiceBtn.customView as! UIButton).isSelected = false
     }
-    
 }

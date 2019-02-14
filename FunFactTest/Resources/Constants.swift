@@ -32,6 +32,8 @@ enum Attributes {
                                         NSAttributedString.Key.font: UIFont(name: "Avenir-BookOblique", size: 14.0)!]
     static let attribute14DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
                                         NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
+    static let attribute16DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
+                                        NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 16.0)!]
     static let attribute14DemiBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
                                        NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
     
@@ -97,7 +99,8 @@ struct Constants {
                                                action: nil)
     
     static let landmarkTypes = ["--- Select landmark type ---",
-                                "Apartment", "Office Building",
+                                "Apartment",
+                                "Office Building",
                                 "Stadium",
                                 "Museum",
                                 "Park",

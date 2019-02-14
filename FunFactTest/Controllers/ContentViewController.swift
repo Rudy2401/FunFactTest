@@ -43,6 +43,7 @@ class ContentViewController: UIViewController {
     var tags: [String] = [""]
     var currPageNumberText = ""
     var totalPageNumberText = ""
+    var quickHelpView = UIAlertController()
     
     @IBAction func likeIt(_ sender: Any) {
         if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray)
@@ -98,174 +99,12 @@ class ContentViewController: UIViewController {
             deleteDislikes(funFactID: funFactID, userID: Auth.auth().currentUser?.uid ?? "")
         }
     }
-    func addLikes(funFactID: String, userID: String) {
-        let db = Firestore.firestore()
-        let funFactRef = db.collection("funFacts").document(funFactID)
-        funFactRef.getDocument { (snapshot, error) in
-            if let document = snapshot {
-                // swiftlint:disable:next force_cast
-                let likeCount = document.data()?["likes"] as! Int
-                funFactRef.setData([
-                    "likes": likeCount + 1
-                ], merge: true) { err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
-                }
-            } else {
-                print ("Error getting document \(error)")
-            }
-        }
-        db.collection("landmarks").document(landmarkID).getDocument { (snapshot, error) in
-            if let document = snapshot {
-                // swiftlint:disable:next force_cast
-                let likeCount = document.data()?["likes"] as! Int
-                db.collection("landmarks").document(self.landmarkID).setData([
-                    "likes": likeCount + 1
-                ], merge: true) { err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
-                }
-            } else {
-                print ("Error getting document \(error.debugDescription)")
-            }
-        }
-        db.collection("users").document(userID).collection("funFactsLiked").document(funFactID).setData([
-            "funFactID": funFactRef
-        ], merge: true) { err in
-            if let err = err {
-                print("Error writing document: \(err)")
-            } else {
-                print("Document successfully written!")
-            }
-        }
-    }
-    func addDislikes(funFactID: String, userID: String) {
-        let db = Firestore.firestore()
-        let funFactRef = db.collection("funFacts").document(funFactID)
-        funFactRef.getDocument { (snapshot, error) in
-            if let document = snapshot {
-                let dislikeCount = document.data()?["dislikes"] as! Int // swiftlint:disable:this force_cast
-                funFactRef.setData([
-                    "dislikes": dislikeCount + 1
-                ], merge: true) { err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
-                }
-            } else {
-                print ("Error getting document \(error)")
-            }
-        }
-        db.collection("landmarks").document(landmarkID).getDocument { (snapshot, error) in
-            if let document = snapshot {
-                let dislikeCount = document.data()?["dislikes"] as! Int // swiftlint:disable:this force_cast
-                db.collection("landmarks").document(self.landmarkID).setData([
-                    "dislikes": dislikeCount + 1
-                ], merge: true) { err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
-                }
-            } else {
-                print ("Error getting document \(error.debugDescription)")
-            }
-        }
-        db.collection("users").document(userID).collection("funFactsDisliked").document(funFactID).setData([
-            "funFactID": funFactRef
-        ], merge: true) { err in
-            if let err = err {
-                print("Error writing document: \(err)")
-            } else {
-                print("Document successfully written!")
-            }
-        }
-    }
-    func deleteLikes(funFactID: String, userID: String) {
-        let db = Firestore.firestore()
-        let funFactRef = db.collection("funFacts").document(funFactID)
-        funFactRef.getDocument { (snapshot, error) in
-            if let document = snapshot {
-                let likeCount = document.data()?["likes"] as! Int // swiftlint:disable:this force_cast
-                funFactRef.setData([
-                    "likes": likeCount - 1
-                ], merge: true) { err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
-                }
-            } else {
-                print ("Error getting document \(error)")
-            }
-        }
-        db.collection("landmarks").document(landmarkID).getDocument { (snapshot, error) in
-            if let document = snapshot {
-                let dislikeCount = document.data()?["likes"] as! Int // swiftlint:disable:this force_cast
-                db.collection("landmarks").document(self.landmarkID).setData([
-                    "likes": dislikeCount - 1
-                ], merge: true) { err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
-                }
-            } else {
-                print ("Error getting document \(error.debugDescription)")
-            }
-        }
-        db.collection("users").document(userID).collection("funFactsLiked").document(funFactID).delete()
-    }
-    func deleteDislikes(funFactID: String, userID: String) {
-        let db = Firestore.firestore()
-        let funFactRef = db.collection("funFacts").document(funFactID)
-        funFactRef.getDocument { (snapshot, error) in
-            if let document = snapshot {
-                let dislikeCount = document.data()?["dislikes"] as! Int // swiftlint:disable:this force_cast
-                funFactRef.setData([
-                    "dislikes": dislikeCount - 1
-                ], merge: true) { err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
-                }
-            } else {
-                print ("Error getting document \(error)")
-            }
-        }
-        db.collection("landmarks").document(landmarkID).getDocument { (snapshot, error) in
-            if let document = snapshot {
-                let dislikeCount = document.data()?["dislikes"] as! Int // swiftlint:disable:this force_cast
-                db.collection("landmarks").document(self.landmarkID).setData([
-                    "dislikes": dislikeCount - 1
-                ], merge: true) { err in
-                    if let err = err {
-                        print("Error writing document: \(err)")
-                    } else {
-                        print("Document successfully written!")
-                    }
-                }
-            } else {
-                print ("Error getting document \(error.debugDescription)")
-            }
-        }
-        db.collection("users").document(userID).collection("funFactsDisliked").document(funFactID).delete()
-    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        if verifiedFlag == "N" {
+            setupVerificationPage()
+        }
         if (self.navigationController?.presentingViewController as? FunFactPageViewController) != nil {
             let addFactGesture = UITapGestureRecognizer(target: self, action: #selector(viewAddFactForLandmark))
             addFactGesture.numberOfTapsRequired = 1
@@ -281,7 +120,7 @@ class ContentViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if Auth.auth().currentUser == nil {
+        if Auth.auth().currentUser == nil || verifiedFlag == "N" {
             likeHeart.isEnabled = false
             dislikeHeart.isEnabled = false
         } else {
@@ -328,8 +167,6 @@ class ContentViewController: UIViewController {
         attributedString.append(sourceAtt1)
         attributedString.append(sourceAtt2)
         let funFactDescAttr = NSMutableAttributedString(string: funFactDesc)
-        let unverifiedAttr = NSMutableAttributedString(string: " (This fact needs verification)",
-                                                       attributes: Attributes.attribute14ItalicsDG)
         let searchPattern = "#\\w+"
         var ranges: [NSRange] = [NSRange]()
         let regex = try! NSRegularExpression(pattern: searchPattern, options: [])
@@ -343,9 +180,7 @@ class ContentViewController: UIViewController {
         }
         let attributedFunFactDesc = NSMutableAttributedString()
         attributedFunFactDesc.append(funFactDescAttr)
-        //        if verifiedFlag == "N" {
-        //            attributedFunFactDesc.append(unverifiedAttr)
-        //        }
+        
         textLabel.attributedText = attributedFunFactDesc
         setupImage()
         sourceURL.attributedText = attributedString
@@ -398,26 +233,78 @@ class ContentViewController: UIViewController {
         }
         
     }
-    func setupImage() {
-        let imageId = funFactID
-        let imageName = "\(imageId).jpeg"
-        let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
-        if imageFromCache != nil {
-            print("******In cache")
-            self.landmarkImage.image = imageFromCache
-            self.landmarkImage.layer.cornerRadius = 5
-        } else {
-            let imageName = "\(funFactID).jpeg"
-            
-            let storage = Storage.storage()
-            let storageRef = storage.reference()
-            let gsReference = storageRef.child("images/\(imageName)")
-            self.landmarkImage.sd_setImage(with: gsReference, placeholderImage: UIImage())
-            self.landmarkImage.layer.cornerRadius = 5
-        }
+    func setupVerificationPage() {
+        let verifView = UIView(frame: UIScreen.main.bounds)
+        verifView.tag = 100
+        verifView.backgroundColor = UIColor(white: 0.9, alpha: 0.95)
+        
+        let verifTextLabel = UILabel()
+        verifTextLabel.numberOfLines = 0
+        verifTextLabel.textAlignment = NSTextAlignment.center
+        let verifText = NSAttributedString(string: "This fact hasn't been verified yet. It will show up on this app only when it's verified by 3 people. You can help verify this fact by clicking below.", attributes: Attributes.attribute16DemiBlack)
+        verifTextLabel.attributedText = verifText
+        
+        let verifButton = CustomButton()
+        verifButton.frame = CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50)
+        verifButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        let verifButtonText = NSAttributedString(string: "Click To Verify", attributes: Attributes.loginButtonAttribute)
+        verifButton.setAttributedTitle(verifButtonText, for: .normal)
+        let verifButtonClickedText = NSAttributedString(string: "Click To Verify", attributes: Attributes.loginButtonClickedAttribute)
+        verifButton.setAttributedTitle(verifButtonClickedText, for: .highlighted)
+        verifButton.setAttributedTitle(verifButtonClickedText, for: .selected)
+        verifButton.addTarget(self, action: #selector(dismissView), for: .touchUpInside)
+        
+        let approveButton = CustomButton()
+        approveButton.frame = CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50)
+        approveButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        let approveButtonText = NSAttributedString(string: "Approve", attributes: Attributes.loginButtonAttribute)
+        approveButton.setAttributedTitle(approveButtonText, for: .normal)
+        let approveButtonClickedText = NSAttributedString(string: "Approve", attributes: Attributes.loginButtonClickedAttribute)
+        approveButton.setAttributedTitle(approveButtonClickedText, for: .highlighted)
+        approveButton.setAttributedTitle(approveButtonClickedText, for: .selected)
+        
+        let rejectButton = CustomButton()
+        rejectButton.frame = CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50)
+        rejectButton.layer.backgroundColor = Colors.redColor.cgColor
+        let rejectButtonText = NSAttributedString(string: "Reject", attributes: Attributes.loginButtonAttribute)
+        rejectButton.setAttributedTitle(rejectButtonText, for: .normal)
+        let rejectButtonClickedText = NSAttributedString(string: "Reject", attributes: Attributes.loginButtonClickedAttribute)
+        rejectButton.setAttributedTitle(rejectButtonClickedText, for: .highlighted)
+        rejectButton.setAttributedTitle(rejectButtonClickedText, for: .selected)
+        
+        self.view.addSubview(approveButton)
+        self.view.addSubview(rejectButton)
+        verifView.addSubview(verifTextLabel)
+        verifView.addSubview(verifButton)
+        self.view.addSubview(verifView)
+        UIApplication.shared.keyWindow!.bringSubviewToFront(verifView)
+
+        verifTextLabel.translatesAutoresizingMaskIntoConstraints = false
+        verifButton.translatesAutoresizingMaskIntoConstraints = false
+        approveButton.translatesAutoresizingMaskIntoConstraints = false
+        rejectButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([verifTextLabel.centerYAnchor.constraint(equalTo: verifView.centerYAnchor),
+                                     verifTextLabel.leftAnchor.constraint(equalTo: verifView.leftAnchor, constant: 10.0),
+                                     verifTextLabel.rightAnchor.constraint(equalTo: verifView.rightAnchor, constant: -10.0),
+                                     verifButton.heightAnchor.constraint(equalToConstant: 50.0),
+                                     verifButton.leftAnchor.constraint(equalTo: verifView.leftAnchor, constant: 10.0),
+                                     verifButton.rightAnchor.constraint(equalTo: verifView.rightAnchor, constant: -10.0),
+                                     verifButton.topAnchor.constraint(equalTo: verifTextLabel.bottomAnchor, constant: 10.0),
+                                     approveButton.topAnchor.constraint(equalTo: dispute.bottomAnchor, constant: 20.0),
+                                     approveButton.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 10.0),
+                                     approveButton.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -10.0),
+                                     approveButton.heightAnchor.constraint(equalToConstant: 50.0),
+                                     rejectButton.topAnchor.constraint(equalTo: approveButton.bottomAnchor, constant: 10.0),
+                                     rejectButton.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 10.0),
+                                     rejectButton.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -10.0),
+                                     rejectButton.heightAnchor.constraint(equalToConstant: 50.0)])
+    }
+    @objc func dismissView(_ sender: UIButton) {
+        self.view.viewWithTag(100)?.removeFromSuperview()
+        quickHelpView = Utils.showQuickHelp()
+        self.present(quickHelpView, animated: true, completion: nil)
     }
     @objc func disputeTapAction(sender : UITapGestureRecognizer) {
-        
         let text = (dispute.text)!
         let clickRange = (text as NSString).range(of: "Here")
         

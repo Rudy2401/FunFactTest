@@ -26,4 +26,8 @@ struct FunFact: Hashable  {
     var dateSubmitted: String
     var source: String
     var tags: [String]
+    var approvalCount: Int
+    var rejectionCount: Int
+    var approvalUsers: [String]
+    var rejectionUsers: [String]
 }

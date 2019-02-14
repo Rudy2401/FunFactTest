@@ -132,10 +132,14 @@ extension MainViewController {
         }
     }
     
-    func downloadFunFacts(for landmarkID: String, db: Firestore) {
+    func downloadFunFactsAndSegue(for landmarkID: String, db: Firestore) {
         let spinner = showLoader(view: self.mapView)
         var funFacts = [FunFact]()
-        db.collection("funFacts").whereField("landmarkId", isEqualTo: landmarkID).getDocuments { (querySnapshot, err) in
+        db.collection("funFacts")
+            .whereField("landmarkId", isEqualTo: landmarkID)
+            .order(by: "verificationFlag", descending: true)
+            .order(by: "likes", descending: true)
+            .getDocuments { (querySnapshot, err) in
             if let err = err {
                 print("Error getting documents: \(err)")
             } else {
@@ -153,7 +157,11 @@ extension MainViewController {
                                           submittedBy: document.data()["submittedBy"] as! String,
                                           dateSubmitted: document.data()["dateSubmitted"] as! String,
                                           source: document.data()["source"] as! String,
-                                          tags: document.data()["tags"] as! [String])
+                                          tags: document.data()["tags"] as! [String],
+                                          approvalCount: document.data()["approvalCount"] as! Int,
+                                          rejectionCount: document.data()["rejectionCount"] as! Int,
+                                          approvalUsers: document.data()["approvalUsers"] as! [String],
+                                          rejectionUsers: document.data()["rejectionUsers"] as! [String])
                     pageContent.append(document.data()["id"] as! String)
                     AppDataSingleton.appDataSharedInstance.listOfFunFacts.listOfFunFacts.insert(funFact)
                     funFacts.append(funFact)

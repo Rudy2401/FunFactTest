@@ -103,13 +103,12 @@ extension AppDelegate: CLLocationManagerDelegate {
             return
         }
         // customize your notification content
-        print ("region = \(region.identifier)")
         let db = Firestore.firestore()
         let title = region.identifier.components(separatedBy: "|").last
         let landmarkID = region.identifier.components(separatedBy: "|").first
         let content = UNMutableNotificationContent()
         var imageId = ""
-        content.title = "Near " + title! + "?"
+        content.title = "NEAR " + title!.uppercased() + "?"
         content.subtitle = "Did you know?"
         
         db.collection("funFacts")
@@ -139,18 +138,15 @@ extension AppDelegate: CLLocationManagerDelegate {
                             print("error = \(error)")
                         } else {
                             guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: imageName, data: data! as NSData, options: nil) else { return  }
-                            print("attachment = \(attachment)")
-                            print("data = \(data)")
                             content.attachments = [attachment]
                             content.sound = UNNotificationSound.default
                             self.notificationCount += 1
                             
                             // when the notification will be triggered
-                            let timeInSeconds: TimeInterval = 5 // 60s * 15 = 15min
+                            let timeInSeconds: TimeInterval = 3
                             // the actual trigger object
                             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInSeconds,
                                                                             repeats: false)
-                            
                             // notification unique identifier, for this example, same as the region to avoid duplicate notifications
                             let identifier = region.identifier
                             
@@ -158,12 +154,19 @@ extension AppDelegate: CLLocationManagerDelegate {
                             let request = UNNotificationRequest(identifier: identifier,
                                                                 content: content,
                                                                 trigger: trigger)
-                            
                             // trying to add the notification request to notification center
-                            self.notificationCenter?.add(request, withCompletionHandler: { (error) in
-                                if error != nil {
-                                    print("Error adding notification with identifier: \(identifier)")
+                            self.notificationCenter.getDeliveredNotifications(completionHandler: { (notifications) in
+                                for notification in notifications {
+                                    if notification.request.identifier == identifier {
+                                        print (notification.request.identifier)
+                                        return
+                                    }
                                 }
+                                self.notificationCenter?.add(request, withCompletionHandler: { (error) in
+                                    if error != nil {
+                                        print("Error adding notification with identifier: \(identifier) \(error?.localizedDescription)")
+                                    }
+                                })
                             })
                         }
                     }

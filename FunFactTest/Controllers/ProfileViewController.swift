@@ -181,7 +181,7 @@ class ProfileViewController: UIViewController {
     }
     
     func downloadFunFactsSubmitted(ref: DocumentReference, completionHandler: @escaping (FunFact) -> ())  {
-        var funFact = FunFact(landmarkId: "", id: "", description: "", likes: 0, dislikes: 0, verificationFlag: "", image: "", imageCaption: "", disputeFlag: "", submittedBy: "", dateSubmitted: "", source: "", tags: [])
+        var funFact = FunFact(landmarkId: "", id: "", description: "", likes: 0, dislikes: 0, verificationFlag: "", image: "", imageCaption: "", disputeFlag: "", submittedBy: "", dateSubmitted: "", source: "", tags: [], approvalCount: 0, rejectionCount: 0, approvalUsers: [], rejectionUsers: [])
         ref.getDocument { (snapshot, error) in
             if let document = snapshot, document.exists {
                 funFact = FunFact(landmarkId: document.data()?["landmarkId"] as! String,
@@ -196,7 +196,11 @@ class ProfileViewController: UIViewController {
                                       submittedBy: document.data()?["submittedBy"] as! String,
                                       dateSubmitted: document.data()?["dateSubmitted"] as! String,
                                       source: document.data()?["source"] as! String,
-                                      tags: document.data()?["tags"] as! [String])
+                                      tags: document.data()?["tags"] as! [String],
+                                      approvalCount: document.data()?["approvalCount"] as! Int,
+                                      rejectionCount: document.data()?["rejectionCount"] as! Int,
+                                      approvalUsers: document.data()?["approvalUsers"] as! [String],
+                                      rejectionUsers: document.data()?["rejectionUsers"] as! [String])
                 completionHandler(funFact)
             } else {
                 print("Document \(ref.documentID) does not exist")
