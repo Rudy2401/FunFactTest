@@ -91,7 +91,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         if (completed && finished) {
             if let currentVC = pageViewController.viewControllers?.last {
                 currentIndex = indexOfViewController(viewController: currentVC as! ContentViewController)
-                print ("currentIndex = \(currentIndex)")
                 self.pageControl.currentPage = currentIndex
             }
         }
@@ -124,6 +123,11 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         dataViewController.landmarkID = landmarkID
         dataViewController.currPageNumberText = String(index+1)
         dataViewController.totalPageNumberText = String(totalPages)
+        dataViewController.approvalCount = funFacts[index].approvalCount
+        dataViewController.rejectionCount = funFacts[index].rejectionCount
+        dataViewController.approvalUsers = funFacts[index].approvalUsers
+        dataViewController.rejectionUsers = funFacts[index].rejectionUsers
+        dataViewController.rejectionReason = funFacts[index].rejectionReason
         currentVC = dataViewController
         return dataViewController
     }
@@ -137,82 +141,19 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     func setupToolbarAndNavigationbar () {
-        let toolBarAttrImage = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                                 NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
-        let toolBarAttrLabel = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                                 NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
-        
         let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
                                  NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
-        let toolBarAttrLabelClicked = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
-                                 NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         
-        let prevLabel1 = String.fontAwesomeIcon(name: .arrowLeft)
-        let prevLabelAttr1 = NSAttributedString(string: prevLabel1, attributes: toolBarAttrImage)
-        let prevLabelAttrClicked1 = NSAttributedString(string: prevLabel1, attributes: toolBarAttrImageClicked)
-        
-        let prevLabel2 = " \nPrevious"
-        let prevLabelAttr2 = NSAttributedString(string: prevLabel2, attributes: toolBarAttrLabel)
-        let prevLabelAttrClicked2 = NSAttributedString(string: prevLabel2, attributes: toolBarAttrLabelClicked)
-        
-        let completePrevLabel = NSMutableAttributedString()
-        completePrevLabel.append(prevLabelAttr1)
-        completePrevLabel.append(prevLabelAttr2)
-        
-        let completePrevLabelClicked = NSMutableAttributedString()
-        completePrevLabelClicked.append(prevLabelAttrClicked1)
-        completePrevLabelClicked.append(prevLabelAttrClicked2)
-        
-        let prev = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
-        prev.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-        prev.setAttributedTitle(completePrevLabel, for: .normal)
-        prev.setAttributedTitle(completePrevLabelClicked, for: .selected)
-        prev.setAttributedTitle(completePrevLabelClicked, for: .highlighted)
-        prev.titleLabel?.textAlignment = .center
-        prev.addTarget(self, action: #selector(prevFunFact), for: .touchUpInside)
-        let prevBtn = UIBarButtonItem(customView: prev)
-        
-        let nextLabel1 = String.fontAwesomeIcon(name: .arrowRight)
-        let nextAttr1 = NSAttributedString(string: nextLabel1, attributes: toolBarAttrImage)
-        let nextLabelAttrClicked1 = NSAttributedString(string: nextLabel1, attributes: toolBarAttrImageClicked)
-        
-        let nextLabel2 = "\nNext"
-        let nextAttr2 = NSAttributedString(string: nextLabel2, attributes: toolBarAttrLabel)
-        let nextLabelAttrClicked2 = NSAttributedString(string: nextLabel2, attributes: toolBarAttrLabelClicked)
-        
-        let completenextLabel = NSMutableAttributedString()
-        completenextLabel.append(nextAttr1)
-        completenextLabel.append(nextAttr2)
-        
-        let completeNextLabelClicked = NSMutableAttributedString()
-        completeNextLabelClicked.append(nextLabelAttrClicked1)
-        completeNextLabelClicked.append(nextLabelAttrClicked2)
-        
-        let next = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
-        next.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
-        next.setAttributedTitle(completenextLabel, for: .normal)
-        next.setAttributedTitle(completeNextLabelClicked, for: .selected)
-        next.setAttributedTitle(completeNextLabelClicked, for: .highlighted)
-        next.titleLabel?.textAlignment = .center
-        next.addTarget(self, action: #selector(nextFunFact), for: .touchUpInside)
-        let nextBtn = UIBarButtonItem(customView: next)
-        
         let shareLabel1 = String.fontAwesomeIcon(name: .shareAlt)
-        let shareAttr1 = NSAttributedString(string: shareLabel1, attributes: Attributes.navBarImageSolidAttribute)
+        let shareAttr1 = NSAttributedString(string: shareLabel1, attributes: Attributes.navBarImageLightAttribute)
         let shareAttrClicked1 = NSAttributedString(string: shareLabel1, attributes: toolBarAttrImageClicked)
-        
-//        let shareLabel2 = "\nShare"
-//        let shareAttr2 = NSAttributedString(string: shareLabel2, attributes: toolBarAttrLabel)
-//        let shareAttrClicked2 = NSAttributedString(string: shareLabel2, attributes: toolBarAttrLabelClicked)
         
         let completeshareLabel = NSMutableAttributedString()
         completeshareLabel.append(shareAttr1)
-//        completeshareLabel.append(shareAttr2)
         
         let completeshareLabelClicked = NSMutableAttributedString()
         completeshareLabelClicked.append(shareAttrClicked1)
-//        completeshareLabelClicked.append(shareAttrClicked2)
         
         let share = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
         share.isUserInteractionEnabled = true
@@ -224,9 +165,8 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         share.addTarget(self, action: #selector(shareFactAction), for: .touchUpInside)
         let shareBtn = UIBarButtonItem(customView: share)
         
-        
         let menuLabel1 = String.fontAwesomeIcon(name: .angleDown)
-        let menuAttr1 = NSAttributedString(string: menuLabel1, attributes: Attributes.navBarImageSolidAttribute)
+        let menuAttr1 = NSAttributedString(string: menuLabel1, attributes: Attributes.navBarImageLightAttribute)
         let menuAttrClicked1 = NSAttributedString(string: menuLabel1, attributes: toolBarAttrImageClicked)
          
         let completemenuLabel = NSMutableAttributedString()
@@ -246,7 +186,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         let menuBtn = UIBarButtonItem(customView: menu)
         
         let voiceLabel1 = String.fontAwesomeIcon(name: .volumeUp)
-        let voiceAttr1 = NSAttributedString(string: voiceLabel1, attributes: Attributes.navBarImageSolidAttribute)
+        let voiceAttr1 = NSAttributedString(string: voiceLabel1, attributes: Attributes.navBarImageLightAttribute)
         let voiceAttrClicked1 = NSAttributedString(string: voiceLabel1, attributes: toolBarAttrImageClicked)
         
         let completevoiceLabel = NSMutableAttributedString()
@@ -266,7 +206,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         let voiceBtn = UIBarButtonItem(customView: voice)
         
         let helpLabel1 = String.fontAwesomeIcon(name: .questionCircle)
-        let helpAttr1 = NSAttributedString(string: helpLabel1, attributes: Attributes.navBarImageSolidAttribute)
+        let helpAttr1 = NSAttributedString(string: helpLabel1, attributes: Attributes.navBarImageLightAttribute)
         let helpAttrClicked1 = NSAttributedString(string: helpLabel1, attributes: Attributes.toolBarImageClickedAttribute)
         
         let completehelpLabel = NSMutableAttributedString()
@@ -370,6 +310,11 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
                 addFactVC?.likes = currentVC.likesObject as! Int
                 addFactVC?.dislikes = currentVC.dislikesObject as! Int
                 addFactVC?.source = currentVC.sourceObject as! String
+                addFactVC?.approvalCount = currentVC.approvalCount
+                addFactVC?.rejectionCount = currentVC.rejectionCount
+                addFactVC?.approvalUsers = currentVC.approvalUsers
+                addFactVC?.rejectionUsers = currentVC.rejectionUsers
+                addFactVC?.rejectionReason = currentVC.rejectionReason
                 self.navigationController?.pushViewController(addFactVC!, animated: true)
                 
             }

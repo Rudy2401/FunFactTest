@@ -43,7 +43,7 @@ enum Attributes {
     static let toolBarImageSolidAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
                                               NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
     
-    static let navBarImageSolidAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+    static let navBarImageLightAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                              NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
     
     static let addFactButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
@@ -106,6 +106,19 @@ struct Constants {
                                 "Park",
                                 "Restaurant/Cafe",
                                 "Landmark"]
+    
+    static let rejectionReason = ["Source invalid",
+                                  "Fact does not match the source",
+                                  "Image incorrect",
+                                  "Inflammatory/Derogatory content",
+                                  "Landmark Name does not match the fact",
+                                  "Other"]
+    
+    static let disputeReason = ["--- Select a reason ---",
+                                "Factually incorrect",
+                                "Fact belongs to another landmark",
+                                "Derogatory/Offensive text",
+                                "Other"]
     
     static func getMarkerDetails(type: String) -> AnnotationType {
         var annotationType = AnnotationType(color: UIColor(), image: UIImage())

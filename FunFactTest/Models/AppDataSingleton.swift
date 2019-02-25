@@ -10,19 +10,25 @@ import Foundation
 
 class AppDataSingleton {
     static let appDataSharedInstance = AppDataSingleton()
-    var userProfile = User(uid: "",
+    var userProfile = UserProfile(uid: "",
                            dislikeCount: 0,
                            disputeCount: 0,
                            likeCount: 0,
                            submittedCount: 0,
-                           email: "", name: "",
+                           verifiedCount: 0,
+                           rejectedCount: 0,
+                           email: "",
+                           name: "",
+                           userName: "",
                            photoURL: "",
                            provider: "",
                            funFactsDisputed: [],
                            funFactsLiked: [],
                            funFactsDisliked: [],
-                           funFactsSubmitted: [])
+                           funFactsSubmitted: [],
+                           funFactsVerified: [],
+                           funFactsRejected: [])
     var listOfLandmarks = ListOfLandmarks(listOfLandmarks: [])
     var listOfFunFacts = ListOfFunFacts(listOfFunFacts: [])
-    var usersDict = [String: User]()
+    var usersDict = [String: UserProfile]()
 }

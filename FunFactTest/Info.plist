@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AlgoliaApiKey</key>
+	<string>b95a5d190ab7cb1520c01cc330c1dedd</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string></string>

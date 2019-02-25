@@ -10,27 +10,28 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 
-class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, UITextViewDelegate {
+class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, UITextViewDelegate, FirestoreManagerDelegate {
+    
     @IBOutlet weak var helpText: UILabel!
     @IBOutlet weak var reasonPicker: UIPickerView!
     @IBOutlet weak var notesText: UITextView!
     @IBOutlet weak var submitButton: CustomButton!
     var pickerData: [String] = [String]()
     var funFactID: String = ""
-    var disputeDict = [String: Dispute]()
     var reason = ""
     var popup = UIAlertController()
+    var firestore = FirestoreManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationController?.navigationBar.tintColor = UIColor.darkGray
 
-        pickerData = ["--- Select a reason ---", "Factually incorrect", "Fact belongs to another landmark", "Derogatory/Offensive text", "Other"]
+        pickerData = Constants.disputeReason
         self.reasonPicker.delegate = self
         self.reasonPicker.dataSource = self
         self.notesText.delegate = self
         
-        reasonPicker.layer.borderWidth = 0.5
+        reasonPicker.layer.borderWidth = 0
         reasonPicker.layer.borderColor = UIColor.gray.cgColor
         reasonPicker.layer.cornerRadius = 5
         
@@ -63,12 +64,15 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         notesText.textColor = UIColor.lightGray
         reasonPicker.layer.cornerRadius = 5
         
-        notesText.layer.borderWidth = CGFloat.init(0.5)
+        notesText.layer.borderWidth = 0
         notesText.layer.borderColor = UIColor.gray.cgColor
         notesText.layer.cornerRadius = 5
         
         submitButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         print(funFactID)
+    }
+    func documentsDidUpdate() {
+        
     }
     
     @objc func cancelAction(_ sender: Any) {
@@ -81,59 +85,20 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         }
         let db = Firestore.firestore()
         
-        let formatter = DateFormatter()
-        // initially set the format based on your datepicker date / server String
-        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-        
-        let myString = formatter.string(from: Date())
-        let yourDate = formatter.date(from: myString)
-        formatter.dateFormat = "MMM dd, yyyy"
-        let myStringafd = formatter.string(from: yourDate!)
-        
+        let date = Timestamp(date: Date())
         let did = db.collection("disputes").document().documentID
+        firestore.addDispute(for: did,
+                             funFactID: funFactID,
+                             reason: reason,
+                             description: notesText.text,
+                             user: Auth.auth().currentUser?.uid ?? "",
+                             date: date,
+                             completion: { (status) in
+                                self.showAlert(message: status)
+                            })
         
-        db.collection("disputes").document(did).setData([
-            "disputeID": did,
-            "funFactID": funFactID,
-            "reason": reason,
-            "description": notesText.text,
-            "user": Auth.auth().currentUser?.uid ?? "",
-            "dateSubmitted": myStringafd
-        ]){ err in
-            if let err = err {
-                print("Error writing document: \(err)")
-                self.showAlert(message: "fail")
-            } else {
-                print("Document successfully written!")
-                self.showAlert(message: "success")
-            }
-        }
-        let disputeRef = db.collection("funFacts").document(funFactID)
-        disputeRef.updateData([
-            "disputeFlag": "Y"
-        ]) { err in
-            if let err = err {
-                print("Error updating document: \(err)")
-            } else {
-                print("Document successfully updated")
-            }
-        }
-        addDisputes(disputeID: did, userID: Auth.auth().currentUser?.uid ?? "")
-    }
-    
-    func addDisputes(disputeID: String, userID: String) {
-        let db = Firestore.firestore()
-        let disputeRef = db.collection("disputes").document(disputeID)
-        
-        db.collection("users").document(userID).collection("funFactsDisputed").document(disputeID).setData([
-            "disputeID": disputeRef
-        ], merge: true){ err in
-            if let err = err {
-                print("Error writing document: \(err)")
-            } else {
-                print("Document successfully written!")
-            }
-        }
+        firestore.updateDisputeFlag(funFactID: funFactID)
+        firestore.addUserDisputes(disputeID: did, userID: Auth.auth().currentUser?.uid ?? "")
     }
     
     func showAlert(message: String) {

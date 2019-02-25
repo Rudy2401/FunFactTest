@@ -13,10 +13,10 @@ struct ListOfDisputes  {
 }
 
 struct Dispute  {
-    let disputeID: String
-    let funFactID: String
-    let reason: String
-    let description: String
-    let user: String
-    let dateSubmitted: String
+    var disputeID: String
+    var funFactID: String
+    var reason: String
+    var description: String
+    var user: String
+    var dateSubmitted: String
 }

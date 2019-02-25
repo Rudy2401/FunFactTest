@@ -65,9 +65,6 @@ extension MainViewController {
         if (mapViewRegionDidChangeFromUserInteraction() || caller == "viewDidLoad") {
             let spinner = showLoader(view: self.mapView)
             
-            let client = Client(appID: "P1NWQ6JXG6", apiKey: "56f9249980860f38c01e52158800a9b0")
-            let index = client.index(withName: "landmark_name")
-            
             let mapRect = self.mapView.visibleMapRect
             let nwMapPoint = MKMapPoint(x: mapRect.origin.x, y: mapRect.maxY)
             let seMapPoint = MKMapPoint(x: mapRect.maxX, y: mapRect.origin.y)
@@ -83,52 +80,58 @@ extension MainViewController {
             }
 
             var filters = ""
-            for land in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
-                filters = filters + " NOT objectID:" + land.id + " AND "
-            }
-            if filters.count > 2 {
-                query.filters = "(" + filters.dropLast(4) + ")"
-            }
-            
-            index.search(query) { (res, error) in
-                guard let hits = res!["hits"] as? [[String: AnyObject]] else { return }
-                for hit in hits {
-                    
-                    let geoloc = hit["_geoloc"] as! [String: Double]
-                    let coordinates = GeoPoint(latitude: geoloc["lat"]!, longitude: geoloc["lng"]!)
-                    
-                    let landmark = Landmark(id: hit["objectID"] as! String,
-                                            name: hit["name"] as! String,
-                                            address: hit["address"] as! String,
-                                            city: hit["city"] as! String,
-                                            state: hit["state"] as! String,
-                                            zipcode: hit["zipcode"] as! String,
-                                            country: hit["country"] as! String,
-                                            type: hit["type"] as! String,
-                                            coordinates: coordinates,
-                                            image: hit["image"] as! String,
-                                            numOfFunFacts: hit["numOfFunFacts"] as! Int,
-                                            likes: hit["likes"] as! Int,
-                                            dislikes: hit["dislikes"] as! Int)
-                    self.setupGeoFences(lat: landmark.coordinates.latitude,
-                                        lon: landmark.coordinates.longitude,
-                                        title: landmark.name,
-                                        landmarkID: landmark.id)
-                    
-                    AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks.insert(landmark)
-                    
-                    // Add anotations
-                    var annotation: FunFactAnnotation
-                    annotation = FunFactAnnotation(landmarkID: hit["objectID"] as! String,
-                                                   title: hit["name"] as! String,
-                                                   address: "\(String(describing: hit["address"])), \(String(describing: hit["city"])), \(String(describing: hit["state"])), \(String(describing: hit["country"]))",
-                                                    type: hit["type"] as! String,
-                                                    coordinate: CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude))
-                    self.mapView.addAnnotation(annotation)
+            if caller != "viewDidLoad" {
+                for land in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
+                    filters = filters + " NOT objectID:" + land.id + " AND "
                 }
-                spinner.dismissLoader()
+                if filters.count > 2 {
+                    query.filters = "(" + filters.dropLast(4) + ")"
+                }
             }
             
+            AlgoliaManager.sharedInstance.landmarkIndex.search(query) { (res, error) in
+                if let error = error {
+                    print ("Error getting data from Algolia \(error.localizedDescription)")
+                }
+                else {
+                    guard let hits = res!["hits"] as? [[String: AnyObject]] else { return }
+                    for hit in hits {
+                        
+                        let geoloc = hit["_geoloc"] as! [String: Double]
+                        let coordinates = GeoPoint(latitude: geoloc["lat"]!, longitude: geoloc["lng"]!)
+                        
+                        let landmark = Landmark(id: hit["objectID"] as! String,
+                                                name: hit["name"] as! String,
+                                                address: hit["address"] as! String,
+                                                city: hit["city"] as! String,
+                                                state: hit["state"] as! String,
+                                                zipcode: hit["zipcode"] as! String,
+                                                country: hit["country"] as! String,
+                                                type: hit["type"] as! String,
+                                                coordinates: coordinates,
+                                                image: hit["image"] as! String,
+                                                numOfFunFacts: hit["numOfFunFacts"] as! Int,
+                                                likes: hit["likes"] as! Int,
+                                                dislikes: hit["dislikes"] as! Int)
+                        self.setupGeoFences(lat: landmark.coordinates.latitude,
+                                            lon: landmark.coordinates.longitude,
+                                            title: landmark.name,
+                                            landmarkID: landmark.id)
+                        
+                        AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks.insert(landmark)
+                        
+                        // Add anotations
+                        var annotation: FunFactAnnotation
+                        annotation = FunFactAnnotation(landmarkID: hit["objectID"] as! String,
+                                                       title: hit["name"] as! String,
+                                                       address: "\(String(describing: hit["address"])), \(String(describing: hit["city"])), \(String(describing: hit["state"])), \(String(describing: hit["country"]))",
+                            type: hit["type"] as! String,
+                            coordinate: CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude))
+                        self.mapView.addAnnotation(annotation)
+                    }
+                    spinner.dismissLoader()
+                }
+            }
         }
     }
     
@@ -155,13 +158,14 @@ extension MainViewController {
                                           imageCaption: document.data()["imageCaption"] as? String ?? "",
                                           disputeFlag: document.data()["disputeFlag"] as! String,
                                           submittedBy: document.data()["submittedBy"] as! String,
-                                          dateSubmitted: document.data()["dateSubmitted"] as! String,
+                                          dateSubmitted: document.data()["dateSubmitted"] as! Timestamp,
                                           source: document.data()["source"] as! String,
                                           tags: document.data()["tags"] as! [String],
                                           approvalCount: document.data()["approvalCount"] as! Int,
                                           rejectionCount: document.data()["rejectionCount"] as! Int,
                                           approvalUsers: document.data()["approvalUsers"] as! [String],
-                                          rejectionUsers: document.data()["rejectionUsers"] as! [String])
+                                          rejectionUsers: document.data()["rejectionUsers"] as! [String],
+                                          rejectionReason: document.data()["rejectionReason"] as! [String])
                     pageContent.append(document.data()["id"] as! String)
                     AppDataSingleton.appDataSharedInstance.listOfFunFacts.listOfFunFacts.insert(funFact)
                     funFacts.append(funFact)

@@ -21,32 +21,26 @@ class AddressViewController: UIViewController {
     var selectedPin: MKPlacemark?
     var callback: ((AddressData) -> Void)?
     
-    struct AddressData {
-        var address: String?
-        var landmarkName: String?
-        var coordinate: CLLocationCoordinate2D?
-        var city: String?
-        var state: String?
-        var country: String?
-        var zipcode: String?
-    }
     override func viewDidLoad() {
         super.viewDidLoad()
         submitButton.backgroundColor = Colors.seagreenColor
         mapView.bringSubviewToFront(submitButton)
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
+        
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.tintColor = .darkGray
         navigationController?.navigationBar.prefersLargeTitles = false
+        
         locationManager.delegate = self as CLLocationManagerDelegate
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
         let locationSearchTable = storyboard!.instantiateViewController(withIdentifier: "LocationSearchTable")
-            as! LocationSearchTableViewController // swiftlint:disable:this force_cast
+            as! LocationSearchTableViewController
         resultSearchController = UISearchController(searchResultsController: locationSearchTable)
         resultSearchController?.searchResultsUpdater = locationSearchTable
+        
         let searchBar = resultSearchController!.searchBar
         let textFieldInsideUISearchBar = searchBar.value(forKey: "searchField") as? UITextField
         textFieldInsideUISearchBar?.font = UIFont(name: "Avenir Next", size: 14.0)

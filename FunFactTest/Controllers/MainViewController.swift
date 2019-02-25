@@ -17,7 +17,7 @@ import FirebaseUI
 import InstantSearch
 
 
-class MainViewController: UIViewController {
+class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     @IBOutlet var annotationBottomView: AnnotationBottomView!
     @IBOutlet var mapView: MKMapView!
@@ -36,20 +36,20 @@ class MainViewController: UIViewController {
     var landmarkTitle = ""
     var landmarkID = ""
     var currentLocationCoordinate = CLLocationCoordinate2D()
-    let jsonObject = FunFactJSONParser()
     var landmarkImage = UIImage()
     var annotations: [FunFactAnnotation]?
     var landmarkType = ""
-    var userProfile = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
+    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
     var boundingBox: GeoRect?
+    var firestore = FirestoreManager()
     
     // 1. create locationManager
     let locationManager = CLLocationManager()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         typeColor.layer.cornerRadius = 2.5
+        firestore.delegate = self
         
         annotationBottomView.alpha = 0.0
         setupNavigationbar()
@@ -59,10 +59,9 @@ class MainViewController: UIViewController {
         locationManager.requestAlwaysAuthorization()
         locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user) in
+        firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user) in
             AppDataSingleton.appDataSharedInstance.userProfile = user
         }
-        downloadAllUserData()
         
         // 3. setup mapView
         mapView.delegate = self
@@ -95,6 +94,10 @@ class MainViewController: UIViewController {
         // 4. setup Firestore data
         loadDataFromFirestoreAndAddAnnotations()
     }
+    func documentsDidUpdate() {
+        print ("uploaded to cache")
+    }
+    
     
     @IBAction func viewAddFact(_ sender: Any) {
         performSegue(withIdentifier: "addFactDetail", sender: self)
@@ -313,8 +316,6 @@ class MainViewController: UIViewController {
     
     func loadDataFromFirestoreAndAddAnnotations() {
         //4. Getting data from Firestore
-        let firestore: FirestoreConnection = FirestoreConnection()
-        
         downloadLandmarks(caller: "viewDidLoad")
         firestore.downloadImagesIntoCache()
     }
@@ -349,101 +350,6 @@ class MainViewController: UIViewController {
     //     In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     
-    }
-    func downloadUserProfile(_ uid: String, completionHandler: @escaping (User) -> ())  {
-        if Auth.auth().currentUser == nil {
-            return
-        }
-        let db = Firestore.firestore()
-        var user = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
-        db.collection("users").document(uid).getDocument { (snapshot, error) in
-            if let document = snapshot {
-                user.dislikeCount = document.data()?["dislikeCount"] as! Int
-                user.likeCount = document.data()?["likeCount"] as! Int
-                user.disputeCount = document.data()?["disputeCount"] as! Int
-                user.submittedCount = document.data()?["submittedCount"] as! Int
-                user.email = document.data()?["email"] as! String
-                user.name = document.data()?["name"] as! String
-                user.photoURL = document.data()?["photoURL"] as! String
-                user.provider = document.data()?["provider"] as! String
-                user.uid = document.data()?["uid"] as! String
-                
-                self.downloadOtherUserData(Auth.auth().currentUser?.uid ?? "", collection: "funFactsLiked", completionHandler: { (ref) in
-                    AppDataSingleton.appDataSharedInstance.userProfile.funFactsLiked = ref
-                })
-                self.downloadOtherUserData(Auth.auth().currentUser?.uid ?? "", collection: "funFactsDisliked", completionHandler: { (ref) in
-                    AppDataSingleton.appDataSharedInstance.userProfile.funFactsDisliked = ref
-                })
-                self.downloadOtherUserData(Auth.auth().currentUser?.uid ?? "", collection: "funFactsSubmitted", completionHandler: { (ref) in
-                    AppDataSingleton.appDataSharedInstance.userProfile.funFactsSubmitted = ref
-                })
-                self.downloadOtherUserData(Auth.auth().currentUser?.uid ?? "", collection: "funFactsDisputed", completionHandler: { (ref) in
-                    AppDataSingleton.appDataSharedInstance.userProfile.funFactsDisputed = ref
-                })
-                
-                completionHandler(user)
-            }
-            else {
-                let err = error
-                print("Error getting documents: \(String(describing: err))")
-            }
-        }
-    }
-    func downloadOtherUserData(_ uid: String, collection: String, completionHandler: @escaping ([DocumentReference]) -> ()) {
-        var refs = [DocumentReference]()
-        let db = Firestore.firestore()
-        db.collection("users").document(uid).collection(collection).getDocuments() { (snap, error) in
-            if let err = error {
-                print("Error getting documents: \(err)")
-            } else {
-                for doc in snap!.documents {
-                    if collection == "funFactsDisputed" {
-                        refs.append(doc.data()["disputeID"] as! DocumentReference)
-                    } else {
-                        refs.append(doc.data()["funFactID"] as! DocumentReference)
-                    }
-                }
-            }
-            completionHandler(refs)
-        }
-    }
-    
-    func downloadAllUserData() {
-        let db = Firestore.firestore()
-        var user = User(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, email: "", name: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [])
-        db.collection("users").getDocuments { (snapshot, error) in
-            if let err = error {
-                print("Error getting documents: \(err)")
-            } else {
-                for doc in snapshot!.documents {
-                    let uid = doc.data()["uid"] as! String
-                    user.uid = uid
-                    user.dislikeCount = doc.data()["dislikeCount"] as! Int
-                    user.disputeCount = doc.data()["disputeCount"] as! Int
-                    user.likeCount = doc.data()["likeCount"] as! Int
-                    user.submittedCount = doc.data()["submittedCount"] as! Int
-                    user.email = doc.data()["email"] as! String
-                    user.name = doc.data()["name"] as! String
-                    user.photoURL = doc.data()["photoURL"] as! String
-                    user.provider = doc.data()["provider"] as! String
-                    AppDataSingleton.appDataSharedInstance.usersDict[uid] = user
-                    
-                    self.downloadOtherUserData(uid, collection: "funFactsLiked", completionHandler: { (ref) in
-                        AppDataSingleton.appDataSharedInstance.usersDict[uid]?.funFactsLiked = ref
-                    })
-                    self.downloadOtherUserData(uid, collection: "funFactsDisliked", completionHandler: { (ref) in
-                        AppDataSingleton.appDataSharedInstance.usersDict[uid]?.funFactsDisliked = ref
-                    })
-                    self.downloadOtherUserData(uid, collection: "funFactsSubmitted", completionHandler: { (ref) in
-                        AppDataSingleton.appDataSharedInstance.usersDict[uid]?.funFactsSubmitted = ref
-                    })
-                    self.downloadOtherUserData(uid, collection: "funFactsDisputed", completionHandler: { (ref) in
-                        AppDataSingleton.appDataSharedInstance.usersDict[uid]?.funFactsDisputed = ref
-                    })
-                    
-                }
-            }
-        }
     }
     
     func setupNavigationbar () {

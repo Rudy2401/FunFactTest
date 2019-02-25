@@ -17,7 +17,9 @@ const algoliasearch = require('algoliasearch');
 
 // Initialize Algolia Client
 const client = algoliasearch(env.algolia.appid, env.algolia.apikey);
-const index = client.initIndex('landmark_name');
+const landmarkIndex = client.initIndex('landmark_name');
+const hashtagIndex = client.initIndex('hashtag_name');
+const userIndex = client.initIndex('user_profile');
 
 exports.indexLandmark = functions.firestore.document('/landmarks/{landmarkID}').onCreate((snap, context) => {
 
@@ -40,7 +42,7 @@ exports.indexLandmark = functions.firestore.document('/landmarks/{landmarkID}').
     const objectID = snap.id;
 
     // Add data to algolia index
-    return index.addObject({
+    return landmarkIndex.addObject({
         objectID,
         name,
         address,
@@ -60,7 +62,54 @@ exports.unindexLandmark = functions.firestore.document('/landmarks/{landmarkID}'
     const objectID = snap.id;
 
     // Delete ID from index
-    return index.deleteObject(objectID);
+    return landmarkIndex.deleteObject(objectID);
+});
+
+exports.indexHashtag = functions.firestore.document('/hashtags/{hashtagID}').onCreate((snap, context) => {
+    const name = snap.id;
+    const count = snap.data().hashtagcount;
+    const objectID = snap.id;
+    var image = "";
+    admin.firestore().collection('hashtags').doc(objectID).collection('funFacts').get().then(doc => {
+        doc.forEach(element => {
+            image = element.id;
+            // Add data to algolia index
+            return hashtagIndex.addObject({
+                objectID,
+                name,
+                count,
+                image
+            });
+        });
+        return "";
+    }).catch(error => {
+        console.log(error);
+    });
+});
+exports.unindexHashtag = functions.firestore.document('/hashtags/{hashtagID}').onDelete((snap, context) => {
+    const objectID = snap.id;
+
+    // Delete ID from index
+    return hashtagIndex.deleteObject(objectID);
+});
+
+exports.indexUsers = functions.firestore.document('/users/{userID}').onCreate((snap, context) => {
+    const name = snap.data().name;
+    const userName = snap.data().userName;
+    const photoURL = snap.data().photoURL;
+    const objectID = snap.id;
+    return userIndex.addObject({
+        objectID,
+        name,
+        userName,
+        photoURL
+    });
+});
+exports.unindexUsers = functions.firestore.document('/users/{userID}').onDelete((snap, context) => {
+    const objectID = snap.id;
+
+    // Delete ID from index
+    return userIndex.deleteObject(objectID);
 });
 
 // Create and Deploy Your First Cloud Functions
@@ -265,25 +314,45 @@ exports.updateSubmittedCountForDelete = functions.firestore.document('/users/{us
     })
 });
 
-exports.updateAdditionalUserFields = functions.auth.user().onCreate((user) => {
-    const email = user.email; // The email of the user.
-    const uid = user.uid;
-    var provider = "";
-    var name = "";
-    var photoURL = "";
-    if (user.providerData !== undefined && user.providerData.length !== 0) {
-        provider = user.providerData[0].providerId;
-        name = user.displayName; // The display name of the user.
-        photoURL = user.photoURL;
-    }
-    const likeCount = 0;
-    const dislikeCount = 0;
-    const disputeCount = 0;
-    const submittedCount = 0;
-    const userData = { email, name, uid, provider, photoURL, likeCount, dislikeCount, disputeCount, submittedCount }
-    return admin.firestore().collection('users').doc(uid).create(userData);
+// exports.updateAdditionalUserFields = functions.auth.user().onCreate((user) => {
+//     console.log(user);
+//     const email = user.email; // The email of the user.
+//     const uid = user.uid;
+//     var provider = "";
+//     var name = "";
+//     var userName = email.split(/[\s@]+/)[0];
+//     var photoURL = "";
+//     if (user.providerData !== undefined && user.providerData.length !== 0) {
+//         provider = user.providerData[0].providerId;
+//         if (user.displayName !== null) {
+//             name = user.displayName; // The display name of the user.
+//         }
+//         if (user.photoURL !== null) {
+//             photoURL = user.photoURL;
+//         }
+//     }
+//     const likeCount = 0;
+//     const dislikeCount = 0;
+//     const disputeCount = 0;
+//     const submittedCount = 0;
+//     const verifiedCount = 0;
+//     const rejectedCount = 0;
+//     const userData = { 
+//         email, 
+//         name, 
+//         userName,
+//         uid, 
+//         provider, 
+//         photoURL, 
+//         likeCount, 
+//         dislikeCount, 
+//         disputeCount, 
+//         submittedCount, 
+//         verifiedCount, 
+//         rejectedCount }
+//     return admin.firestore().collection('users').doc(uid).create(userData);
 
-});
+// });
 
 exports.deleteUserFields = functions.auth.user().onDelete((user) => {
     const uid = user.uid;
@@ -315,6 +384,73 @@ exports.udpateNumOfFunFactsForDelete = functions.firestore.document('/funFacts/{
         const funFactCount = snap.data().numOfFunFacts;
         const numOfFunFacts = funFactCount - 1;
         const data = { numOfFunFacts }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+
+exports.updateVerifiedCount = functions.firestore.document('/users/{userID}/funFactsVerified/{funFactID}').onCreate((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        var count = 0;
+        if (isNaN(snap.data().verifiedCount)) {
+            count = 0;
+        } else {
+            count = snap.data().verifiedCount;
+        }
+        const verifiedCount = count + 1;
+        const data = { verifiedCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+exports.updateVerifiedCountForDelete = functions.firestore.document('/users/{userID}/funFactsVerified/{funFactID}').onDelete((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        const verifiedCount = snap.data().verifiedCount - 1;
+        const data = { verifiedCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+
+
+exports.updateRejectedCount = functions.firestore.document('/users/{userID}/funFactsRejected/{funFactID}').onCreate((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        var count = 0;
+        if (isNaN(snap.data().rejectedCount)) {
+            count = 0;
+        } else {
+            count = snap.data().rejectedCount;
+        }
+        const rejectedCount = count + 1;
+        const data = { rejectedCount }
+        // run update
+        return docRef.set(data, { merge: true });
+    })
+});
+exports.updateRejectedCountForDelete = functions.firestore.document('/users/{userID}/funFactsRejected/{funFactID}').onDelete((change, context) => {
+    // New document Created : add one to count
+    const userID = context.params.userID
+    const docRef = admin.firestore().collection('users').doc(userID)
+
+    return docRef.get().then(snap => {
+        // get the total tag count and add one
+        const rejectedCount = snap.data().rejectedCount - 1;
+        const data = { rejectedCount }
         // run update
         return docRef.set(data, { merge: true });
     })

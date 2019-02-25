@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */; };
 		D800724D2209DBB500A20084 /* FirestoreRandomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */; };
+		D8310F0D221F4BCF007336A0 /* AddressDataStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F0C221F4BCF007336A0 /* AddressDataStruct.swift */; };
+		D8310F0F221F8645007336A0 /* AlgoliaSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F0E221F8645007336A0 /* AlgoliaSearchManager.swift */; };
+		D8310F11221F9690007336A0 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F10221F9690007336A0 /* UIImage.swift */; };
 		D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */ = {isa = PBXBuildFile; fileRef = D834DFF720F677690091CA40 /* ListOfFunFacts.json */; };
-		D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */; };
 		D83F06022161BD0700B37FED /* UserStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83F06012161BD0700B37FED /* UserStruct.swift */; };
 		D848BD3621343FAF00C31CD0 /* ButtonWithShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD3521343FAF00C31CD0 /* ButtonWithShadow.swift */; };
 		D848BD3A2134909E00C31CD0 /* SignInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD392134909E00C31CD0 /* SignInViewController.swift */; };
@@ -51,10 +53,12 @@
 		D8B3103821CADFD600E85148 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103721CADFD600E85148 /* SearchViewController.swift */; };
 		D8B3103A21CAEAA500E85148 /* SearchCellTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */; };
 		D8B3103C21E2E7F900E85148 /* AppDataSingleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8B3103B21E2E7F900E85148 /* AppDataSingleton.swift */; };
-		D8CB08C7221078FF00A86F9E /* ContentViewControllerDataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CB08C6221078FF00A86F9E /* ContentViewControllerDataExtension.swift */; };
 		D8CB08C92212638800A86F9E /* VerifyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CB08C82212638800A86F9E /* VerifyViewController.swift */; };
+		D8CB08CB2217144700A86F9E /* RejectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CB08CA2217144600A86F9E /* RejectionView.swift */; };
+		D8CB08CD221714C800A86F9E /* RejectionView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D8CB08CC221714C800A86F9E /* RejectionView.xib */; };
+		D8CB08CF221DAA0F00A86F9E /* AlgoliaManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CB08CE221DAA0F00A86F9E /* AlgoliaManager.swift */; };
 		D8CBADCE21C295C900C42F91 /* MainViewControllerExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8CBADCD21C295C900C42F91 /* MainViewControllerExtension.swift */; };
-		D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */; };
+		D8D18571212A1CFF0093B66C /* FirestoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18570212A1CFF0093B66C /* FirestoreManager.swift */; };
 		D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18572212A1E510093B66C /* LandmarkStruct.swift */; };
 		D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18574212A1F2F0093B66C /* FunFactStruct.swift */; };
 		D8DF6A5E210634800031A153 /* DisputeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DF6A5D210634800031A153 /* DisputeViewController.swift */; };
@@ -70,7 +74,7 @@
 		D8ED8FF8210A49480010EF7C /* AddFactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */; };
 		D8ED8FFA210A49780010EF7C /* AddressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FF9210A49780010EF7C /* AddressViewController.swift */; };
 		D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */; };
-		D8F0078521ED5E7E0031325F /* SearchLandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F0078421ED5E7E0031325F /* SearchLandmarkStruct.swift */; };
+		D8F0078521ED5E7E0031325F /* SearchStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F0078421ED5E7E0031325F /* SearchStruct.swift */; };
 		D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F76AF0210E1A3100A039D2 /* AddressCell.swift */; };
 		D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */; };
 		D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */ = {isa = PBXBuildFile; fileRef = D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */; };
@@ -114,8 +118,10 @@
 		D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreRandomFunctions.swift; sourceTree = "<group>"; };
 		D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FontAwesome_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = BoltsSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8310F0C221F4BCF007336A0 /* AddressDataStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressDataStruct.swift; sourceTree = "<group>"; };
+		D8310F0E221F8645007336A0 /* AlgoliaSearchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoliaSearchManager.swift; sourceTree = "<group>"; };
+		D8310F10221F9690007336A0 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		D834DFF720F677690091CA40 /* ListOfFunFacts.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ListOfFunFacts.json; sourceTree = "<group>"; };
-		D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactJSONParser.swift; sourceTree = "<group>"; };
 		D83F06012161BD0700B37FED /* UserStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStruct.swift; sourceTree = "<group>"; };
 		D848BD3521343FAF00C31CD0 /* ButtonWithShadow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonWithShadow.swift; sourceTree = "<group>"; };
 		D848BD392134909E00C31CD0 /* SignInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInViewController.swift; sourceTree = "<group>"; };
@@ -158,10 +164,12 @@
 		D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCellTableViewCell.swift; sourceTree = "<group>"; };
 		D8B3103B21E2E7F900E85148 /* AppDataSingleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDataSingleton.swift; sourceTree = "<group>"; };
 		D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GeoFire.xcodeproj; path = "geofire-objc/GeoFire.xcodeproj"; sourceTree = "<group>"; };
-		D8CB08C6221078FF00A86F9E /* ContentViewControllerDataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewControllerDataExtension.swift; sourceTree = "<group>"; };
 		D8CB08C82212638800A86F9E /* VerifyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyViewController.swift; sourceTree = "<group>"; };
+		D8CB08CA2217144600A86F9E /* RejectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RejectionView.swift; sourceTree = "<group>"; };
+		D8CB08CC221714C800A86F9E /* RejectionView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RejectionView.xib; sourceTree = "<group>"; };
+		D8CB08CE221DAA0F00A86F9E /* AlgoliaManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgoliaManager.swift; sourceTree = "<group>"; };
 		D8CBADCD21C295C900C42F91 /* MainViewControllerExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewControllerExtension.swift; sourceTree = "<group>"; };
-		D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreConnection.swift; sourceTree = "<group>"; };
+		D8D18570212A1CFF0093B66C /* FirestoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreManager.swift; sourceTree = "<group>"; };
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
 		D8D18574212A1F2F0093B66C /* FunFactStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactStruct.swift; sourceTree = "<group>"; };
 		D8DF6A5D210634800031A153 /* DisputeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisputeViewController.swift; sourceTree = "<group>"; };
@@ -177,7 +185,7 @@
 		D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactViewController.swift; sourceTree = "<group>"; };
 		D8ED8FF9210A49780010EF7C /* AddressViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressViewController.swift; sourceTree = "<group>"; };
 		D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchTableViewController.swift; sourceTree = "<group>"; };
-		D8F0078421ED5E7E0031325F /* SearchLandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchLandmarkStruct.swift; sourceTree = "<group>"; };
+		D8F0078421ED5E7E0031325F /* SearchStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchStruct.swift; sourceTree = "<group>"; };
 		D8F76AF0210E1A3100A039D2 /* AddressCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressCell.swift; sourceTree = "<group>"; };
 		D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ListOfLandmarks.json; sourceTree = "<group>"; };
@@ -239,19 +247,30 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		D8310F132220943B007336A0 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				D88DBE80212F3727009A2CC2 /* CacheManager.swift */,
+				D8CB08CE221DAA0F00A86F9E /* AlgoliaManager.swift */,
+				D8310F0E221F8645007336A0 /* AlgoliaSearchManager.swift */,
+				D8D18570212A1CFF0093B66C /* FirestoreManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
 		D88DBE7D212EFC0B009A2CC2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				D8FE7FA120DC4237007B4550 /* Utils.swift */,
+				D88DBE7E212EFC48009A2CC2 /* Constants.swift */,
 				D834DFF720F677690091CA40 /* ListOfFunFacts.json */,
 				D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */,
-				D88DBE7E212EFC48009A2CC2 /* Constants.swift */,
-				D8E78FF221430F73006F03B9 /* overlay-google.json */,
-				D8E78FF621432A19006F03B9 /* overlay-brightcolors.json */,
 				D8E78FF821432BF4006F03B9 /* overlay-blue.json */,
+				D8E78FF621432A19006F03B9 /* overlay-brightcolors.json */,
 				D8E78FFA21432CBF006F03B9 /* overlay-dark.json */,
+				D8E78FF221430F73006F03B9 /* overlay-google.json */,
 				D8E78FFC2143323C006F03B9 /* overlay-light.json */,
 				D8E78FFE214349CE006F03B9 /* overlay-sharp.json */,
+				D8FE7FA120DC4237007B4550 /* Utils.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -301,10 +320,12 @@
 				D848BD4021357F3F00C31CD0 /* CustomUINavigation.swift */,
 				D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */,
 				D88DBE83212F68F9009A2CC2 /* FancyButton.swift */,
-				D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */,
 				D865045E216AC58600B65AAB /* HashtagCell.swift */,
-				D86DA75E217424A8001F7B5C /* UserSubsCell.swift */,
+				D8CB08CA2217144600A86F9E /* RejectionView.swift */,
+				D8CB08CC221714C800A86F9E /* RejectionView.xib */,
 				D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */,
+				D8310F10221F9690007336A0 /* UIImage.swift */,
+				D86DA75E217424A8001F7B5C /* UserSubsCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -312,15 +333,14 @@
 		D8D1856E2129EDFA0093B66C /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				D88DBE80212F3727009A2CC2 /* CacheManager.swift */,
-				D848BD442136F50C00C31CD0 /* DisputeStruct.swift */,
-				D8D18570212A1CFF0093B66C /* FirestoreConnection.swift */,
-				D834DFF920F6AF210091CA40 /* FunFactJSONParser.swift */,
-				D8D18574212A1F2F0093B66C /* FunFactStruct.swift */,
-				D8D18572212A1E510093B66C /* LandmarkStruct.swift */,
-				D83F06012161BD0700B37FED /* UserStruct.swift */,
+				D8310F0C221F4BCF007336A0 /* AddressDataStruct.swift */,
 				D8B3103B21E2E7F900E85148 /* AppDataSingleton.swift */,
-				D8F0078421ED5E7E0031325F /* SearchLandmarkStruct.swift */,
+				D848BD442136F50C00C31CD0 /* DisputeStruct.swift */,
+				D8D18574212A1F2F0093B66C /* FunFactStruct.swift */,
+				D8FE7FA320DC491F007B4550 /* FunFactAnnotation.swift */,
+				D8D18572212A1E510093B66C /* LandmarkStruct.swift */,
+				D8F0078421ED5E7E0031325F /* SearchStruct.swift */,
+				D83F06012161BD0700B37FED /* UserStruct.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -331,7 +351,6 @@
 				D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */,
 				D8ED8FF9210A49780010EF7C /* AddressViewController.swift */,
 				D8FE7FA920E45082007B4550 /* ContentViewController.swift */,
-				D8CB08C6221078FF00A86F9E /* ContentViewControllerDataExtension.swift */,
 				D8DF6A5D210634800031A153 /* DisputeViewController.swift */,
 				D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */,
 				D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */,
@@ -345,8 +364,8 @@
 				D848BD3B213490D100C31CD0 /* SignUpViewController.swift */,
 				D8A2ADE421938268003C4EB1 /* TabBarController.swift */,
 				D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */,
-				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
 				D8CB08C82212638800A86F9E /* VerifyViewController.swift */,
+				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -373,20 +392,21 @@
 		D8FE7F8120DB2712007B4550 /* FunFactTest */ = {
 			isa = PBXGroup;
 			children = (
-				D87ED7BB2151BF5400B14B5F /* functions */,
-				D87ED7B92151BF3C00B14B5F /* firebase.json */,
-				D8FE7F8220DB2712007B4550 /* AppDelegate.swift */,
-				D8FE7F8620DB2712007B4550 /* Main.storyboard */,
 				D8FE7F8B20DB2716007B4550 /* LaunchScreen.storyboard */,
-				D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */,
-				D88DBE7D212EFC0B009A2CC2 /* Resources */,
-				D8D1856F2129EE020093B66C /* Controllers */,
-				D8D1856E2129EDFA0093B66C /* Models */,
-				D8D1856D2129EDD70093B66C /* Views */,
-				D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */,
+				D8FE7F8620DB2712007B4550 /* Main.storyboard */,
+				D87ED7BB2151BF5400B14B5F /* functions */,
 				D8FE7FAD20EAE746007B4550 /* PodFile */,
-				D8FE7F8920DB2716007B4550 /* Assets.xcassets */,
+				D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */,
+				D87ED7B92151BF3C00B14B5F /* firebase.json */,
+				D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */,
 				D8FE7F8E20DB2716007B4550 /* Info.plist */,
+				D8FE7F8220DB2712007B4550 /* AppDelegate.swift */,
+				D8FE7F8920DB2716007B4550 /* Assets.xcassets */,
+				D8D1856F2129EE020093B66C /* Controllers */,
+				D8310F132220943B007336A0 /* Managers */,
+				D8D1856E2129EDFA0093B66C /* Models */,
+				D88DBE7D212EFC0B009A2CC2 /* Resources */,
+				D8D1856D2129EDD70093B66C /* Views */,
 			);
 			path = FunFactTest;
 			sourceTree = "<group>";
@@ -499,6 +519,7 @@
 				D8FE7F8D20DB2716007B4550 /* LaunchScreen.storyboard in Resources */,
 				D8FE7F8A20DB2716007B4550 /* Assets.xcassets in Resources */,
 				D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */,
+				D8CB08CD221714C800A86F9E /* RejectionView.xib in Resources */,
 				D87ED7BC2151BF5400B14B5F /* functions in Resources */,
 				D8FE7F8820DB2712007B4550 /* Main.storyboard in Resources */,
 				D8E78FF321430F73006F03B9 /* overlay-google.json in Resources */,
@@ -662,7 +683,7 @@
 			files = (
 				D8A2AE412195FF97003C4EB1 /* FontAwesomeBarButtonItem.swift in Sources */,
 				D8A2AE422195FF97003C4EB1 /* FontAwesomeImageView.swift in Sources */,
-				D8F0078521ED5E7E0031325F /* SearchLandmarkStruct.swift in Sources */,
+				D8F0078521ED5E7E0031325F /* SearchStruct.swift in Sources */,
 				D8A2AE432195FF97003C4EB1 /* FontAwesomeTabBarItem.swift in Sources */,
 				D8B3103C21E2E7F900E85148 /* AppDataSingleton.swift in Sources */,
 				D8A2AE442195FF97003C4EB1 /* FontAwesomeView.swift in Sources */,
@@ -671,12 +692,12 @@
 				D8CB08C92212638800A86F9E /* VerifyViewController.swift in Sources */,
 				D8A2AE472195FF97003C4EB1 /* FontAwesomeTextRepresentable.swift in Sources */,
 				D8A2AE482195FF97003C4EB1 /* FontAwesomeImageRepresentable.swift in Sources */,
+				D8CB08CF221DAA0F00A86F9E /* AlgoliaManager.swift in Sources */,
 				D8A2AE492195FF97003C4EB1 /* Enum.swift in Sources */,
 				D8A2AE4A2195FF97003C4EB1 /* FontAwesome.h in Sources */,
 				D8A2AE4B2195FF97003C4EB1 /* FontAwesomeSegmentedControl.swift in Sources */,
 				D8A2AE4C2195FF97003C4EB1 /* FontAwesome.swift in Sources */,
 				D848BD3A2134909E00C31CD0 /* SignInViewController.swift in Sources */,
-				D834DFFA20F6AF210091CA40 /* FunFactJSONParser.swift in Sources */,
 				D88DBE7F212EFC48009A2CC2 /* Constants.swift in Sources */,
 				D86DA75F217424A8001F7B5C /* UserSubsCell.swift in Sources */,
 				D848BD4121357F3F00C31CD0 /* CustomUINavigation.swift in Sources */,
@@ -690,13 +711,16 @@
 				D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */,
 				D8DF6A5E210634800031A153 /* DisputeViewController.swift in Sources */,
 				D865045F216AC58600B65AAB /* HashtagCell.swift in Sources */,
-				D8D18571212A1CFF0093B66C /* FirestoreConnection.swift in Sources */,
+				D8310F0D221F4BCF007336A0 /* AddressDataStruct.swift in Sources */,
+				D8D18571212A1CFF0093B66C /* FirestoreManager.swift in Sources */,
 				D8E78FED21409D26006F03B9 /* ProfileViewController.swift in Sources */,
 				D8FE7FA220DC4237007B4550 /* Utils.swift in Sources */,
 				D8F9012121304B9500D83F8E /* WelcomeViewController.swift in Sources */,
 				D8A2ADE521938268003C4EB1 /* TabBarController.swift in Sources */,
 				D8E78FF12141FC9B006F03B9 /* CustomButton.swift in Sources */,
 				D8FE7F8520DB2712007B4550 /* MainViewController.swift in Sources */,
+				D8310F0F221F8645007336A0 /* AlgoliaSearchManager.swift in Sources */,
+				D8310F11221F9690007336A0 /* UIImage.swift in Sources */,
 				D8FE7FA420DC491F007B4550 /* FunFactAnnotation.swift in Sources */,
 				D800724D2209DBB500A20084 /* FirestoreRandomFunctions.swift in Sources */,
 				D8FE7F9720DB2795007B4550 /* AnnotationBottomView.swift in Sources */,
@@ -704,6 +728,7 @@
 				D8B3103A21CAEAA500E85148 /* SearchCellTableViewCell.swift in Sources */,
 				D8ED8FF8210A49480010EF7C /* AddFactViewController.swift in Sources */,
 				D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */,
+				D8CB08CB2217144700A86F9E /* RejectionView.swift in Sources */,
 				D8FE7FAC20E4671C007B4550 /* FunFactPageViewController.swift in Sources */,
 				D8ED8FFA210A49780010EF7C /* AddressViewController.swift in Sources */,
 				D848BD3E2134F05800C31CD0 /* CustomTextField.swift in Sources */,
@@ -711,7 +736,6 @@
 				D8B3103821CADFD600E85148 /* SearchViewController.swift in Sources */,
 				D8FE7FAA20E45083007B4550 /* ContentViewController.swift in Sources */,
 				D86DA75D21741BA6001F7B5C /* UserSubsTableViewController.swift in Sources */,
-				D8CB08C7221078FF00A86F9E /* ContentViewControllerDataExtension.swift in Sources */,
 				D83F06022161BD0700B37FED /* UserStruct.swift in Sources */,
 				D848BD452136F50C00C31CD0 /* DisputeStruct.swift in Sources */,
 				D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */,

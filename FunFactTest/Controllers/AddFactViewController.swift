@@ -13,8 +13,8 @@ import MapKit
 import FirebaseAuth
 
 class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate,
-UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-
+UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AlgoliaSearchManagerDelegate, FirestoreManagerDelegate {
+    
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var landmarkImage: UIImageView!
     @IBOutlet weak var landmarkType: UIPickerView!
@@ -29,6 +29,9 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
     @IBOutlet weak var landmarkNameBtn: UIButton!
     @IBOutlet weak var sourceBtn: UIButton!
     @IBOutlet weak var autocompleteTableView: UITableView!
+    
+    var algoliaManager = AlgoliaSearchManager()
+    var firestore = FirestoreManager()
     var address: String?
     var landmarkName: String?
     var landmarkID: String!
@@ -41,8 +44,7 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
     var zipcode: String?
     var popup = UIAlertController()
     var tag = 100
-    var hashtags = [String: Int]()
-    var autocompleteHashtags = [String]()
+    var autocompleteHashtags = [SearchHashtag]()
     var mode = ""
     var funFactID = ""
     var landmarkTypeText = ""
@@ -56,6 +58,11 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
     var landLikes = 0
     var landDislikes = 0
     var numOfFunFacts = 0
+    var approvalCount = 0
+    var approvalUsers = [String]()
+    var rejectionCount = 0
+    var rejectionUsers = [String]()
+    var rejectionReason = [String]()
     var verificationFlag = "N"
     var disputeFlag = "N"
     var landmark = Landmark(id: "",
@@ -76,9 +83,7 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
         super.viewDidLoad()
         navigationController?.navigationBar.tintColor = .darkGray
 
-        downloadHashtags { (hashtags) in
-            self.hashtags = hashtags
-        }
+        algoliaManager.delegate = self
         funFactDescription.keyboardDistanceFromTextField = 200
         autocompleteTableView.translatesAutoresizingMaskIntoConstraints = false
         autocompleteTableView.delegate = self
@@ -93,16 +98,6 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
                 | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
         scrollView.isUserInteractionEnabled = true
 
-//        addressBtn.applyGradient(colors: [UIColor.red.cgColor, UIColor.green.cgColor])
-//        addressBtn.titleLabel?.applyGradient(colors: [UIColor.red.cgColor, UIColor.green.cgColor])
-//        let gradientLayer = CAGradientLayer()
-//        gradientLayer.colors = [UIColor.red.cgColor, UIColor.green.cgColor]
-//        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-//        gradientLayer.endPoint = CGPoint(x: 1, y: 0)
-//        gradientLayer.frame = addressBtn.bounds
-//        addressBtn.layer.addSublayer(gradientLayer)
-        addressBtn.titleLabel?.applyGradient(colors: [UIColor.red.cgColor, UIColor.green.cgColor])
-//        addressBtn.layer.insertSublayer(gradientLayer, below: addressBtn.titleLabel?.layer)
         addressBtn.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         addressBtn.setTitle(String.fontAwesomeIcon(name: .mapMarked), for: .normal)
 
@@ -206,20 +201,6 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
                                                           backgroundColor: .clear)
         }
     }
-    func downloadHashtags(completionHandler: @escaping ([String: Int]) -> Void) {
-        var hashtags = [String: Int]()
-        let db = Firestore.firestore()
-        db.collection("hashtags").getDocuments { (snap, error) in
-            if let err = error {
-                print("Error getting documents: \(err)")
-            } else {
-                for doc in snap!.documents {
-                    hashtags[doc.documentID] = doc.data()["hashtagcount"] as? Int
-                }
-            }
-            completionHandler(hashtags)
-        }
-    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
@@ -231,6 +212,9 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
 
         // Show the navigation bar on other view controllers
         self.tabBarController?.tabBar.isHidden = false
+    }
+    func documentsDidUpdate() {
+        print ("firestore connection made")
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let backItem = UIBarButtonItem()
@@ -257,9 +241,8 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
             let country = addDet.country ?? ""
             let zipcode = addDet.zipcode ?? ""
             let address = (add+city+state+country+zipcode).lowercased()
-            self.checkIfLandmarkExists(address: address, completionHandler:
+            self.firestore.checkIfLandmarkExists(address: address, completionHandler:
                 { (id, numOfFunFacts, landLikes, landDislikes) in
-                print (id)
                 self.landmarkID = id
                 self.numOfFunFacts = numOfFunFacts
                 self.landLikes = landLikes
@@ -267,35 +250,8 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
             })
         }
     }
-    func checkIfLandmarkExists(address: String, completionHandler: @escaping (String, Int, Int, Int) -> Void) {
-        let db = Firestore.firestore()
-        var landmarkID = ""
-        var numOfFunFacts = 0
-        var likes = 0
-        var dislikes = 0
-        db.collection("landmarks").getDocuments { (snapshot, error) in
-            if let error = error {
-                print("Error getting documents: \(error)")
-            } else {
-                for document in snapshot!.documents {
-                    let addr = ((document.data()["address"] as! String)
-                        + (document.data()["city"] as! String)
-                        + (document.data()["state"] as! String)
-                        + (document.data()["country"] as! String)
-                        + (document.data()["zipcode"] as! String)).lowercased()
-                    if addr == address {
-                        print ("!!!Landmark Exists!!!")
-                        landmarkID = document.data()["id"] as! String
-                        numOfFunFacts = document.data()["numOfFunFacts"] as! Int
-                        likes = document.data()["likes"] as! Int
-                        dislikes = document.data()["dislikes"] as! Int
-                        completionHandler(landmarkID, numOfFunFacts, likes, dislikes)
-                    } else {
-                        completionHandler(landmarkID, numOfFunFacts, likes, dislikes)
-                    }
-                }
-            }
-        }
+    func documentsDidDownload() {
+        print ("hashatag downloaded")
     }
 
     override func didReceiveMemoryWarning() {
@@ -417,17 +373,9 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
         let alertController = UIAlertController(title: "Submission",
                                                 message: "Are you sure you want to submit?",
                                                 preferredStyle: .alert)
-
+        
         let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             let db = Firestore.firestore()
-            //Date formatting start
-            let formatter = DateFormatter()
-            formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-            let myString = formatter.string(from: Date())
-            let yourDate = formatter.date(from: myString)
-            formatter.dateFormat = "MMM dd, yyyy"
-            let myStringafd = formatter.string(from: yourDate!)
-            //Date formatting end
             var tempLandmarkID = ""
             tempLandmarkID = (self.landmarkID == "") ?
                 db.collection("landmarks").document().documentID : self.landmarkID
@@ -444,94 +392,63 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
                                        longitude: self.landmark.coordinates.longitude) : self.coordinate
             //Upload Landmark details - merge if landmark already exists
             let ffID = (self.mode != "edit") ? db.collection("funFacts").document().documentID : self.funFactID
-            db.collection("landmarks").document(tempLandmarkID).setData([
-                "id": tempLandmarkID as Any,
-                "name": self.landmarkName as Any,
-                "address": self.address as Any,
-                "city": self.city as Any,
-                "state": self.state as Any,
-                "zipcode": self.zipcode as Any,
-                "country": self.country as Any,
-                "image": ffID, // MARK: Revisit later
-                "type": self.type as Any,
-                "numOfFunFacts": self.numOfFunFacts,
-                "likes": self.landLikes,
-                "dislikes": self.landDislikes,
-                "coordinates": GeoPoint(latitude: self.coordinate.latitude as Double,
-                                        longitude: self.coordinate.longitude as Double)
-            ], merge: true) { err in
-                if let err = err {
-                    print("Error writing document: \(err)")
+            let landmark = Landmark(id: tempLandmarkID,
+                                    name: self.landmarkName ?? "",
+                                    address: self.address ?? "",
+                                    city: self.city ?? "",
+                                    state: self.state ?? "",
+                                    zipcode: self.zipcode ?? "",
+                                    country: self.country ?? "",
+                                    type: self.type ?? "",
+                                    coordinates: GeoPoint(latitude: self.coordinate.latitude as Double,
+                                                          longitude: self.coordinate.longitude as Double),
+                                    image: ffID,
+                                    numOfFunFacts: self.numOfFunFacts,
+                                    likes: self.landLikes,
+                                    dislikes: self.landDislikes)
+            self.firestore.addLandmark(landmark: landmark, completion: { (error) in
+                if let error = error {
+                    print ("Error writing document: \(error)")
                 } else {
                     print("Document successfully written!")
                 }
-            }
+            })
+            
             //Upload fun fact details
-            db.collection("funFacts").document(ffID).setData([
-                "landmarkId": tempLandmarkID as Any,
-                "id": ffID,
-                "description": self.funFactDescription.text,
-                "likes": self.likes,
-                "dislikes": self.dislikes,
-                "verificationFlag": self.verificationFlag,
-                "imageName": ffID,
-                "disputeFlag": self.disputeFlag,
-                "submittedBy": Auth.auth().currentUser?.uid ?? "",
-                "dateSubmitted": myStringafd,
-                "imageCaption": self.imageCaption.text!,
-                "source": self.sourceTextField.text!,
-                "tags": self.funFactDescription.text.hashtags()
-            ], merge: true) { err in
-                if let err = err {
-                    print("Error writing document: \(err)")
-                    self.showAlert(message: "fail")
+            let funFact = FunFact(landmarkId: tempLandmarkID,
+                                  id: ffID,
+                                  description: self.funFactDescription.text,
+                                  likes: self.likes,
+                                  dislikes: self.dislikes,
+                                  verificationFlag: self.verificationFlag,
+                                  image: ffID,
+                                  imageCaption: self.imageCaption.text,
+                                  disputeFlag: self.disputeFlag,
+                                  submittedBy: Auth.auth().currentUser?.uid ?? "",
+                                  dateSubmitted: Timestamp(date: Date()),
+                                  source: self.sourceTextField.text ?? "",
+                                  tags: self.funFactDescription.text.hashtags(),
+                                  approvalCount: self.approvalCount,
+                                  rejectionCount: self.rejectionCount,
+                                  approvalUsers: self.approvalUsers,
+                                  rejectionUsers: self.rejectionUsers,
+                                  rejectionReason: self.rejectionReason)
+            self.firestore.addFunFact(funFact: funFact, completion: { (error) in
+                if let error = error {
+                    print ("Error writing document: \(error)")
                 } else {
                     print("Document successfully written!")
-                    self.showAlert(message: "success")
                 }
-            }
-            self.uploadImage(imageName: ffID + ".jpeg")
-            self.addHashtags(funFactID: ffID, hashtags: self.funFactDescription.text.hashtags())
-            self.addUserSubmitted(funFactID: ffID, userID: Auth.auth().currentUser?.uid ?? "")
+            })
+            self.firestore.uploadImage(imageName: ffID + ".jpeg", image: self.landmarkImage.image ?? UIImage())
+            self.firestore.addHashtags(funFactID: ffID, hashtags: self.funFactDescription.text.hashtags())
+            self.firestore.addUserSubmitted(funFactID: ffID, userID: Auth.auth().currentUser?.uid ?? "")
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alertController.addAction(okayAction)
         alertController.addAction(cancelAction)
-
         self.present(alertController, animated: true, completion: nil)
-
         return
-
-    }
-    func addHashtags(funFactID: String, hashtags: [String]) {
-        let db = Firestore.firestore()
-        let funFactRef = db.collection("funFacts").document(funFactID)
-
-        for hashtag in hashtags {
-            db.collection("hashtags").document(hashtag).collection("funFacts").document(funFactID).setData([
-                "funFactID": funFactRef
-            ], merge: true) { err in
-                if let err = err {
-                    print("Error writing document: \(err)")
-                } else {
-                    print("Document successfully written!")
-                }
-            }
-        }
-    }
-    func addUserSubmitted(funFactID: String, userID: String) {
-        let db = Firestore.firestore()
-        let funFactRef = db.collection("funFacts").document(funFactID)
-
-        db.collection("users").document(userID).collection("funFactsSubmitted").document(funFactID).setData([
-            "funFactID": funFactRef
-        ], merge: true) { err in
-            if let err = err {
-                print("Error writing document: \(err)")
-            } else {
-                print("Document successfully written!")
-            }
-        }
     }
     func getLandmarkObject(landmarkID: String) {
         for landmark in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks
@@ -614,16 +531,12 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
                                    handler: {_ in
             switch(type) {
             case "textfield":
-                // swiftlint:disable:next force_cast
                 (toFocus as! UITextField).becomeFirstResponder()
             case "textview":
-                // swiftlint:disable:next force_cast
                 (toFocus as! UITextView).becomeFirstResponder()
             case "imageview":
-                // swiftlint:disable:next force_cast
                 (toFocus as! UIImageView).becomeFirstResponder()
             case "pickerview":
-                // swiftlint:disable:next force_cast
                 (toFocus as! UIPickerView).becomeFirstResponder()
             default:
                 print("default")
@@ -673,106 +586,8 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
             self.landmarkImage.layer.cornerRadius = 5
         }
     }
-    func uploadImage(imageName: String) {
-        let storage = Storage.storage()
-        var data = Data()
-        // Create a storage reference from our storage service
-        let storageRef = storage.reference()
-        // Data in memory
-
-        do {
-            try landmarkImage.image?.compressImage(300, completion: { (image, compressRatio) in
-                print(image.size)
-                data = image.jpegData(compressionQuality: compressRatio)!
-            })
-        } catch {
-            print("Error")
-        }
-
-        // Create a reference to the file you want to upload
-        let landmarkRef = storageRef.child("images/\(imageName)")
-
-        // Upload the file to the path "images/rivers.jpg"
-        landmarkRef.putData(data, metadata: nil) { (metadata, error) in
-            guard let metadata = metadata
-                else {
-                // Uh-oh, an error occurred!
-                return
-            }
-            // Metadata contains file metadata such as size, content-type.
-            metadata.contentType = "image/jpeg"
-            metadata.cacheControl = "public,max-age=300"
-            landmarkRef.putData(data, metadata: metadata)
-            // You can also access to download URL after upload.
-            landmarkRef.downloadURL { (url, error) in
-                guard url != nil else {
-                    // Uh-oh, an error occurred!
-                    let error = error
-                    print ("Error: \(error)")
-                    return
-                }
-            }
-        }
-    }
 }
 
-extension UIImage {
-    enum CompressImageErrors: Error {
-        case invalidExSize
-        case sizeImpossibleToReach
-    }
-    func compressImage(_ expectedSizeKb: Int, completion: (UIImage, CGFloat) -> Void ) throws {
-        let minimalCompressRate: CGFloat = 0.4 // min compressRate to be checked later
-        if expectedSizeKb == 0 {
-            throw CompressImageErrors.invalidExSize // if the size is equal to zero throws
-        }
-
-        let expectedSizeBytes = expectedSizeKb * 1024
-        let imageToBeHandled: UIImage = self
-        var actualHeight: CGFloat = self.size.height
-        var actualWidth: CGFloat = self.size.width
-        var maxHeight: CGFloat = 841 //A4 default size I'm thinking about a document
-        var maxWidth: CGFloat = 594
-        var imgRatio: CGFloat = actualWidth/actualHeight
-        let maxRatio: CGFloat = maxWidth/maxHeight
-        var compressionQuality: CGFloat = 1
-        var imageData: Data = imageToBeHandled.jpegData(compressionQuality: compressionQuality)!
-        while imageData.count > expectedSizeBytes {
-            if actualHeight > maxHeight || actualWidth > maxWidth {
-                if imgRatio < maxRatio {
-                    imgRatio = maxHeight / actualHeight
-                    actualWidth = imgRatio * actualWidth
-                    actualHeight = maxHeight
-                } else if imgRatio > maxRatio {
-                    imgRatio = maxWidth / actualWidth
-                    actualHeight = imgRatio * actualHeight
-                    actualWidth = maxWidth
-                } else {
-                    actualHeight = maxHeight
-                    actualWidth = maxWidth
-                    compressionQuality = 1
-                }
-            }
-            let rect = CGRect(x: 0.0, y: 0.0, width: actualWidth, height: actualHeight)
-            UIGraphicsBeginImageContext(rect.size)
-            imageToBeHandled.draw(in: rect)
-            let img = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            if let imgData = img!.jpegData(compressionQuality: compressionQuality) {
-                if imgData.count > expectedSizeBytes {
-                    if compressionQuality > minimalCompressRate {
-                        compressionQuality -= 0.1
-                    } else {
-                        maxHeight *= 0.9
-                        maxWidth *= 0.9
-                    }
-                }
-                imageData = imgData
-            }
-        }
-        completion(UIImage(data: imageData)!, compressionQuality)
-    }
-}
 extension String {
     func hashtags() -> [String] {
         if let regex = try? NSRegularExpression(pattern: "#[a-z0-9]+", options: .caseInsensitive) {
@@ -805,9 +620,10 @@ extension AddNewFactViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? HashtagCell
         let index = indexPath.row as Int
-
-        cell?.hashtag?.text = "#\(autocompleteHashtags[index])"
-        cell?.count?.text = "\(String(describing: self.hashtags[autocompleteHashtags[index]]!)) posts"
+        let name = "#\(autocompleteHashtags[index].nameHighlighted ?? "")"
+        let count = "\(autocompleteHashtags[index].count ?? 0) posts"
+        cell?.hashtag?.highlightedText = name
+        cell?.count?.text = count
         return cell!
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -819,33 +635,9 @@ extension AddNewFactViewController: UITableViewDelegate, UITableViewDataSource {
     }
     func searchAutocompleteEntriesWithSubstring(substring: String) {
         autocompleteHashtags.removeAll(keepingCapacity: true)
-        for curString in self.hashtags.keys {
-            let myString: NSString! = curString as NSString
-            let substringRange: NSRange! = myString.range(of: substring)
-            if substringRange.location == 0 {
-                autocompleteHashtags.append(curString)
-            }
+        algoliaManager.getHashtags(searchText: substring) { (hashtags) in
+            self.autocompleteHashtags = hashtags
+            self.autocompleteTableView.reloadData()
         }
-        autocompleteTableView.reloadData()
-    }
-}
-extension UIButton {
-    func applyGradient(colors: [CGColor]) {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = colors
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 0)
-        gradientLayer.frame = self.bounds
-        self.layer.addSublayer(gradientLayer)
-    }
-}
-extension UILabel {
-    func applyGradient(colors: [CGColor]) {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = colors
-        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
-        gradientLayer.endPoint = CGPoint(x: 1, y: 0)
-        gradientLayer.frame = self.bounds
-        self.layer.addSublayer(gradientLayer)
     }
 }

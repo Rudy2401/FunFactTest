@@ -10,22 +10,27 @@ import Foundation
 import FirebaseFirestore
 
 struct ListOfUsers  {
-    var listOfLandmarks: [User]
+    var listOfLandmarks: [UserProfile]
 }
-struct User {
+struct UserProfile {
     var uid: String
     var dislikeCount: Int
     var disputeCount: Int
     var likeCount: Int
     var submittedCount: Int
+    var verifiedCount: Int
+    var rejectedCount: Int
     var email: String
     var name: String
+    var userName: String
     var photoURL: String
     var provider: String
     var funFactsDisputed: [DocumentReference]
     var funFactsLiked: [DocumentReference]
     var funFactsDisliked: [DocumentReference]
     var funFactsSubmitted: [DocumentReference]
+    var funFactsVerified: [DocumentReference]
+    var funFactsRejected: [DocumentReference]
 }
 
 struct FunFactsDisputed {
@@ -41,5 +46,13 @@ struct FunFactsDisliked {
 }
 
 struct FunFactsSubmitted {
+    var funFactID: DocumentReference
+}
+
+struct FunFactsVerified {
+    var funFactID: DocumentReference
+}
+
+struct FunFactsRejected {
     var funFactID: DocumentReference
 }

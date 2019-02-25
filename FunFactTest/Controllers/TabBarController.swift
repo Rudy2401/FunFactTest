@@ -13,7 +13,7 @@ class TabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBar.tintColor = Colors.seagreenColor
-        
+
         tabBar.items?[0].setTitleTextAttributes(Attributes.toolBarLabelAttribute, for: .normal)
         tabBar.items?[0].setTitleTextAttributes(Attributes.toolBarLabelClickedAttribute, for: .selected)
         tabBar.items?[0].title = "Home"
@@ -31,11 +31,11 @@ class TabBarController: UITabBarController {
         tabBar.items?[1].title = "Profile"
         tabBar.items?[1].image = UIImage.fontAwesomeIcon(name: .user,
                                                          style: .light,
-                                                         textColor: UIColor.darkGray,
+                                                         textColor: .black,
                                                          size: CGSize(width: 30, height: 30))
         tabBar.items?[1].selectedImage = UIImage.fontAwesomeIcon(name: .user,
                                                                  style: .solid,
-                                                                 textColor: UIColor.darkGray,
+                                                                 textColor: .darkGray,
                                                                  size: CGSize(width: 30, height: 30))
         
         tabBar.items?[2].setTitleTextAttributes(Attributes.toolBarLabelAttribute, for: .normal)

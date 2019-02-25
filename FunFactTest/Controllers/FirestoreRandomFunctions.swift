@@ -57,9 +57,12 @@ extension MainViewController {
                     let id = document.data()["id"] as! String
                     let user = document.data()["submittedBy"] as! String
                     let funFactRef = db.collection("funFacts").document(id)
-                    
-                    db.collection("users").document(user).collection("funFactsSubmitted").document(id).setData(["funFactID": funFactRef], merge: true)
-                    
+                    db.collection("users")
+                        .document(user)
+                        .collection("funFactsSubmitted")
+                        .document(id)
+                        .setData(["funFactID": funFactRef],
+                                 merge: true)
                 }
             }
         }
@@ -75,7 +78,12 @@ extension MainViewController {
                     let user = document.data()["user"] as! String
                     let disputeRef = db.collection("disputes").document(id)
                     
-                    db.collection("users").document(user).collection("funFactsDisputed").document(id).setData(["disputeID": disputeRef], merge: true)
+                    db.collection("users")
+                        .document(user)
+                        .collection("funFactsDisputed")
+                        .document(id)
+                        .setData(["disputeID": disputeRef],
+                                 merge: true)
                     
                 }
             }
@@ -201,12 +209,29 @@ extension MainViewController {
             } else {
                 for document in querySnapshot!.documents {
                     let funFactID = document.documentID
-                    let approvalUsers = [String]()
-                    let rejectionUsers = [String]()
-                    let data = ["approvalCount": 0,
-                                "rejectionCount": 0,
-                                "approvalUsers": approvalUsers,
-                                "rejectionUsers": rejectionUsers] as [String : Any]
+                    let data = ["rejectionReason": []] as [String : Any]
+                    db.collection("funFacts").document(funFactID).setData(data, merge: true)
+                }
+            }
+        }
+    }
+    func convertStringToTimestamp() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments { (snap, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for document in snap!.documents {
+                    let funFactID = document.documentID
+                    let dateString = document.data()["dateSubmitted"] as! String
+                    
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "MMM dd, yyyy"
+                    let date = dateFormatter.date(from: dateString)
+                    let dateSubmitted = Timestamp(date: date!)
+                    
+                    let data = ["dateSubmitted": dateSubmitted]
+                    
                     db.collection("funFacts").document(funFactID).setData(data, merge: true)
                 }
             }

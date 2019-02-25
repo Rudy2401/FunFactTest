@@ -32,7 +32,7 @@ class SignInViewController: UIViewController {
         passwordImageButton.setTitle(String.fontAwesomeIcon(name: .lock), for: .normal)
         
         signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
-        signUpButton.layer.backgroundColor = Colors.greenColor.cgColor
+        signUpButton.layer.backgroundColor = UIColor.darkGray.cgColor
         
         let cancelItem = UIBarButtonItem(
             title: "Cancel",
@@ -105,7 +105,10 @@ class SignInViewController: UIViewController {
                     return
             }
             let db = Firestore.firestore()
-            db.collection("users").document(Auth.auth().currentUser?.uid ?? "").setData(["name": Auth.auth().currentUser?.displayName], merge: true)
+            db.collection("users")
+                .document(Auth.auth().currentUser?.uid ?? "")
+                .setData(["name": Auth.auth().currentUser?.displayName ?? ""],
+                         merge: true)
             
             // Dismiss keyboard
             self.view.endEditing(true)

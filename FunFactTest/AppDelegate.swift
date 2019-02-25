@@ -23,6 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let locationManager = CLLocationManager()
     var notificationCenter: UNUserNotificationCenter!
     var notificationCount = 0
+    var manager: AlgoliaManager!
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
@@ -39,6 +40,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // define what do you need permission to use
         let options: UNAuthorizationOptions = [.alert, .sound]
         notificationCenter.delegate = self
+        
+        //Algolia instantiate
+        manager = AlgoliaManager.sharedInstance
         
          //request permission
         notificationCenter?.requestAuthorization(options: options) { (granted, error) in
@@ -118,7 +122,7 @@ extension AppDelegate: CLLocationManagerDelegate {
                 if let error = error {
                     print ("Error getting document \(error)")
                 } else {
-                    let document = snapshot?.documents.first
+                    let document = snapshot?.documents.randomElement()
                     content.body = document?.data()["description"] as! String
                     imageId = document?.data()["imageName"] as! String
                 }
@@ -156,15 +160,16 @@ extension AppDelegate: CLLocationManagerDelegate {
                                                                 trigger: trigger)
                             // trying to add the notification request to notification center
                             self.notificationCenter.getDeliveredNotifications(completionHandler: { (notifications) in
-                                for notification in notifications {
+                                // MARK: This portion is commented to receive multiple notifications for one landmark
+                                /*for notification in notifications {
                                     if notification.request.identifier == identifier {
                                         print (notification.request.identifier)
                                         return
                                     }
-                                }
+                                }*/
                                 self.notificationCenter?.add(request, withCompletionHandler: { (error) in
                                     if error != nil {
-                                        print("Error adding notification with identifier: \(identifier) \(error?.localizedDescription)")
+                                        print("Error adding notification with identifier: \(identifier) \(error?.localizedDescription ?? "")")
                                     }
                                 })
                             })

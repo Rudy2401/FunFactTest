@@ -15,26 +15,18 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var landmarkButton: UIButton!
-    @IBOutlet weak var addressButton: UIButton!
     @IBOutlet weak var hashtagButton: UIButton!
     @IBOutlet weak var userButton: UIButton!
     
     let searchController = UISearchController(searchResultsController: nil)
-    var filteredLandmarks = [String]()
-    var landmarks = [String]()
-    var addresses = [String]()
-    var filteredAddresses = [String]()
-    var hashtags = [String]()
-    var filteredHashtags = [String]()
-    var users = [String]()
-    var filteredUsers = [String]()
-    var imageDict = [String: String]()
     
     var searchId = 0
     var displayedSearchId = -1
     var loadedPage: UInt = 0
     var nbPages: UInt = 0
     var searchLandmarks = [SearchLandmark]()
+    var searchHashtags = [SearchHashtag]()
+    var searchUsers = [SearchUsers]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,14 +36,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         searchController.delegate = self
         landmarkButton.isSelected = true
 
-        for landmark in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
-            landmarks.append(landmark.name)
-            addresses.append(((landmark.address.trimmingCharacters(in: .whitespacesAndNewlines) == "") ? landmark.name : landmark.address) + ", " + landmark.city + ", " + landmark.state + " " + landmark.zipcode)
-        }
-        
-        getHashtags()
-        getUsers()
-        populateDict()
         // Setup the Search Controller
         navigationItem.hidesSearchBarWhenScrolling = false
         searchController.searchBar.sizeToFit()
@@ -63,54 +47,11 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         definesPresentationContext = true
     }
     
-    func getHashtags() {
-        let db = Firestore.firestore()
-        db.collection("hashtags").order(by: "hashtagcount", descending: true).getDocuments { (snapshot, error) in
-            if let err = error {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in (snapshot?.documents)! {
-                    self.hashtags.append("#\(document.documentID)")
-                }
-            }
-        }
-    }
-    
-    func getUsers() {
-        let db = Firestore.firestore()
-        db.collection("users").getDocuments { (snapshot, error) in
-            if let err = error {
-                print("Error getting documents: \(err)")
-            } else {
-                for document in (snapshot?.documents)! {
-                    self.users.append(document.data()["name"] as! String)
-                }
-            }
-        }
-    }
-    
-    func populateDict() {
-        for landmark in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
-            for funFact in AppDataSingleton.appDataSharedInstance.listOfFunFacts.listOfFunFacts {
-                if landmark.id == funFact.landmarkId {
-                    imageDict[landmark.name] = funFact.image
-                    break
-                }
-            }
-            
-        }
-    }
-    
     func setupButtons() {
         let landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttribute)
         let landmarkStringSelected = NSAttributedString(string: "Places", attributes: Attributes.searchButtonSelectedAttribute)
         landmarkButton.setAttributedTitle(landmarkString, for: .normal)
         landmarkButton.setAttributedTitle(landmarkStringSelected, for: .selected)
-        
-        let addressString = NSAttributedString(string: "Address", attributes: Attributes.searchButtonAttribute)
-        let addressStringSelected = NSAttributedString(string: "Address", attributes: Attributes.searchButtonSelectedAttribute)
-        addressButton.setAttributedTitle(addressString, for: .normal)
-        addressButton.setAttributedTitle(addressStringSelected, for: .selected)
         
         let hashtagString = NSAttributedString(string: "Tags", attributes: Attributes.searchButtonAttribute)
         let hashtagStringSelected = NSAttributedString(string: "Tags", attributes: Attributes.searchButtonSelectedAttribute)
@@ -139,21 +80,16 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func filterContentForSearchText(_ searchText: String, scope: String = "All") {
-        let client = Client(appID: "P1NWQ6JXG6", apiKey: "56f9249980860f38c01e52158800a9b0")
-        let index = client.index(withName: "landmark_name")
-        let query = Query()
-        
-        let curSearchId = searchId
-        query.query = searchText
-        query.hitsPerPage = 15
-        query.attributesToRetrieve = ["name", "address", "image"]
-        query.attributesToHighlight = ["name"]
         if landmarkButton.isSelected {
-            index.search(query, completionHandler: { (data, error) in
-                if (curSearchId <= self.displayedSearchId) || error != nil {
+            let landmarkQuery = Query()
+            landmarkQuery.query = searchText
+            landmarkQuery.hitsPerPage = 15
+            landmarkQuery.attributesToRetrieve = ["name", "address", "image", "city", "state", "country", "zipcode"]
+            landmarkQuery.attributesToHighlight = ["name", "address"]
+            AlgoliaManager.sharedInstance.landmarkIndex.search(landmarkQuery, completionHandler: { (data, error) in
+                if error != nil {
                     return
                 }
-                self.displayedSearchId = curSearchId
                 self.loadedPage = 0 // Reset loaded page
                 // Decode JSON
                 guard let hits = data!["hits"] as? [[String: AnyObject]] else { return }
@@ -168,24 +104,55 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 self.tableView.reloadData()
             })
         }
-        self.searchId += 1
         
-        if addressButton.isSelected {
-            filteredAddresses = addresses.filter({( address : String) -> Bool in
-                return address.lowercased().contains(searchText.lowercased())
-            })
-        }
         if hashtagButton.isSelected {
-            filteredHashtags = hashtags.filter({( hashtag : String) -> Bool in
-                return hashtag.lowercased().contains(searchText.lowercased())
+            let hashtagQuery = Query()
+            hashtagQuery.query = searchText
+            hashtagQuery.hitsPerPage = 15
+            hashtagQuery.attributesToRetrieve = ["name", "count", "image"]
+            hashtagQuery.attributesToHighlight = ["name"]
+            AlgoliaManager.sharedInstance.hashtagIndex.search(hashtagQuery, completionHandler: { (data, error) in
+                if error != nil {
+                    return
+                }
+                self.loadedPage = 0 // Reset loaded page
+                // Decode JSON
+                guard let hits = data!["hits"] as? [[String: AnyObject]] else { return }
+                guard let nbPages = data!["nbPages"] as? UInt else { return }
+                self.nbPages = nbPages
+                
+                var tmp = [SearchHashtag]()
+                for hit in hits {
+                    tmp.append(SearchHashtag(json: hit))
+                }
+                self.searchHashtags = tmp
+                self.tableView.reloadData()
             })
         }
         if userButton.isSelected {
-            filteredUsers = users.filter({( user : String) -> Bool in
-                return user.lowercased().contains(searchText.lowercased())
+            let userQuery = Query()
+            userQuery.query = searchText
+            userQuery.hitsPerPage = 15
+            userQuery.attributesToRetrieve = ["name", "userName", "photoURL"]
+            userQuery.attributesToHighlight = ["name", "userName"]
+            AlgoliaManager.sharedInstance.usersIndex.search(userQuery, completionHandler: { (data, error) in
+                if error != nil {
+                    return
+                }
+                self.loadedPage = 0 // Reset loaded page
+                // Decode JSON
+                guard let hits = data!["hits"] as? [[String: AnyObject]] else { return }
+                guard let nbPages = data!["nbPages"] as? UInt else { return }
+                self.nbPages = nbPages
+                
+                var tmp = [SearchUsers]()
+                for hit in hits {
+                    tmp.append(SearchUsers(json: hit))
+                }
+                self.searchUsers = tmp
+                self.tableView.reloadData()
             })
         }
-        tableView.reloadData()
     }
 
     func isFiltering() -> Bool {
@@ -198,17 +165,13 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 return searchLandmarks.count
             }
             if hashtagButton.isSelected {
-                return filteredHashtags.count
+                return searchHashtags.count
             }
             if userButton.isSelected {
-                return filteredUsers.count
-            }
-            if addressButton.isSelected {
-                return filteredAddresses.count
+                return searchUsers.count
             }
         }
-        
-        return landmarks.count
+        return searchLandmarks.count
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -224,67 +187,68 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         var searchText = ""
         var secondaryText = ""
         var image = ""
+        var photoURL = ""
         
-        print (isFiltering())
         if isFiltering() {
             if landmarkButton.isSelected {
-                print (searchLandmarks)
                 searchText = searchLandmarks[indexPath.row].nameHighlighted!
-                secondaryText = searchLandmarks[indexPath.row].address!
+                secondaryText = searchLandmarks[indexPath.row].addressHighlighted!
                 image = searchLandmarks[indexPath.row].image!
-            }
-            if addressButton.isSelected {
-                secondaryText = filteredAddresses[indexPath.row]
-                for landmark in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
-                    if landmark.address == secondaryText.split(separator: ",")[0] {
-                        searchText = landmark.name
-                    }
-                }
+                cell.searchImageView.image = setupImage(image: image)
             }
             if hashtagButton.isSelected {
-                searchText = filteredHashtags[indexPath.row]
+                searchText = "#\(searchHashtags[indexPath.row].nameHighlighted!)"
+                secondaryText = "\(searchHashtags[indexPath.row].count ?? 0) facts"
+                image = searchHashtags[indexPath.row].image!
+                cell.searchImageView.image = setupImage(image: image)
             }
             if userButton.isSelected {
-                searchText = filteredUsers[indexPath.row]
+                searchText = searchUsers[indexPath.row].userNameHighlighted!
+                secondaryText = searchUsers[indexPath.row].nameHighlighted!
+                photoURL = searchUsers[indexPath.row].photoURL!
+                let photoUrl = URL(string: photoURL)
+                if photoUrl == URL(string: "") {
+                    cell.searchImageView.image = UIImage
+                        .fontAwesomeIcon(name: .user,
+                                         style: .solid,
+                                         textColor: .black,
+                                         size: CGSize(width: 100, height: 100))
+                }
+                else {
+                    let data = try? Data(contentsOf: photoUrl ?? URL(string: "")!)
+                    if data == nil {
+                        cell.searchImageView.image = UIImage
+                            .fontAwesomeIcon(name: .user,
+                                             style: .solid,
+                                             textColor: .darkGray,
+                                             size: CGSize(width: 100, height: 100))
+                    } else {
+                        cell.searchImageView.image = UIImage(data: data!)
+                    }
+                }
             }
         } else {
             searchLandmarks = []
             tableView.reloadData()
         }
         cell.primaryText.highlightedTextColor = Colors.seagreenColor
+        cell.secondaryText.highlightedTextColor = Colors.seagreenColor
         cell.primaryText.highlightedText = searchText
-        cell.secondaryText.text = secondaryText
-        if searchText.count > 0 {
-            cell.searchImageView.image = setupImage(image: image)
-        }
-        else {
-            cell.searchImageView.image = UIImage()
-        }
+        cell.secondaryText.highlightedText = secondaryText
         return cell
     }
 
     @IBAction func onClickLandmark(_ sender: Any) {
         landmarkButton.isSelected = true
-        addressButton.isSelected = false
         hashtagButton.isSelected = false
         userButton.isSelected = false
         searchController.searchBar.placeholder = "Search Landmarks"
         tableView.reloadData()
     }
     
-    @IBAction func onClickAddress(_ sender: Any) {
-        addressButton.isSelected = true
-        landmarkButton.isSelected = false
-        hashtagButton.isSelected = false
-        userButton.isSelected = false
-        searchController.searchBar.placeholder = "Search Addresses"
-        tableView.reloadData()
-    }
-    
     @IBAction func onClickHashtag(_ sender: Any) {
         hashtagButton.isSelected = true
         landmarkButton.isSelected = false
-        addressButton.isSelected = false
         userButton.isSelected = false
         searchController.searchBar.placeholder = "Search Hashtags"
         tableView.reloadData()
@@ -293,7 +257,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     @IBAction func onClickUser(_ sender: Any) {
         userButton.isSelected = true
         landmarkButton.isSelected = false
-        addressButton.isSelected = false
         hashtagButton.isSelected = false
         searchController.searchBar.placeholder = "Search Users"
         tableView.reloadData()
@@ -322,7 +285,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
 extension SearchViewController: UISearchResultsUpdating {
     // MARK: - UISearchResultsUpdating Delegate
     func updateSearchResults(for searchController: UISearchController) {
-        filterContentForSearchText(searchController.searchBar.text!)
-
+        DispatchQueue.main.async {
+            self.filterContentForSearchText(searchController.searchBar.text!)
+        }
     }
 }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 struct ListOfFunFacts  {
     var listOfFunFacts: Set<FunFact>
@@ -23,11 +24,12 @@ struct FunFact: Hashable  {
     var imageCaption: String
     var disputeFlag: String
     var submittedBy: String
-    var dateSubmitted: String
+    var dateSubmitted: Timestamp
     var source: String
     var tags: [String]
     var approvalCount: Int
     var rejectionCount: Int
     var approvalUsers: [String]
     var rejectionUsers: [String]
+    var rejectionReason: [String]
 }

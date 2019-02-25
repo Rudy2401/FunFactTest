@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="RejectionView" customModule="FunFactTest" customModuleProvider="target">
+            <connections>
+                <outlet property="cancelButton" destination="Fli-sy-NMe" id="sgY-ge-Bef"/>
+                <outlet property="contentView" destination="Kfi-vO-Nck" id="phH-to-5ZV"/>
+                <outlet property="label" destination="Oag-zs-k1e" id="4Xz-Ys-y8F"/>
+                <outlet property="okButton" destination="6x0-cF-Wen" id="6D0-PV-lUo"/>
+                <outlet property="rejectionReason" destination="Tjb-iJ-TWB" id="gLT-Zw-f5J"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="Kfi-vO-Nck">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please select a reason below:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Oag-zs-k1e">
+                    <rect key="frame" x="10" y="30" width="355" height="23.5"/>
+                    <fontDescription key="fontDescription" name="AvenirNext-Regular" family="Avenir Next" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="74t-ys-CaB">
+                    <rect key="frame" x="10" y="289.5" width="355" height="50"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fli-sy-NMe" customClass="CustomButton" customModule="FunFactTest" customModuleProvider="target">
+                            <rect key="frame" x="0.0" y="0.0" width="172.5" height="50"/>
+                            <state key="normal" title="Button"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="25"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="cancelAction:" destination="-1" eventType="touchUpInside" id="aNK-PM-xXC"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6x0-cF-Wen" customClass="CustomButton" customModule="FunFactTest" customModuleProvider="target">
+                            <rect key="frame" x="182.5" y="0.0" width="172.5" height="50"/>
+                            <state key="normal" title="Button"/>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                    <real key="value" value="25"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                            <connections>
+                                <action selector="submitAction:" destination="-1" eventType="touchUpInside" id="iNd-Cy-SE9"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="50" id="0Sg-Fb-50K"/>
+                    </constraints>
+                </stackView>
+                <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Tjb-iJ-TWB">
+                    <rect key="frame" x="10" y="64" width="355" height="216"/>
+                </pickerView>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="Tjb-iJ-TWB" firstAttribute="leading" secondItem="XJ4-Ta-jKc" secondAttribute="leading" constant="10" id="0PE-7P-aiL"/>
+                <constraint firstItem="74t-ys-CaB" firstAttribute="leading" secondItem="XJ4-Ta-jKc" secondAttribute="leading" constant="10" id="8gI-aW-51r"/>
+                <constraint firstItem="Tjb-iJ-TWB" firstAttribute="top" secondItem="Oag-zs-k1e" secondAttribute="bottom" constant="10" id="Bgj-Ow-CqZ"/>
+                <constraint firstItem="74t-ys-CaB" firstAttribute="top" secondItem="Tjb-iJ-TWB" secondAttribute="bottom" constant="10" id="LVK-Fc-lwx"/>
+                <constraint firstItem="Oag-zs-k1e" firstAttribute="top" secondItem="XJ4-Ta-jKc" secondAttribute="top" constant="10" id="Tqf-Yd-99A"/>
+                <constraint firstItem="Oag-zs-k1e" firstAttribute="leading" secondItem="XJ4-Ta-jKc" secondAttribute="leading" constant="10" id="lpF-fG-IAg"/>
+                <constraint firstItem="XJ4-Ta-jKc" firstAttribute="trailing" secondItem="74t-ys-CaB" secondAttribute="trailing" constant="10" id="mrZ-Uw-kwa"/>
+                <constraint firstItem="XJ4-Ta-jKc" firstAttribute="trailing" secondItem="Oag-zs-k1e" secondAttribute="trailing" constant="10" id="qpY-ZW-acV"/>
+                <constraint firstItem="XJ4-Ta-jKc" firstAttribute="trailing" secondItem="Tjb-iJ-TWB" secondAttribute="trailing" constant="10" id="rI7-dz-OtL"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="XJ4-Ta-jKc"/>
+            <point key="canvasLocation" x="39.200000000000003" y="46.326836581709152"/>
+        </view>
+    </objects>
+</document>
