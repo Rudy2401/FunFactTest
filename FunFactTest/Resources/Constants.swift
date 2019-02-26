@@ -17,6 +17,13 @@ enum Colors {
     static let redColor = UIColor(displayP3Red: 178/255, green: 34/255, blue: 34/255, alpha: 1.0)
 }
 
+enum UserLevel {
+    static let rookie = "Rookie"
+    static let advanced = "Advanced"
+    static let superstar = "Super Star"
+    static let creme = "Crème de la crème"
+}
+
 enum Attributes {
     static let attribute12RegDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                     NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]

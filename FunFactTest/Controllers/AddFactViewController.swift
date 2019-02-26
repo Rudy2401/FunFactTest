@@ -12,8 +12,7 @@ import FirebaseStorage
 import MapKit
 import FirebaseAuth
 
-class AddNewFactViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate,
-UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AlgoliaSearchManagerDelegate, FirestoreManagerDelegate {
+class AddNewFactViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AlgoliaSearchManagerDelegate, FirestoreManagerDelegate {
     
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var landmarkImage: UIImageView!
@@ -180,17 +179,25 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
 
         if mode == "edit" {
             navigationItem.title = "Edit Fun Fact"
-            getLandmarkObject(landmarkID: landmarkID)
-            self.landmarkType.selectRow(self.pickerData.firstIndex(of: self.landmark.type)!,
-                                        inComponent: 0,
-                                        animated: true)
-            self.addressTextField?.text = landmark.address
-            funFactDescription.text = funFactDesc
-            imageCaption.text = imageCaptionText
-            sourceTextField.text = source
-            funFactDescription.textColor = UIColor.black
-            imageCaption.textColor = UIColor.black
-            setupImage()
+            firestore.getLandmark(for: landmarkID) { (landmark, error) in
+                if let error = error {
+                    print ("Error getting landmark object \(error)")
+                }
+                else {
+                    self.landmark = landmark!
+                    self.landmarkType.selectRow(self.pickerData.firstIndex(of: self.landmark.type)!,
+                                                inComponent: 0,
+                                                animated: true)
+                    self.addressTextField?.text = self.landmark.address
+                    self.funFactDescription.text = self.funFactDesc
+                    self.imageCaption.text = self.imageCaptionText
+                    self.sourceTextField.text = self.source
+                    self.funFactDescription.textColor = UIColor.black
+                    self.imageCaption.textColor = UIColor.black
+                    self.setupImage()
+                }
+            }
+            
         } else {
             navigationItem.title = "Add A New Fun Fact"
             landmarkImage.image = UIImage.fontAwesomeIcon(name: .fileImage,
@@ -284,85 +291,6 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
         landmarkImage.image = selectedImage
         self.dismiss(animated: true, completion: nil)
     }
-
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return pickerData.count
-    }
-    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return pickerData[row]
-    }
-    func pickerView(_ pickerView: UIPickerView,
-                    viewForRow row: Int,
-                    forComponent component: Int,
-                    reusing view: UIView?) -> UIView {
-        guard var label = view as? UILabel? else { return UILabel() }
-        if label == nil {
-            label = UILabel()
-        }
-
-        let data = pickerData[row]
-        let title = NSAttributedString(string: data,
-                                       attributes: [NSAttributedString.Key.font: UIFont(name: "Avenir Next",
-                                                                                        size: 14)!])
-        label?.attributedText = title
-        label?.textAlignment = .center
-        return label!
-    }
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        type = pickerData[row]
-    }
-    func textViewDidChange(_ textView: UITextView) {
-
-    }
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        tag = textView.tag
-        if textView.textColor == UIColor.lightGray {
-            textView.text = nil
-            textView.textColor = UIColor.black
-        }
-        navigationController?.navigationBar.isHidden = true
-    }
-
-    func textViewDidEndEditing(_ textView: UITextView) {
-        if textView.text.isEmpty {
-            if textView.tag == 0 {
-                textView.text = "Click on the icon to select image. Enter image caption here."
-            } else if textView.tag == 1 {
-                textView.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable."
-            }
-            textView.textColor = UIColor.lightGray
-        }
-        navigationController?.navigationBar.isHidden = false
-    }
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        navigationController?.navigationBar.isHidden = true
-    }
-
-    // Finish Editing The Text Field
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        navigationController?.navigationBar.isHidden = false
-    }
-    // Hide the keyboard when the return key pressed
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        autocompleteTableView.isHidden = true
-        let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
-        let numberOfChars = newText.count
-        let tags = newText.components(separatedBy: "#")
-        var tagSubstring = ""
-        if tags.count > 1 && !((tags.last?.contains(" "))! || (tags.last?.contains("."))!) {
-            tagSubstring = tags.last!
-            autocompleteTableView.isHidden = false
-            searchAutocompleteEntriesWithSubstring(substring: tagSubstring)
-        }
-        return numberOfChars < 300
-    }
     @objc func cancelAction(_ sender: Any) {
         navigationController?.popViewController(animated: true)
     }
@@ -449,12 +377,6 @@ UITextViewDelegate, UITextFieldDelegate, UINavigationControllerDelegate, UIImage
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
         return
-    }
-    func getLandmarkObject(landmarkID: String) {
-        for landmark in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks
-            where landmark.id == landmarkID {
-            self.landmark = landmark
-        }
     }
     func validatePage() -> Bool {
         var errors = false

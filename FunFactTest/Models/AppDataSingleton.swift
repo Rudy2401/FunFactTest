@@ -20,6 +20,7 @@ class AppDataSingleton {
                            email: "",
                            name: "",
                            userName: "",
+                           level: "",
                            photoURL: "",
                            provider: "",
                            funFactsDisputed: [],
@@ -28,7 +29,4 @@ class AppDataSingleton {
                            funFactsSubmitted: [],
                            funFactsVerified: [],
                            funFactsRejected: [])
-    var listOfLandmarks = ListOfLandmarks(listOfLandmarks: [])
-    var listOfFunFacts = ListOfFunFacts(listOfFunFacts: [])
-    var usersDict = [String: UserProfile]()
 }

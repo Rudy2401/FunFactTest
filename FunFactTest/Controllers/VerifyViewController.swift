@@ -34,7 +34,7 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
         
         let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             let rejCount = self.rejectionCount + 1
-            let funFactRef = db.collection("funFacts").document(self.funFactID)
+            let funFactRef = self.firestore.db.collection("funFacts").document(self.funFactID)
             if rejCount == 3 {
                 self.verFlag = "R"
             }

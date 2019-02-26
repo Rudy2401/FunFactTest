@@ -37,11 +37,11 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     var landmarkID = ""
     var currentLocationCoordinate = CLLocationCoordinate2D()
     var landmarkImage = UIImage()
-    var annotations: [FunFactAnnotation]?
     var landmarkType = ""
-    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
     var boundingBox: GeoRect?
     var firestore = FirestoreManager()
+    var currentAnnotation: FunFactAnnotation?
     
     // 1. create locationManager
     let locationManager = CLLocationManager()
@@ -107,7 +107,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         mapView.setCenter(mapView.userLocation.coordinate, animated: true)
     }
     
-    func setupBottomView (annotationClicked: FunFactAnnotation, listOfLandmarks: Set<Landmark>) {
+    func setupBottomView (annotationClicked: FunFactAnnotation, landmark: Landmark) {
         typeColor.backgroundColor = Constants.getMarkerDetails(type: annotationClicked.type).color
         annotationBottomView.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
         annotationBottomView.layer.shadowOffset = CGSize(width: 0, height: 3)
@@ -122,25 +122,6 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         annotationBottomView.layer.cornerRadius = 5
         let numOffAttr = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                            NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]
-        var landmark = Landmark(id: "",
-                                name: "",
-                                address: "",
-                                city: "",
-                                state: "",
-                                zipcode: "",
-                                country: "",
-                                type: "",
-                                coordinates: GeoPoint(latitude: 0, longitude: 0),
-                                image: "",
-                                numOfFunFacts: 0,
-                                likes: 0,
-                                dislikes: 0 )
-        
-        for lm in listOfLandmarks {
-            if lm.id == annotationClicked.landmarkID {
-                landmark = lm
-            }
-        }
         
         landmarkTitle = (annotationClicked.title)!
         landmarkID = annotationClicked.landmarkID
@@ -385,7 +366,15 @@ extension MainViewController: MKMapViewDelegate {
         }
         
         if let annotation = view.annotation as? FunFactAnnotation {
-            setupBottomView(annotationClicked: annotation, listOfLandmarks: AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks)
+            self.currentAnnotation = annotation
+            firestore.getLandmark(for: annotation.landmarkID) { (landmark, error) in
+                if let error = error {
+                    print("Error getting landmark object \(error)")
+                }
+                else {
+                    self.setupBottomView(annotationClicked: annotation, landmark: landmark!)
+                }
+            }
         }
     }
     

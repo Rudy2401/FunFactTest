@@ -21,6 +21,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     @IBOutlet weak var signInButton: CustomButton!
     @IBOutlet weak var verifiedNum: UILabel!
     @IBOutlet weak var rejectedNum: UILabel!
+    @IBOutlet weak var levelLabel: UILabel!
     
     var uid = ""
     var mode = ""
@@ -38,8 +39,9 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     var photoURL = ""
     var name = ""
     var userNameString = ""
+    var levelString = ""
     var firestore = FirestoreManager()
-    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -97,6 +99,8 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             photoURL = userProfile.photoURL
             name = userProfile.name
             userNameString = userProfile.userName
+            levelString = userProfile.level
+            
         }
         else {
             submittedCount = AppDataSingleton.appDataSharedInstance.userProfile.submittedCount
@@ -106,6 +110,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             photoURL = AppDataSingleton.appDataSharedInstance.userProfile.photoURL
             name = AppDataSingleton.appDataSharedInstance.userProfile.name
             userNameString = AppDataSingleton.appDataSharedInstance.userProfile.userName
+            levelString = AppDataSingleton.appDataSharedInstance.userProfile.level
         }
         // Hide the navigation bar on the this view controller
         self.navigationController?.toolbar.isHidden = true
@@ -162,6 +167,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             navigationController?.navigationBar.tintColor = UIColor.darkGray
             userName.text = name
             userProfileName.text = userNameString
+            levelLabel.text = "Level: \(levelString)"
             userImageView.layer.cornerRadius = userImageView.frame.height/2
             signOutButton.layer.backgroundColor = Colors.seagreenColor.cgColor
             userImageView.layer.borderWidth = 0.5

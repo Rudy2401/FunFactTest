@@ -478,7 +478,7 @@ class FirestoreManager {
             return
         }
         let db = Firestore.firestore()
-        var user = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+        var user = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
         db.collection("users").document(uid).getDocument { (snapshot, error) in
             if let document = snapshot {
                 user.dislikeCount = document.data()?["dislikeCount"] as! Int
@@ -487,6 +487,7 @@ class FirestoreManager {
                 user.submittedCount = document.data()?["submittedCount"] as! Int
                 user.email = document.data()?["email"] as! String
                 user.name = document.data()?["name"] as! String
+                user.level = document.data()?["level"] as! String
                 user.photoURL = document.data()?["photoURL"] as! String
                 user.provider = document.data()?["provider"] as! String
                 user.uid = document.data()?["uid"] as! String
@@ -530,6 +531,7 @@ class FirestoreManager {
                       "dislikeCount": 0,
                       "disputeCount": 0,
                       "likeCount": 0,
+                      "level": UserLevel.rookie,
                       "submittedCount": 0,
                       "verifiedCount": 0,
                       "rejectedCount": 0,
@@ -644,6 +646,73 @@ class FirestoreManager {
             } else {
                 completion(nil)
             }
+        }
+    }
+    
+    /// Get landmark object for a landmarkID
+    func getLandmark(for landmarkID: String, completion: @escaping (Landmark?, String?) -> ()) {
+        db.collection("landmarks").document(landmarkID).getDocument { (snapshot, error) in
+            if let error = error {
+                completion(nil, error.localizedDescription)
+            } else {
+                let document = snapshot!
+                let landmark = Landmark(id: document.data()?["id"] as! String,
+                                        name: document.data()?["name"] as! String,
+                                        address: document.data()?["address"] as! String,
+                                        city: document.data()?["city"] as! String,
+                                        state: document.data()?["state"] as! String,
+                                        zipcode: document.data()?["zipcode"] as! String,
+                                        country: document.data()?["country"] as! String,
+                                        type: document.data()?["type"] as! String,
+                                        coordinates: document.data()?["coordinates"] as! GeoPoint,
+                                        image: document.data()?["image"] as! String,
+                                        numOfFunFacts: document.data()?["numOfFunFacts"] as! Int,
+                                        likes: document.data()?["likes"] as! Int,
+                                        dislikes: document.data()?["dislikes"] as! Int)
+                completion(landmark, nil)
+            }
+        }
+    }
+    
+    /// Download Fun facts sorted based on verification flag desc and likes desc
+    /// - Parameters:
+    ///     - landmarkID: Landmark document name
+    ///     - completion: All fun facts for the landmarkID
+    func downloadFunFacts(for landmarkID: String, completion: @escaping ([FunFact]?, [Any]?, String?) -> ()) {
+        var funFacts = [FunFact]()
+        db.collection("funFacts")
+            .whereField("landmarkId", isEqualTo: landmarkID)
+            .order(by: "verificationFlag", descending: true)
+            .order(by: "likes", descending: true)
+            .getDocuments { (querySnapshot, err) in
+                if let err = err {
+                    completion(nil, nil, err.localizedDescription)
+                } else {
+                    var pageContent = Array<Any>()
+                    for document in querySnapshot!.documents {
+                        let funFact = FunFact(landmarkId: document.data()["landmarkId"] as! String,
+                                              id: document.data()["id"] as! String,
+                                              description: document.data()["description"] as! String,
+                                              likes: document.data()["likes"] as! Int,
+                                              dislikes: document.data()["dislikes"] as! Int,
+                                              verificationFlag: document.data()["verificationFlag"] as? String ?? "",
+                                              image: document.data()["imageName"] as! String,
+                                              imageCaption: document.data()["imageCaption"] as? String ?? "",
+                                              disputeFlag: document.data()["disputeFlag"] as! String,
+                                              submittedBy: document.data()["submittedBy"] as! String,
+                                              dateSubmitted: document.data()["dateSubmitted"] as! Timestamp,
+                                              source: document.data()["source"] as! String,
+                                              tags: document.data()["tags"] as! [String],
+                                              approvalCount: document.data()["approvalCount"] as! Int,
+                                              rejectionCount: document.data()["rejectionCount"] as! Int,
+                                              approvalUsers: document.data()["approvalUsers"] as! [String],
+                                              rejectionUsers: document.data()["rejectionUsers"] as! [String],
+                                              rejectionReason: document.data()["rejectionReason"] as! [String])
+                        pageContent.append(document.data()["id"] as! String)
+                        funFacts.append(funFact)
+                    }
+                    completion(funFacts, pageContent, nil)
+                }
         }
     }
 }

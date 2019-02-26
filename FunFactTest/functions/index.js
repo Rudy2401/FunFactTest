@@ -314,46 +314,6 @@ exports.updateSubmittedCountForDelete = functions.firestore.document('/users/{us
     })
 });
 
-// exports.updateAdditionalUserFields = functions.auth.user().onCreate((user) => {
-//     console.log(user);
-//     const email = user.email; // The email of the user.
-//     const uid = user.uid;
-//     var provider = "";
-//     var name = "";
-//     var userName = email.split(/[\s@]+/)[0];
-//     var photoURL = "";
-//     if (user.providerData !== undefined && user.providerData.length !== 0) {
-//         provider = user.providerData[0].providerId;
-//         if (user.displayName !== null) {
-//             name = user.displayName; // The display name of the user.
-//         }
-//         if (user.photoURL !== null) {
-//             photoURL = user.photoURL;
-//         }
-//     }
-//     const likeCount = 0;
-//     const dislikeCount = 0;
-//     const disputeCount = 0;
-//     const submittedCount = 0;
-//     const verifiedCount = 0;
-//     const rejectedCount = 0;
-//     const userData = { 
-//         email, 
-//         name, 
-//         userName,
-//         uid, 
-//         provider, 
-//         photoURL, 
-//         likeCount, 
-//         dislikeCount, 
-//         disputeCount, 
-//         submittedCount, 
-//         verifiedCount, 
-//         rejectedCount }
-//     return admin.firestore().collection('users').doc(uid).create(userData);
-
-// });
-
 exports.deleteUserFields = functions.auth.user().onDelete((user) => {
     const uid = user.uid;
     return admin.firestore().collection('users').doc(uid).delete();

@@ -15,9 +15,10 @@ import InstantSearch
 import MapKit
 
 var mapChangedFromUserInteraction = false
-let db = Firestore.firestore()
+let algoliaManager = AlgoliaSearchManager()
 
-extension MainViewController: CLLocationManagerDelegate {
+extension MainViewController: CLLocationManagerDelegate, AlgoliaSearchManagerDelegate {
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
         guard let location = manager.location else{
@@ -36,6 +37,9 @@ extension MainViewController: CLLocationManagerDelegate {
             .contains(where: {
                 $0.state == .began || $0.state == .ended
             }) == true
+    }
+    func documentsDidDownload() {
+        
     }
 }
 extension UNNotificationAttachment {
@@ -70,65 +74,54 @@ extension MainViewController {
             let seMapPoint = MKMapPoint(x: mapRect.maxX, y: mapRect.origin.y)
             
             let query = Query()
-            let boundingBox = GeoRect(p1: LatLng(lat: nwMapPoint.coordinate.latitude, lng: nwMapPoint.coordinate.longitude),
-                                      p2: LatLng(lat: seMapPoint.coordinate.latitude, lng: seMapPoint.coordinate.longitude))
+            let boundingBox = GeoRect(p1: LatLng(lat: nwMapPoint.coordinate.latitude,
+                                                 lng: nwMapPoint.coordinate.longitude),
+                                      p2: LatLng(lat: seMapPoint.coordinate.latitude,
+                                                 lng: seMapPoint.coordinate.longitude))
             if caller == "viewDidLoad" {
-                query.aroundLatLng = LatLng(lat: self.mapView.userLocation.coordinate.latitude, lng: self.mapView.userLocation.coordinate.longitude)
+                query.aroundLatLng = LatLng(lat: self.mapView.userLocation.coordinate.latitude,
+                                            lng: self.mapView.userLocation.coordinate.longitude)
                 query.aroundRadius = .all
             } else {
                 query.insideBoundingBox = [boundingBox]
             }
-
+            
             var filters = ""
             if caller != "viewDidLoad" {
-                for land in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
-                    filters = filters + " NOT objectID:" + land.id + " AND "
+                for annotation in mapView.annotations {
+                    if annotation is MKUserLocation {
+                        print ("MKUserLocation")
+                    } else {
+                        let a = annotation as! FunFactAnnotation
+                        filters = filters + " NOT objectID:" + a.landmarkID + " AND "
+                    }
                 }
                 if filters.count > 2 {
                     query.filters = "(" + filters.dropLast(4) + ")"
                 }
             }
             
-            AlgoliaManager.sharedInstance.landmarkIndex.search(query) { (res, error) in
+            algoliaManager.downloadLandmarks(query: query) { (landmark, error) in
                 if let error = error {
-                    print ("Error getting data from Algolia \(error.localizedDescription)")
+                    print ("Error getting data from Algolia \(error)")
                 }
                 else {
-                    guard let hits = res!["hits"] as? [[String: AnyObject]] else { return }
-                    for hit in hits {
-                        
-                        let geoloc = hit["_geoloc"] as! [String: Double]
-                        let coordinates = GeoPoint(latitude: geoloc["lat"]!, longitude: geoloc["lng"]!)
-                        
-                        let landmark = Landmark(id: hit["objectID"] as! String,
-                                                name: hit["name"] as! String,
-                                                address: hit["address"] as! String,
-                                                city: hit["city"] as! String,
-                                                state: hit["state"] as! String,
-                                                zipcode: hit["zipcode"] as! String,
-                                                country: hit["country"] as! String,
-                                                type: hit["type"] as! String,
-                                                coordinates: coordinates,
-                                                image: hit["image"] as! String,
-                                                numOfFunFacts: hit["numOfFunFacts"] as! Int,
-                                                likes: hit["likes"] as! Int,
-                                                dislikes: hit["dislikes"] as! Int)
-                        self.setupGeoFences(lat: landmark.coordinates.latitude,
-                                            lon: landmark.coordinates.longitude,
-                                            title: landmark.name,
-                                            landmarkID: landmark.id)
-                        
-                        AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks.insert(landmark)
-                        
-                        // Add anotations
-                        var annotation: FunFactAnnotation
-                        annotation = FunFactAnnotation(landmarkID: hit["objectID"] as! String,
-                                                       title: hit["name"] as! String,
-                                                       address: "\(String(describing: hit["address"])), \(String(describing: hit["city"])), \(String(describing: hit["state"])), \(String(describing: hit["country"]))",
-                            type: hit["type"] as! String,
-                            coordinate: CLLocationCoordinate2D(latitude: coordinates.latitude, longitude: coordinates.longitude))
-                        self.mapView.addAnnotation(annotation)
-                    }
+                    let landmark = landmark!
+                    self.setupGeoFences(lat: landmark.coordinates.latitude,
+                                        lon: landmark.coordinates.longitude,
+                                        title: landmark.name,
+                                        landmarkID: landmark.id)
+                    
+                    // Add anotations
+                    var annotation: FunFactAnnotation
+                    annotation = FunFactAnnotation(
+                        landmarkID: landmark.id,
+                        title: landmark.name,
+                        address: "\(landmark.address), \(landmark.city), \(landmark.state), \(landmark.country)",
+                        type: landmark.type,
+                        coordinate: CLLocationCoordinate2D(latitude: landmark.coordinates.latitude,
+                                                           longitude: landmark.coordinates.longitude))
+                    self.mapView.addAnnotation(annotation)
                     spinner.dismissLoader()
                 }
             }
@@ -137,54 +130,18 @@ extension MainViewController {
     
     func downloadFunFactsAndSegue(for landmarkID: String, db: Firestore) {
         let spinner = showLoader(view: self.mapView)
-        var funFacts = [FunFact]()
-        db.collection("funFacts")
-            .whereField("landmarkId", isEqualTo: landmarkID)
-            .order(by: "verificationFlag", descending: true)
-            .order(by: "likes", descending: true)
-            .getDocuments { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
+        firestore.downloadFunFacts(for: landmarkID) { (funFacts, pageContent, error) in
+            if let error = error {
+                print("Error downloading Fun Facts \(error)")
             } else {
-                var pageContent = Array<Any>()
-                for document in querySnapshot!.documents {
-                    let funFact = FunFact(landmarkId: document.data()["landmarkId"] as! String,
-                                          id: document.data()["id"] as! String,
-                                          description: document.data()["description"] as! String,
-                                          likes: document.data()["likes"] as! Int,
-                                          dislikes: document.data()["dislikes"] as! Int,
-                                          verificationFlag: document.data()["verificationFlag"] as? String ?? "",
-                                          image: document.data()["imageName"] as! String,
-                                          imageCaption: document.data()["imageCaption"] as? String ?? "",
-                                          disputeFlag: document.data()["disputeFlag"] as! String,
-                                          submittedBy: document.data()["submittedBy"] as! String,
-                                          dateSubmitted: document.data()["dateSubmitted"] as! Timestamp,
-                                          source: document.data()["source"] as! String,
-                                          tags: document.data()["tags"] as! [String],
-                                          approvalCount: document.data()["approvalCount"] as! Int,
-                                          rejectionCount: document.data()["rejectionCount"] as! Int,
-                                          approvalUsers: document.data()["approvalUsers"] as! [String],
-                                          rejectionUsers: document.data()["rejectionUsers"] as! [String],
-                                          rejectionReason: document.data()["rejectionReason"] as! [String])
-                    pageContent.append(document.data()["id"] as! String)
-                    AppDataSingleton.appDataSharedInstance.listOfFunFacts.listOfFunFacts.insert(funFact)
-                    funFacts.append(funFact)
-                }
-                
+                let funFacts = funFacts!
                 let destinationVC = self.storyboard?.instantiateViewController(withIdentifier: "funFactPage") as! FunFactPageViewController
-                
-                var address = ""
-                for i in AppDataSingleton.appDataSharedInstance.listOfLandmarks.listOfLandmarks {
-                    if i.id == landmarkID {
-                        address = i.address
-                    }
-                }
-                destinationVC.pageContent = pageContent as NSArray
+                destinationVC.pageContent = pageContent! as NSArray
                 destinationVC.funFacts = funFacts
                 destinationVC.headingContent = self.landmarkTitle
                 destinationVC.landmarkID = landmarkID
                 destinationVC.landmarkType = self.landmarkType
-                destinationVC.address = address
+                destinationVC.address = self.currentAnnotation?.address ?? ""
                 
                 self.navigationController?.pushViewController(destinationVC, animated: true)
                 spinner.dismissLoader()

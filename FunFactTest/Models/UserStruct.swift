@@ -23,6 +23,7 @@ struct UserProfile {
     var email: String
     var name: String
     var userName: String
+    var level: String
     var photoURL: String
     var provider: String
     var funFactsDisputed: [DocumentReference]
