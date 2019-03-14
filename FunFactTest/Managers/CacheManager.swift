@@ -33,4 +33,12 @@ final class CacheManager {
     func getFromCache(key: String) -> AnyObject? {
         return CacheManager.cache.object(forKey: key as NSString)
     }
+    
+    func checkIfImageExists(imageName: String) -> Bool {
+        return CacheManager.cache.object(forKey: imageName as NSString) == nil ? false : true
+    }
+    
+    func replaceImage(imageName: String, image: AnyObject) {
+        CacheManager.cache.setObject(image, forKey: imageName as NSString)
+    }
 }

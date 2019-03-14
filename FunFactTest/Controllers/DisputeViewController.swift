@@ -93,8 +93,13 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
                              description: notesText.text,
                              user: Auth.auth().currentUser?.uid ?? "",
                              date: date,
-                             completion: { (status) in
-                                self.showAlert(message: status)
+                             completion: { (error) in
+                                if let error = error {
+                                    print ("Error adding dispute \(error)")
+                                    self.showAlert(message: "fail")
+                                } else {
+                                    self.showAlert(message: "success")
+                                }
                             })
         
         firestore.updateDisputeFlag(funFactID: funFactID)

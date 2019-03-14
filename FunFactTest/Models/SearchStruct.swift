@@ -19,6 +19,7 @@ struct SearchLandmark {
     var image: String? { return json["image"] as? String }
     var nameHighlighted: String? { return SearchResults.highlightResult(hit: json, path: "name")?.value }
     var addressHighlighted: String? { return SearchResults.highlightResult(hit: json, path: "address")?.value }
+    var landmarkID: String? { return json["objectID"] as? String }
 }
 
 struct SearchHashtag {
@@ -41,4 +42,5 @@ struct SearchUsers {
     var nameHighlighted: String? { return SearchResults.highlightResult(hit: json, path: "name")?.value }
     var userNameHighlighted: String? { return SearchResults.highlightResult(hit: json, path: "userName")?.value }
     var photoURL: String? { return json["photoURL"] as? String }
+    var userID: String? { return json["objectID"] as? String }
 }

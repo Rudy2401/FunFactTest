@@ -9,13 +9,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FunFactTest/Controllers/ProfileViewController.swift"
-            timestampString = "572832732.1381741"
+            filePath = "FunFactTest/Managers/FirestoreManager.swift"
+            timestampString = "574221532.077261"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "183"
-            endingLineNumber = "183"
-            landmarkName = "subTapAction(sender:)"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
+            landmarkName = "uploadImage(imageName:image:type:completion:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,14 +25,46 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "FunFactTest/Controllers/ProfileViewController.swift"
-            timestampString = "572832732.138437"
+            filePath = "FunFactTest/Managers/FirestoreManager.swift"
+            timestampString = "574221532.077337"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "60"
-            endingLineNumber = "60"
-            landmarkName = "viewDidLoad()"
+            startingLineNumber = "753"
+            endingLineNumber = "753"
+            landmarkName = "getLandmarksInMapArea(neCoordinate:swCoordinate:completion:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;__C.FIRQuerySnapshot&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in FunFactTest.FirestoreManager.getLandmarksInMapArea(neCoordinate: __C.CLLocationCoordinate2D, swCoordinate: __C.CLLocationCoordinate2D, completion: (Swift.Optional&lt;FunFactTest.Landmark&gt;, Swift.Optional&lt;Swift.String&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "FunFactTest"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rushi/Documents/My%20Playground/FunFactTest/FunFactTest/Managers/FirestoreManager.swift"
+                  timestampString = "573882987.285404"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "753"
+                  endingLineNumber = "753"
+                  offsetFromSymbolStart = "1160">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;__C.FIRQuerySnapshot&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in FunFactTest.FirestoreManager.getLandmarksInMapArea(neCoordinate: __C.CLLocationCoordinate2D, swCoordinate: __C.CLLocationCoordinate2D, completion: (Swift.Optional&lt;FunFactTest.Landmark&gt;, Swift.Optional&lt;Swift.String&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "FunFactTest"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/rushi/Documents/My%20Playground/FunFactTest/FunFactTest/Managers/FirestoreManager.swift"
+                  timestampString = "573882987.287141"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "753"
+                  endingLineNumber = "753"
+                  offsetFromSymbolStart = "9756">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

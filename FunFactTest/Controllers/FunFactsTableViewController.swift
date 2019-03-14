@@ -10,72 +10,77 @@ import UIKit
 import FirebaseFirestore
 import FirebaseStorage
 
-class UserSubsTableViewController: UITableViewController, FirestoreManagerDelegate {
+class FunFactsTableViewController: UITableViewController, FirestoreManagerDelegate {
     var userProfile: UserProfile?
-    var funFacts: [FunFact]?
-    var landmarksDict: [String: String]?
-    var sender: String?
+    var funFacts = [FunFact]()
+    var sender = ListOfFunFactsByType.submissions
     var firestore = FirestoreManager()
+    var refs: [DocumentReference]?
+    var hashtagName = ""
+    var landmarkName = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.delegate = self
+        tableView.dataSource = self
         navigationController?.navigationBar.prefersLargeTitles = true
-//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-//        navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.isOpaque = true
+        
         if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
             navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
         }
         switch sender {
-        case "sub":
+        case .submissions:
             navigationItem.title = "User Submissions"
             firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsSubmitted") { (refs) in
                 for ref in refs {
                     self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts?.append(funFact)
+                        self.funFacts.append(funFact)
                         self.tableView.reloadData()
                     })
                 }
             }
-        case "ver":
+        case .verifications:
             navigationItem.title = "User Verifications"
             firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsVerified") { (refs) in
                 for ref in refs {
                     self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts?.append(funFact)
+                        self.funFacts.append(funFact)
                         self.tableView.reloadData()
                     })
                 }
             }
-        case "disp":
+        case .disputes:
             navigationItem.title = "User Disputes"
             firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsDisputed") { (refs) in
                 for ref in refs {
                     self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts?.append(funFact)
+                        self.funFacts.append(funFact)
                         self.tableView.reloadData()
                     })
                 }
             }
-        case "rej":
+        case .rejections:
             navigationItem.title = "User Rejections"
             firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsRejected") { (refs) in
                 for ref in refs {
                     self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts?.append(funFact)
+                        self.funFacts.append(funFact)
                         self.tableView.reloadData()
                     })
                 }
             }
-        default:
-            navigationItem.title = "User Submissions"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsSubmitted") { (refs) in
-                for ref in refs {
-                    self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts?.append(funFact)
-                        self.tableView.reloadData()
-                    })
-                }
+        case .hashtags:
+            navigationItem.title = hashtagName
+            for ref in self.refs! {
+                self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
+                    self.funFacts.append(funFact)
+                    self.tableView.reloadData()
+                })
             }
+        case .landmarks:
+            navigationItem.title = landmarkName
+            tableView.reloadData()
         }
         
         // Uncomment the following line to preserve selection between presentations
@@ -88,6 +93,9 @@ class UserSubsTableViewController: UITableViewController, FirestoreManagerDelega
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
+    override func viewWillDisappear(_ animated: Bool) {
+        
+    }
     func documentsDidUpdate() {
         
     }
@@ -96,7 +104,7 @@ class UserSubsTableViewController: UITableViewController, FirestoreManagerDelega
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         var numOfSections: Int = 0
-        if funFacts?.count ?? 0 > 0 {
+        if funFacts.count > 0 {
             tableView.separatorStyle = .singleLine
             numOfSections            = 1
             tableView.backgroundView = nil
@@ -112,14 +120,14 @@ class UserSubsTableViewController: UITableViewController, FirestoreManagerDelega
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return funFacts!.count
+        return funFacts.count
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! UserSubsCell
         let index = indexPath.row as Int
-        cell.funFactDescription.text = self.funFacts?[index].description
-        cell.landmarkName.text = self.landmarksDict?[self.funFacts?[index].landmarkId ?? ""]
+        cell.funFactDescription.text = self.funFacts[index].description
+        cell.landmarkName.text = self.funFacts[index].landmarkName
         cell.funFactImage.image = setupImage(index: index)
         return cell
     }
@@ -133,26 +141,26 @@ class UserSubsTableViewController: UITableViewController, FirestoreManagerDelega
             let index = (sender as! NSIndexPath).row
             let contentVC = segue.destination as? ContentViewController
             
-            contentVC!.dataObject = self.funFacts![index].id as AnyObject
-            contentVC!.funFactDesc = self.funFacts![index].description as String
-            contentVC!.imageObject = self.funFacts![index].image as AnyObject
-            contentVC!.submittedByObject = self.funFacts![index].submittedBy as AnyObject
-            contentVC!.dateObject = self.funFacts![index].dateSubmitted as AnyObject
-            contentVC!.sourceObject = self.funFacts![index].source as AnyObject
-            contentVC!.verifiedFlag = self.funFacts![index].verificationFlag
-            contentVC!.disputeFlag = self.funFacts![index].disputeFlag
-            contentVC!.imageCaption = self.funFacts![index].imageCaption
-            contentVC!.tags = self.funFacts![index].tags
-            contentVC?.landmarkID = self.funFacts![index].landmarkId
-            contentVC!.likesObject = self.funFacts![index].likes as AnyObject
-            contentVC!.dislikesObject = self.funFacts![index].dislikes as AnyObject
-            contentVC!.funFactID = self.funFacts![index].id
-            contentVC!.headingObject = self.landmarksDict?[self.funFacts?[index].landmarkId ?? ""] as AnyObject
+            contentVC!.dataObject = self.funFacts[index].id as AnyObject
+            contentVC!.funFactDesc = self.funFacts[index].description as String
+            contentVC!.imageObject = self.funFacts[index].image as AnyObject
+            contentVC!.submittedByObject = self.funFacts[index].submittedBy as AnyObject
+            contentVC!.dateObject = self.funFacts[index].dateSubmitted as AnyObject
+            contentVC!.sourceObject = self.funFacts[index].source as AnyObject
+            contentVC!.verifiedFlag = self.funFacts[index].verificationFlag
+            contentVC!.disputeFlag = self.funFacts[index].disputeFlag
+            contentVC!.imageCaption = self.funFacts[index].imageCaption
+            contentVC!.tags = self.funFacts[index].tags
+            contentVC?.landmarkID = self.funFacts[index].landmarkId
+            contentVC!.likesObject = self.funFacts[index].likes as AnyObject
+            contentVC!.dislikesObject = self.funFacts[index].dislikes as AnyObject
+            contentVC!.funFactID = self.funFacts[index].id
+            contentVC!.headingObject = self.funFacts[index].landmarkName as AnyObject
         }
     }
     func setupImage(index: Int) -> UIImage {
         let funFactImage = UIImageView()
-        let imageId = self.funFacts![index].id
+        let imageId = self.funFacts[index].id
         let imageName = "\(imageId).jpeg"
         let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
         if imageFromCache != nil {

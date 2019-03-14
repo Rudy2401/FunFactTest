@@ -15,5 +15,6 @@ target 'FunFactTest' do
     pod 'FacebookShare'
     pod 'InstantSearchClient', '~> 6.0'
     pod 'InstantSearch', '~> 3.0'
+    pod 'Geofirestore'
     #pod 'SwiftLint'
 end

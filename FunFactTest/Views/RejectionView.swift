@@ -66,9 +66,12 @@ class RejectionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
         okButton.setAttributedTitle(okButtonClickedText, for: .highlighted)
         okButton.setAttributedTitle(okButtonClickedText, for: .selected)
         
-        cancelButton.layer.backgroundColor = Colors.redColor.cgColor
+        cancelButton.layer.backgroundColor = UIColor.white.cgColor
+        cancelButton.layer.borderColor = Colors.seagreenColor.cgColor
+        cancelButton.layer.borderWidth = 1.0
+        cancelButton.tintColor = Colors.seagreenColor
         cancelButton.frame = CGRect(x: 0, y: 0, width: contentView.frame.width/2 - 10, height: 50)
-        let cancelButtonText = NSAttributedString(string: "Cancel", attributes: Attributes.loginButtonAttribute)
+        let cancelButtonText = NSAttributedString(string: "Cancel", attributes: Attributes.cancelButtonAttribute)
         cancelButton.setAttributedTitle(cancelButtonText, for: .normal)
         let cancelButtonClickedText = NSAttributedString(string: "Cancel", attributes: Attributes.loginButtonClickedAttribute)
         cancelButton.setAttributedTitle(cancelButtonClickedText, for: .highlighted)

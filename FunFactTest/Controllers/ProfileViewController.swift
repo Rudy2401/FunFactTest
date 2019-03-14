@@ -22,6 +22,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     @IBOutlet weak var verifiedNum: UILabel!
     @IBOutlet weak var rejectedNum: UILabel!
     @IBOutlet weak var levelLabel: UILabel!
+    @IBOutlet weak var locationLabel: UILabel!
     
     var uid = ""
     var mode = ""
@@ -31,7 +32,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     var funFactsDisputed = [FunFact]()
     var funFactsVerified = [FunFact]()
     var funFactsRejected = [FunFact]()
-    var landmarksDict = [String: String]()
     var submittedCount = 0
     var disputeCount = 0
     var verifiedCount = 0
@@ -41,7 +41,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     var userNameString = ""
     var levelString = ""
     var firestore = FirestoreManager()
-    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", city: "", country: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,6 +49,8 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
+        navigationController?.navigationBar.isOpaque = true
+        navigationController?.view.backgroundColor = .white
         submittedNum.textColor = Colors.blueColor
         if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
             navigationController?.navigationBar.largeTitleTextAttributes = [
@@ -58,9 +60,32 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
         }
         navigationItem.title = "User Profile"
         
-        firestore.populateLandmarkDict() { (dict) in
-            self.landmarksDict = dict
+        let editLabel1 = String.fontAwesomeIcon(name: .edit)
+        let editAttr1 = NSAttributedString(string: editLabel1, attributes: Attributes.navBarImageLightAttribute)
+        let editAttrClicked1 = NSAttributedString(string: editLabel1, attributes: Attributes.toolBarImageClickedAttribute)
+        
+        let completeEditLabel = NSMutableAttributedString()
+        completeEditLabel.append(editAttr1)
+        
+        let completeEditLabelClicked = NSMutableAttributedString()
+        completeEditLabelClicked.append(editAttrClicked1)
+        
+        let edit = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
+        edit.isUserInteractionEnabled = true
+        edit.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+        edit.setAttributedTitle(completeEditLabel, for: .normal)
+        edit.setAttributedTitle(completeEditLabelClicked, for: .highlighted)
+        edit.setAttributedTitle(completeEditLabelClicked, for: .selected)
+        edit.titleLabel?.textAlignment = .center
+        edit.addTarget(self, action: #selector(editProfileAction), for: .touchUpInside)
+        let editBtn = UIBarButtonItem(customView: edit)
+        
+        if mode != "other" {
+            navigationItem.setRightBarButtonItems([editBtn], animated: true)
         }
+    }
+    @objc func editProfileAction(sender : UITapGestureRecognizer) {
+        performSegue(withIdentifier: "editProfile", sender: sender)
     }
     func documentsDidUpdate() {
         print("downloaded")
@@ -166,6 +191,44 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             signInView.isHidden = true
             navigationController?.navigationBar.tintColor = UIColor.darkGray
             userName.text = name
+            var location = ""
+            if mode != "other" {
+                if AppDataSingleton.appDataSharedInstance.userProfile.city == "" {
+                    if AppDataSingleton.appDataSharedInstance.userProfile.country.count > 1 {
+                        location = AppDataSingleton.appDataSharedInstance.userProfile.country
+                    } else {
+                        location = "User Location Unknown"
+                    }
+                }
+                else if AppDataSingleton.appDataSharedInstance.userProfile.country == "" {
+                    if AppDataSingleton.appDataSharedInstance.userProfile.city.count > 1 {
+                        location = AppDataSingleton.appDataSharedInstance.userProfile.city
+                    } else {
+                        location = "User Location Unknown"
+                    }
+                } else {
+                    location = "\(AppDataSingleton.appDataSharedInstance.userProfile.city), \(AppDataSingleton.appDataSharedInstance.userProfile.country)"
+                }
+            } else {
+                if userProfile.city == "" {
+                    if userProfile.country.count > 1 {
+                        location = userProfile.country
+                    } else {
+                        location = "User Location Unknown"
+                    }
+                }
+                else if userProfile.country == "" {
+                    if userProfile.city.count > 1 {
+                        location = userProfile.city
+                    } else {
+                        location = "User Location Unknown"
+                    }
+                } else {
+                    location = "\(userProfile.city), \(userProfile.country)"
+                }
+            }
+            
+            locationLabel.text = location
             userProfileName.text = userNameString
             levelLabel.text = "Level: \(levelString)"
             userImageView.layer.cornerRadius = userImageView.frame.height/2
@@ -183,76 +246,68 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     @objc func subTapAction(sender : UITapGestureRecognizer) {
         if mode == "other" {
             firestore.downloadUserProfile(uid) { (userProfile) in
-                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! UserSubsTableViewController
+                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                 userSubsVC.userProfile = userProfile
                 userSubsVC.funFacts = self.funFactsSubmitted
-                userSubsVC.sender = "sub"
-                userSubsVC.landmarksDict = self.landmarksDict
+                userSubsVC.sender = .submissions
                 self.navigationController?.pushViewController(userSubsVC, animated: true)
             }
         } else {
-            let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! UserSubsTableViewController
+            let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
             userSubsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
             userSubsVC.funFacts = self.funFactsSubmitted
-            userSubsVC.sender = "sub"
-            userSubsVC.landmarksDict = self.landmarksDict
+            userSubsVC.sender = .submissions
             self.navigationController?.pushViewController(userSubsVC, animated: true)
         }
     }
     @objc func dispTapAction(sender : UITapGestureRecognizer) {
         if mode == "other" {
             firestore.downloadUserProfile(uid) { (userProfile) in
-                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! UserSubsTableViewController
+                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                 userSubsVC.userProfile = userProfile
                 userSubsVC.funFacts = self.funFactsSubmitted
-                userSubsVC.sender = "disp"
-                userSubsVC.landmarksDict = self.landmarksDict
+                userSubsVC.sender = .disputes
                 self.navigationController?.pushViewController(userSubsVC, animated: true)
             }
         } else {
-            let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! UserSubsTableViewController
+            let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
             userSubsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
             userSubsVC.funFacts = self.funFactsSubmitted
-            userSubsVC.sender = "disp"
-            userSubsVC.landmarksDict = self.landmarksDict
+            userSubsVC.sender = .disputes
             self.navigationController?.pushViewController(userSubsVC, animated: true)
         }
     }
     @objc func verTapAction(sender : UITapGestureRecognizer) {
         if mode == "other" {
             firestore.downloadUserProfile(uid) { (userProfile) in
-                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! UserSubsTableViewController
+                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                 userSubsVC.userProfile = userProfile
                 userSubsVC.funFacts = self.funFactsSubmitted
-                userSubsVC.sender = "ver"
-                userSubsVC.landmarksDict = self.landmarksDict
+                userSubsVC.sender = .verifications
                 self.navigationController?.pushViewController(userSubsVC, animated: true)
             }
         } else {
-            let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! UserSubsTableViewController
+            let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
             userSubsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
             userSubsVC.funFacts = self.funFactsSubmitted
-            userSubsVC.sender = "ver"
-            userSubsVC.landmarksDict = self.landmarksDict
+            userSubsVC.sender = .verifications
             self.navigationController?.pushViewController(userSubsVC, animated: true)
         }
     }
     @objc func rejTapAction(sender : UITapGestureRecognizer) {
         if mode == "other" {
             firestore.downloadUserProfile(uid) { (userProfile) in
-                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! UserSubsTableViewController
+                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                 userSubsVC.userProfile = userProfile
                 userSubsVC.funFacts = self.funFactsSubmitted
-                userSubsVC.sender = "rej"
-                userSubsVC.landmarksDict = self.landmarksDict
+                userSubsVC.sender = .rejections
                 self.navigationController?.pushViewController(userSubsVC, animated: true)
             }
         } else {
-            let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! UserSubsTableViewController
+            let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
             userSubsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
             userSubsVC.funFacts = self.funFactsSubmitted
-            userSubsVC.sender = "rej"
-            userSubsVC.landmarksDict = self.landmarksDict
+            userSubsVC.sender = .rejections
             self.navigationController?.pushViewController(userSubsVC, animated: true)
         }
     }
@@ -268,6 +323,11 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-
+        let destinationEditVC = segue.destination as? EditProfileViewController
+        destinationEditVC?.fullName = AppDataSingleton.appDataSharedInstance.userProfile.name
+        destinationEditVC?.userName = AppDataSingleton.appDataSharedInstance.userProfile.userName
+        destinationEditVC?.photoURL = AppDataSingleton.appDataSharedInstance.userProfile.photoURL
+        destinationEditVC?.city = AppDataSingleton.appDataSharedInstance.userProfile.city
+        destinationEditVC?.country = AppDataSingleton.appDataSharedInstance.userProfile.country
     }
 }

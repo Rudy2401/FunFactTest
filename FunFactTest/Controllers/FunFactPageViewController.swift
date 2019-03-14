@@ -24,7 +24,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     var dateContent = NSArray()
     var currentIndex = 0
     var totalPages = 0
-    var landmarkType = ""
     var funFacts = [FunFact]()
     var funFactDict = [String: [FunFact]]()
     var currentVC = ContentViewController()
@@ -119,7 +118,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         dataViewController.funFactID = funFacts[index].id
         dataViewController.address = address
         dataViewController.headingObject = headingContent as AnyObject
-        dataViewController.landmarkType = landmarkType
         dataViewController.landmarkID = landmarkID
         dataViewController.currPageNumberText = String(index+1)
         dataViewController.totalPageNumberText = String(totalPages)
@@ -300,8 +298,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
                 addFactVC?.mode = "edit"
                 addFactVC?.funFactID = currentVC.funFactID
                 addFactVC?.landmarkName = currentVC.headingObject as? String
-                addFactVC?.landmarkTypeText = currentVC.landmarkType
-                addFactVC?.type = currentVC.landmarkType
                 addFactVC?.imageCaptionText = currentVC.imageCaption
                 addFactVC?.funFactDesc = currentVC.funFactDesc
                 addFactVC?.landmarkID = currentVC.landmarkID

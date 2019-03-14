@@ -26,20 +26,10 @@ class ImageViewViewController: UIViewController, UIScrollViewDelegate{
         scrollView.delegate = self
         imageView.image = image
         imageCaption?.text = imageCaptionText
-        scrollView.autoresizingMask = UIView.AutoresizingMask(rawValue: UIView.AutoresizingMask.RawValue(UInt8(UIView.AutoresizingMask.flexibleWidth.rawValue) | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
+        scrollView.contentSize = imageView.frame.size
         navigationController?.navigationBar.backItem?.title = ""
         view.bringSubviewToFront(imageCaption!)
         setupGestureRecognizer()
-    }
-
-    func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        let imageViewSize = imageView.frame.size
-        let scrollViewSize = scrollView.bounds.size
-        
-        let verticalPadding = imageViewSize.height < scrollViewSize.height ? (scrollViewSize.height - imageViewSize.height) / 2 : 0
-        let horizontalPadding = imageViewSize.width < scrollViewSize.width ? (scrollViewSize.width - imageViewSize.width) / 2 : 0
-        
-        scrollView.contentInset = UIEdgeInsets(top: verticalPadding, left: horizontalPadding, bottom: verticalPadding, right: horizontalPadding)
     }
 
     override func didReceiveMemoryWarning() {
@@ -51,18 +41,35 @@ class ImageViewViewController: UIViewController, UIScrollViewDelegate{
     }
 
     func setupGestureRecognizer() {
-        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(ImageViewViewController.handleDoubleTap(_:)))
+        let doubleTap = UITapGestureRecognizer(target: self,
+                                               action: #selector(handleDoubleTap))
         doubleTap.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTap)
     }
     
     @objc func handleDoubleTap(_ recognizer: UITapGestureRecognizer) {
-        
         if (scrollView.zoomScale > scrollView.minimumZoomScale) {
+            print ("1")
             scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
         } else {
-            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: true)
+            print ("2")
+//            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: true)
+            let zoomRect = zoomRectForScale(scale: scrollView.maximumZoomScale / 3.0,
+                                            center: recognizer.location(in: recognizer.view))
+            scrollView.zoom(to: zoomRect, animated: true)
         }
+        
+    }
+    func zoomRectForScale(scale : CGFloat, center : CGPoint) -> CGRect {
+        var zoomRect = CGRect.zero
+        if let imageV = self.imageView {
+            zoomRect.size.height = imageV.frame.size.height / scale
+            zoomRect.size.width  = imageV.frame.size.width  / scale
+            let newCenter = imageV.convert(center, from: self.scrollView)
+            zoomRect.origin.x = newCenter.x - ((zoomRect.size.width / 2.0))
+            zoomRect.origin.y = newCenter.y - ((zoomRect.size.height / 2.0))
+        }
+        return zoomRect
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

@@ -10,8 +10,11 @@ import UIKit
 import FirebaseFirestore
 import FirebaseStorage
 import InstantSearchClient
+import CoreLocation
+import MapKit
 
-class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchControllerDelegate {
+class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchControllerDelegate,
+FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegate, MKMapViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var landmarkButton: UIButton!
@@ -27,6 +30,11 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     var searchLandmarks = [SearchLandmark]()
     var searchHashtags = [SearchHashtag]()
     var searchUsers = [SearchUsers]()
+    var firestore = FirestoreManager()
+    var algoliaManager = AlgoliaSearchManager()
+    let locationManager = CLLocationManager()
+    var currentLocation = CLLocationCoordinate2D()
+    var mapView: MKMapView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,10 +42,14 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.delegate = self
         tableView.dataSource = self
         searchController.delegate = self
+        firestore.delegate = self
+        algoliaManager.delegate = self
         landmarkButton.isSelected = true
 
         // Setup the Search Controller
         navigationItem.hidesSearchBarWhenScrolling = false
+        navigationController?.navigationBar.tintColor = .darkGray
+        navigationController?.navigationBar.isOpaque = false
         searchController.searchBar.sizeToFit()
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
@@ -45,8 +57,52 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         searchController.searchBar.placeholder = "Search Landmarks"
         navigationItem.searchController = searchController
         definesPresentationContext = true
+        
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.startUpdatingLocation()
+        }
+        mapView = MKMapView(frame: self.view.frame)
+        mapView!.delegate = self
+        mapView!.showsUserLocation = true
+        if landmarkButton.isSelected {
+            let landmarkQuery = Query()
+            landmarkQuery.hitsPerPage = 15
+            landmarkQuery.attributesToRetrieve = ["name", "address", "image", "city", "state", "country", "zipcode", "objectID"]
+            landmarkQuery.attributesToHighlight = ["name", "address"]
+            landmarkQuery.aroundLatLng = LatLng(lat: (mapView?.userLocation.coordinate.latitude)!,
+                                                lng: (mapView?.userLocation.coordinate.longitude)!)
+            landmarkQuery.aroundRadius = .all
+            AlgoliaManager.sharedInstance.landmarkIndex.search(landmarkQuery, completionHandler: { (data, error) in
+                if error != nil {
+                    return
+                }
+                self.loadedPage = 0 // Reset loaded page
+                // Decode JSON
+                guard let hits = data!["hits"] as? [[String: AnyObject]] else { return }
+                guard let nbPages = data!["nbPages"] as? UInt else { return }
+                self.nbPages = nbPages
+                
+                var tmp = [SearchLandmark]()
+                for hit in hits {
+                    tmp.append(SearchLandmark(json: hit))
+                }
+                self.searchLandmarks = tmp
+                self.tableView.reloadData()
+            })
+        }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.navigationBar.prefersLargeTitles = false
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+    func documentsDidDownload() {
+        
+    }
     func setupButtons() {
         let landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttribute)
         let landmarkStringSelected = NSAttributedString(string: "Places", attributes: Attributes.searchButtonSelectedAttribute)
@@ -63,6 +119,10 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         userButton.setAttributedTitle(userString, for: .normal)
         userButton.setAttributedTitle(userStringSelected, for: .selected)
     }
+    func documentsDidUpdate() {
+        
+    }
+    
     
     func willPresentSearchController(_ searchController: UISearchController) {
         navigationController?.navigationBar.isTranslucent = true
@@ -84,7 +144,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             let landmarkQuery = Query()
             landmarkQuery.query = searchText
             landmarkQuery.hitsPerPage = 15
-            landmarkQuery.attributesToRetrieve = ["name", "address", "image", "city", "state", "country", "zipcode"]
+            landmarkQuery.attributesToRetrieve = ["name", "address", "image", "city", "state", "country", "zipcode", "objectID"]
             landmarkQuery.attributesToHighlight = ["name", "address"]
             AlgoliaManager.sharedInstance.landmarkIndex.search(landmarkQuery, completionHandler: { (data, error) in
                 if error != nil {
@@ -133,7 +193,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
             let userQuery = Query()
             userQuery.query = searchText
             userQuery.hitsPerPage = 15
-            userQuery.attributesToRetrieve = ["name", "userName", "photoURL"]
+            userQuery.attributesToRetrieve = ["name", "userName", "photoURL", "objectID"]
             userQuery.attributesToHighlight = ["name", "userName"]
             AlgoliaManager.sharedInstance.usersIndex.search(userQuery, completionHandler: { (data, error) in
                 if error != nil {
@@ -156,7 +216,8 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
     }
 
     func isFiltering() -> Bool {
-        return searchController.isActive && !searchBarIsEmpty()
+        return true
+//        return searchController.isActive && !searchBarIsEmpty()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -194,6 +255,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 searchText = searchLandmarks[indexPath.row].nameHighlighted!
                 secondaryText = searchLandmarks[indexPath.row].addressHighlighted!
                 image = searchLandmarks[indexPath.row].image!
+                cell.landmarkID = searchLandmarks[indexPath.row].landmarkID!
                 cell.searchImageView.image = setupImage(image: image)
             }
             if hashtagButton.isSelected {
@@ -206,6 +268,7 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
                 searchText = searchUsers[indexPath.row].userNameHighlighted!
                 secondaryText = searchUsers[indexPath.row].nameHighlighted!
                 photoURL = searchUsers[indexPath.row].photoURL!
+                cell.userID = searchUsers[indexPath.row].userID!
                 let photoUrl = URL(string: photoURL)
                 if photoUrl == URL(string: "") {
                     cell.searchImageView.image = UIImage
@@ -236,6 +299,52 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         cell.primaryText.highlightedText = searchText
         cell.secondaryText.highlightedText = secondaryText
         return cell
+    }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if self.hashtagButton.isSelected {
+            let cell = tableView.cellForRow(at: indexPath) as! SearchCellTableViewCell
+            let hashtag = "\(cell.primaryText.text?.components(separatedBy: "#").last ?? "")"
+            firestore.getFunFacts(for: hashtag) { (refs, error) in
+                if let error = error {
+                    print ("Error getting hashtag funfacts \(error)")
+                } else {
+                    let funFactsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
+                    funFactsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
+                    funFactsVC.refs = refs
+                    funFactsVC.sender = .hashtags
+                    funFactsVC.hashtagName = cell.primaryText.text!
+                    self.navigationController?.pushViewController(funFactsVC, animated: true)
+                }
+            }
+        } else if landmarkButton.isSelected {
+            let cell = tableView.cellForRow(at: indexPath) as! SearchCellTableViewCell
+            let landmarkID = cell.landmarkID
+            firestore.downloadFunFacts(for: landmarkID) { (funFacts, pageContent, error) in
+                if let error = error {
+                    print ("Error getting funfacts \(error)")
+                } else {
+                    let funFacts = funFacts!
+                    let destinationVC = self.storyboard?.instantiateViewController(withIdentifier: "funFactPage") as! FunFactPageViewController
+                    destinationVC.pageContent = pageContent! as NSArray
+                    destinationVC.funFacts = funFacts
+                    destinationVC.headingContent = cell.primaryText.text ?? ""
+                    destinationVC.landmarkID = landmarkID
+                    destinationVC.address = cell.secondaryText.text ?? ""
+                    
+                    self.navigationController?.pushViewController(destinationVC, animated: true)
+                }
+            }
+        } else if userButton.isSelected {
+            let cell = tableView.cellForRow(at: indexPath) as! SearchCellTableViewCell
+            let userID = cell.userID
+            firestore.downloadUserProfile(userID) { (user) in
+                let profileVC = self.storyboard?.instantiateViewController(withIdentifier: "profileView") as! ProfileViewController
+                profileVC.uid = userID
+                profileVC.mode = "other"
+                profileVC.userProfile = user
+                self.navigationController?.pushViewController(profileVC, animated: true)
+            }
+        }
     }
 
     @IBAction func onClickLandmark(_ sender: Any) {
@@ -280,7 +389,6 @@ class SearchViewController: UIViewController, UITableViewDataSource, UITableView
         }
         return landmarkImage.image!
     }
-    
 }
 extension SearchViewController: UISearchResultsUpdating {
     // MARK: - UISearchResultsUpdating Delegate

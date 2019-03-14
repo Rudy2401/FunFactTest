@@ -21,6 +21,7 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.title = "Rejecting A Fact"
         rejectionView.delegate = self
         firestore.delegate = self
     }

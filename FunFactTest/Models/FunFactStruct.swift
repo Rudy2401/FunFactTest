@@ -15,6 +15,7 @@ struct ListOfFunFacts  {
 
 struct FunFact: Hashable  {
     var landmarkId: String
+    var landmarkName: String
     var id: String
     var description: String
     var likes: Int

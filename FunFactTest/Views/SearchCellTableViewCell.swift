@@ -12,6 +12,8 @@ class SearchCellTableViewCell: UITableViewCell {
     @IBOutlet weak var secondaryText: UILabel!
     @IBOutlet weak var primaryText: UILabel!
     @IBOutlet weak var searchImageView: UIImageView!
+    var landmarkID = ""
+    var userID = ""
     
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -9,6 +9,7 @@
 import Foundation
 import FirebaseStorage
 import FirebaseFirestore
+import Geofirestore
 
 extension MainViewController {
     func updateData() {
@@ -233,6 +234,74 @@ extension MainViewController {
                     let data = ["dateSubmitted": dateSubmitted]
                     
                     db.collection("funFacts").document(funFactID).setData(data, merge: true)
+                }
+            }
+        }
+    }
+    func addLandmarkNameToFunFacts() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments { (snapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for document in snapshot!.documents {
+                    let landmarkID = document.data()["landmarkId"] as! String
+                    let funFactID = document.documentID as String
+                    db.collection("landmarks")
+                        .document(landmarkID)
+                        .getDocument(completion: { (snapshot, error) in
+                            if let error = error {
+                                print("Error getting documents: \(error)")
+                            } else {
+                                let landmarkName = snapshot?.data()?["name"] as! String
+                                db.collection("funFacts")
+                                    .document(funFactID)
+                                    .setData(["landmarkName": landmarkName], merge: true)
+                            }
+                    })
+                }
+            }
+        }
+    }
+    func updateGeoFirestoreData() {
+        let db = Firestore.firestore()
+        let geoFirestoreRef = Firestore.firestore().collection("landmarks")
+        let geoFirestore = GeoFirestore(collectionRef: geoFirestoreRef)
+        db.collection("landmarks").getDocuments { (snap, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for doc in (snap?.documents)! {
+                    let coordinates = doc.data()["coordinates"] as! GeoPoint
+                    geoFirestore.setLocation(geopoint: coordinates, forDocumentWithID: doc.documentID) { (error) in
+                        if (error != nil) {
+                            print("An error occured: \(error)")
+                        } else {
+                            print("Saved location successfully!")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    func removeLatLong() {
+        let db = Firestore.firestore()
+        db.collection("landmarks").getDocuments { (snap, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for doc in (snap?.documents)! {
+                    let documentID = doc.documentID
+                    db.collection("landmarks")
+                        .document(documentID)
+                        .updateData(["latitude": FieldValue.delete(),
+                                     "longitude": FieldValue.delete()]) { err in
+                                        if let err = err {
+                                            print("Error updating document: \(err)")
+                                        } else {
+                                            print("Document successfully updated")
+                                        }
+                    }
                 }
             }
         }

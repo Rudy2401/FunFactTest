@@ -11,8 +11,10 @@ import Firebase
 import FirebaseStorage
 import MapKit
 import FirebaseAuth
+import IQKeyboardManagerSwift
+import Geofirestore
 
-class AddNewFactViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AlgoliaSearchManagerDelegate, FirestoreManagerDelegate {
+class AddNewFactViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AlgoliaSearchManagerDelegate, FirestoreManagerDelegate, GeoFirestoreManagerDelegate {
     
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var landmarkImage: UIImageView!
@@ -31,6 +33,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
     
     var algoliaManager = AlgoliaSearchManager()
     var firestore = FirestoreManager()
+    var geoFirestore = GeoFirestoreManager()
     var address: String?
     var landmarkName: String?
     var landmarkID: String!
@@ -84,6 +87,9 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
 
         algoliaManager.delegate = self
         funFactDescription.keyboardDistanceFromTextField = 200
+        funFactDescription.keyboardType = .twitter
+        sourceTextField.keyboardType = .URL
+        
         autocompleteTableView.translatesAutoresizingMaskIntoConstraints = false
         autocompleteTableView.delegate = self
         autocompleteTableView.dataSource = self
@@ -137,11 +143,6 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         addressTextField?.text = address
         landmarkNameTextField?.text = landmarkName
 
-        if address != nil {
-            addressTextField?.isUserInteractionEnabled = false
-            landmarkNameTextField?.isUserInteractionEnabled = false
-        }
-
         let mytapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewAddressScreen))
         mytapGestureRecognizer.numberOfTapsRequired = 1
         addressTextField?.addGestureRecognizer(mytapGestureRecognizer)
@@ -188,7 +189,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                     self.landmarkType.selectRow(self.pickerData.firstIndex(of: self.landmark.type)!,
                                                 inComponent: 0,
                                                 animated: true)
-                    self.addressTextField?.text = self.landmark.address
+                    self.addressTextField?.text = self.landmark.address.replacingOccurrences(of: " ", with: "") == "" ? self.landmarkName : self.landmark.address
                     self.funFactDescription.text = self.funFactDesc
                     self.imageCaption.text = self.imageCaptionText
                     self.sourceTextField.text = self.source
@@ -242,19 +243,24 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             self.state = addDet.state
             self.zipcode = addDet.zipcode
             self.coordinate = addDet.coordinate!
-            let add = addDet.address ?? ""
-            let city = addDet.city ?? ""
-            let state = addDet.state ?? ""
-            let country = addDet.country ?? ""
-            let zipcode = addDet.zipcode ?? ""
-            let address = (add+city+state+country+zipcode).lowercased()
-            self.firestore.checkIfLandmarkExists(address: address, completionHandler:
-                { (id, numOfFunFacts, landLikes, landDislikes) in
-                self.landmarkID = id
-                self.numOfFunFacts = numOfFunFacts
-                self.landLikes = landLikes
-                self.landDislikes = landDislikes
-            })
+            self.landmarkNameTextField?.isEnabled = false
+            
+            
+            
+            
+//            let add = addDet.address ?? ""
+//            let city = addDet.city ?? ""
+//            let state = addDet.state ?? ""
+//            let country = addDet.country ?? ""
+//            let zipcode = addDet.zipcode ?? ""
+//            let address = (add+city+state+country+zipcode).lowercased()
+//            self.firestore.checkIfLandmarkExists(address: address, completionHandler:
+//                { (id, numOfFunFacts, landLikes, landDislikes) in
+//                self.landmarkID = id
+//                self.numOfFunFacts = numOfFunFacts
+//                self.landLikes = landLikes
+//                self.landDislikes = landDislikes
+//            })
         }
     }
     func documentsDidDownload() {
@@ -273,8 +279,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             let imag = UIImagePickerController()
             imag.delegate = self
             imag.sourceType = UIImagePickerController.SourceType.photoLibrary
-            //imag.mediaTypes = [kUTTypeImage];
-            imag.allowsEditing = false
+            imag.allowsEditing = true
             self.present(imag, animated: true, completion: nil)
         }
     }
@@ -285,9 +290,8 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
 
         guard let selectedImage = info[convertFromUIImagePickerControllerInfoKey(
-            UIImagePickerController.InfoKey.originalImage)]
+            UIImagePickerController.InfoKey.editedImage)]
             as? UIImage else { return }
-        //var tempImage:UIImage = editingInfo[UIImagePickerControllerOriginalImage] as UIImage
         landmarkImage.image = selectedImage
         self.dismiss(animated: true, completion: nil)
     }
@@ -339,11 +343,24 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                     print ("Error writing document: \(error)")
                 } else {
                     print("Document successfully written!")
+                    // Upload GeoFirestore related data
+                    self.geoFirestore
+                        .addGeoFirestoreData(for: tempLandmarkID,
+                                             coordinates: GeoPoint(latitude: self.coordinate.latitude as Double,
+                                                                   longitude: self.coordinate.longitude as Double),
+                                             completion: { (error) in
+                                                if let error = error {
+                                                    print ("Error writing Geofirestore document: \(error)")
+                                                } else {
+                                                    print("GeoFirestore data successfully written!")
+                                                }
+                        })
                 }
             })
             
             //Upload fun fact details
             let funFact = FunFact(landmarkId: tempLandmarkID,
+                                  landmarkName: self.landmarkName ?? "",
                                   id: ffID,
                                   description: self.funFactDescription.text,
                                   likes: self.likes,
@@ -364,11 +381,25 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             self.firestore.addFunFact(funFact: funFact, completion: { (error) in
                 if let error = error {
                     print ("Error writing document: \(error)")
+                    self.showAlert(message: "fail")
                 } else {
                     print("Document successfully written!")
+                    self.showAlert(message: "success")
                 }
             })
-            self.firestore.uploadImage(imageName: ffID + ".jpeg", image: self.landmarkImage.image ?? UIImage())
+            self.firestore.uploadImage(imageName: ffID + ".jpeg",
+                                       image: self.landmarkImage.image ?? UIImage(),
+                                       type: ImageType.funFact,
+                                       completion: { (url, error) in
+                                        if let error = error {
+                                            print ("Error uploading image \(error)")
+                                        } else {
+                                            print ("Image uploaded successfully")
+                                            if CacheManager.shared.checkIfImageExists(imageName: ffID + ".jpeg") {
+                                                CacheManager.shared.replaceImage(imageName: ffID + ".jpeg", image: self.landmarkImage.image ?? UIImage())
+                                            }
+                                        }
+            })
             self.firestore.addHashtags(funFactID: ffID, hashtags: self.funFactDescription.text.hashtags())
             self.firestore.addUserSubmitted(funFactID: ffID, userID: Auth.auth().currentUser?.uid ?? "")
         })
@@ -417,9 +448,9 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  toFocus: self.funFactDescription!,
                                  type: "textview")
         }
-        if (sourceTextField?.text?.isEmpty)! {
+        if (sourceTextField?.text?.isEmpty)! || !(sourceTextField.text?.isValidURL)! {
             errors = true
-            message += "Please enter a valid source"
+            message += "Please enter a valid source URL"
             Utils.alertWithTitle(title: title,
                                  message: message,
                                  viewController: self,
@@ -443,6 +474,15 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  viewController: self,
                                  toFocus: self.landmarkType!,
                                  type: "pickerview")
+        }
+        if funFactDescription.text.count > 300 {
+            errors = true
+            message += "Please make sure that the fun fact description is limited to 300 characters"
+            Utils.alertWithTitle(title: title,
+                                 message: message,
+                                 viewController: self,
+                                 toFocus: self.funFactDescription!,
+                                 type: "textview")
         }
         return errors
     }
