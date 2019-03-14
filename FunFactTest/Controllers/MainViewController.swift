@@ -15,7 +15,7 @@ import UserNotifications
 import MapKitGoogleStyler
 import FirebaseUI
 import InstantSearch
-
+import Geofirestore
 
 class MainViewController: UIViewController, FirestoreManagerDelegate {
     
@@ -38,7 +38,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     var currentLocationCoordinate = CLLocationCoordinate2D()
     var landmarkImage = UIImage()
     var landmarkType = ""
-    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "",city: "", country: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
     var boundingBox: GeoRect?
     var firestore = FirestoreManager()
     var currentAnnotation: FunFactAnnotation?
@@ -50,7 +50,6 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         super.viewDidLoad()
         typeColor.layer.cornerRadius = 2.5
         firestore.delegate = self
-        
         annotationBottomView.alpha = 0.0
         setupNavigationbar()
         
@@ -59,6 +58,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         locationManager.requestAlwaysAuthorization()
         locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+
         firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user) in
             AppDataSingleton.appDataSharedInstance.userProfile = user
         }
@@ -88,11 +88,29 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         addFactButton.setAttributedTitle(addFactLabelAttrClicked, for: .highlighted)
         addFactButton.titleLabel?.textAlignment = .center
         
-        mapView.layoutMargins = UIEdgeInsets(top: 200, left: 0, bottom: 20, right: 0)
-//        configureTileOverlay()
+        let currentLocationLabel = String.fontAwesomeIcon(name: .locationArrow)
+        let currentLocationAttr = NSAttributedString(string: currentLocationLabel, attributes: Attributes.currentLocationButtonAttribute)
+        let currentLocationAttrClicked = NSAttributedString(string: currentLocationLabel, attributes: Attributes.toolBarImageClickedAttribute)
         
-        // 4. setup Firestore data
-        loadDataFromFirestoreAndAddAnnotations()
+        currentLocationButton.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
+        currentLocationButton.clipsToBounds = true
+        currentLocationButton.layer.cornerRadius = 25
+        currentLocationButton.layer.shadowPath = UIBezierPath(roundedRect: currentLocationButton.bounds, cornerRadius: 25).cgPath
+        currentLocationButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        currentLocationButton.layer.shadowOffset = CGSize(width: 0, height: 9)
+        currentLocationButton.layer.shadowOpacity = 1.0
+        currentLocationButton.layer.shadowRadius = 10.0
+        currentLocationButton.layer.masksToBounds = false
+        currentLocationButton.setAttributedTitle(currentLocationAttr, for: .normal)
+        currentLocationButton.setAttributedTitle(currentLocationAttrClicked, for: .selected)
+        currentLocationButton.setAttributedTitle(currentLocationAttrClicked, for: .highlighted)
+        currentLocationButton.titleLabel?.textAlignment = .center
+        
+        mapView.layoutMargins = UIEdgeInsets(top: 200, left: 0, bottom: 20, right: 0)
+        if let coor = mapView.userLocation.location?.coordinate {
+            mapView.setCenter(coor, animated: true)
+        }
+//        configureTileOverlay()
     }
     func documentsDidUpdate() {
         print ("uploaded to cache")
@@ -100,6 +118,14 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     
     @IBAction func viewAddFact(_ sender: Any) {
+        if Auth.auth().currentUser == nil {
+            let alert = UIAlertController(title: "Error",
+                                          message: "Please sign in to submit a fact.",
+                                          preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+        }
         performSegue(withIdentifier: "addFactDetail", sender: self)
     }
     
@@ -241,6 +267,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
             }, completion: nil)
             UIView.animate(withDuration: 0.5, animations: {
                 self.addFactButton.transform = CGAffineTransform(translationX: 0, y: -110)
+                self.currentLocationButton.transform = CGAffineTransform(translationX: 0, y: -110)
             }, completion: nil)
         } else {
             view.transform = CGAffineTransform(translationX: 0, y: 0)
@@ -250,6 +277,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
             }, completion: nil)
             UIView.animate(withDuration: 0.5, animations: {
                 self.addFactButton.transform = CGAffineTransform(translationX: 0, y: 0)
+                self.currentLocationButton.transform = CGAffineTransform(translationX: 0, y: 0)
             }, completion: nil)
         }
     }
@@ -260,7 +288,6 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        self.navigationController!.navigationBar.frame = CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 10.0)
         // 1. status is not determined
         if CLLocationManager.authorizationStatus() == .notDetermined {
             locationManager.requestAlwaysAuthorization()
@@ -286,8 +313,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     @objc func viewFunFactDetailPage(recognizer: UITapGestureRecognizer) {
-        let db = Firestore.firestore()
-        downloadFunFactsAndSegue(for: landmarkID, db: db)
+        downloadFunFactsAndSegue(for: landmarkID)
     }
     
     override func didReceiveMemoryWarning() {
@@ -297,8 +323,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     func loadDataFromFirestoreAndAddAnnotations() {
         //4. Getting data from Firestore
-        downloadLandmarks(caller: "viewDidLoad")
-        firestore.downloadImagesIntoCache()
+        downloadLandmarks(caller: .firstLoad)
     }
     func setupGeoFences(lat: Double, lon: Double, title: String, landmarkID: String) {
         // 1. check if system can monitor regions
@@ -335,8 +360,8 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     func setupNavigationbar () {
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
+//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+//        navigationController?.navigationBar.shadowImage = UIImage()
         if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
             navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
         }

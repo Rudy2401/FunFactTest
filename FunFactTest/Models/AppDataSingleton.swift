@@ -23,10 +23,14 @@ class AppDataSingleton {
                            level: "",
                            photoURL: "",
                            provider: "",
+                           city: "",
+                           country: "",
                            funFactsDisputed: [],
                            funFactsLiked: [],
                            funFactsDisliked: [],
                            funFactsSubmitted: [],
                            funFactsVerified: [],
                            funFactsRejected: [])
+    
+    var listOfLandmarkIDs = [""]
 }

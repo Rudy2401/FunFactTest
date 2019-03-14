@@ -26,6 +26,8 @@ struct UserProfile {
     var level: String
     var photoURL: String
     var provider: String
+    var city: String
+    var country: String
     var funFactsDisputed: [DocumentReference]
     var funFactsLiked: [DocumentReference]
     var funFactsDisliked: [DocumentReference]

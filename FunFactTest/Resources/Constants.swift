@@ -15,6 +15,9 @@ enum Colors {
     static let fbBlueColor = UIColor(displayP3Red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
     static let greenColor = UIColor(displayP3Red: 46/255, green: 204/255, blue: 113/255, alpha: 1.0)
     static let redColor = UIColor(displayP3Red: 178/255, green: 34/255, blue: 34/255, alpha: 1.0)
+    static let maroonColor = UIColor(displayP3Red: 176/255, green: 48/255, blue: 96/255, alpha: 1.0)
+    static let airforceBlueColor = UIColor(displayP3Red: 93/255, green: 138/255, blue: 168/255, alpha: 1.0)
+    static let azureBlue = UIColor(displayP3Red: 0/255, green: 128/255, blue: 255/255, alpha: 1.0)
 }
 
 enum UserLevel {
@@ -22,6 +25,41 @@ enum UserLevel {
     static let advanced = "Advanced"
     static let superstar = "Super Star"
     static let creme = "Crème de la crème"
+}
+
+enum ImageType {
+    static let profile = "profileImages"
+    static let funFact = "images"
+}
+
+enum ListOfFunFactsByType {
+    case submissions
+    case disputes
+    case verifications
+    case rejections
+    case hashtags
+    case landmarks
+}
+
+enum LandmarkTypes {
+    static let landmark = "Landmark"
+    static let art = "Art & Culture"
+    static let restaurant = "Restaurants, Bars & Cafes"
+    static let cool = "Cool & Unique"
+    static let park = "Parks & Gardens"
+    static let natural = "Natural Landmarks"
+    static let historic = "Historic Places"
+    static let promotions = "Promotions"
+}
+
+enum FirestoreGeoConstants {
+    case firstLoad
+    case mapEvent
+}
+
+enum FirestoreErrors {
+    static let annotationExists = "Annotation already present"
+    static let mapTooLarge = "Map area too large"
 }
 
 enum Attributes {
@@ -39,10 +77,18 @@ enum Attributes {
                                         NSAttributedString.Key.font: UIFont(name: "Avenir-BookOblique", size: 14.0)!]
     static let attribute14DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
                                         NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
+    static let attribute14Gray = [ NSAttributedString.Key.foregroundColor: UIColor.gray,
+                                        NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
+    static let attribute16Gray = [ NSAttributedString.Key.foregroundColor: UIColor.gray,
+                                   NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 16.0)!]
+    static let attribute12Gray = [ NSAttributedString.Key.foregroundColor: UIColor.gray,
+                                   NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 12.0)!]
     static let attribute16DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
                                         NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 16.0)!]
     static let attribute14DemiBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
                                        NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
+    static let attribute16DemiBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
+                                       NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 16.0)!]
     
     static let smallImageAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
                                        NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 12, style: .solid)]
@@ -55,6 +101,8 @@ enum Attributes {
     
     static let addFactButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
                                           NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
+    static let currentLocationButtonAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
+                                          NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
     
     static let toolBarLabelAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                          NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]
@@ -66,6 +114,11 @@ enum Attributes {
     
     static let loginButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
                                         NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 16.0)!]
+    static let cancelButtonAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
+                                        NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 16.0)!]
+    static let cancelButtonClickedAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
+                                                NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 16.0)!]
+    
     static let loginButtonImageBrandAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
                                                   NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
     static let loginButtonImageSolidAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
@@ -106,51 +159,56 @@ struct Constants {
                                                action: nil)
     
     static let landmarkTypes = ["--- Select landmark type ---",
-                                "Apartment",
-                                "Office Building",
-                                "Stadium",
-                                "Museum",
-                                "Park",
-                                "Restaurant/Cafe",
-                                "Landmark"]
+                                LandmarkTypes.art,
+                                LandmarkTypes.cool,
+                                LandmarkTypes.historic,
+                                LandmarkTypes.landmark,
+                                LandmarkTypes.natural,
+                                LandmarkTypes.park,
+                                LandmarkTypes.restaurant]
     
     static let rejectionReason = ["Source invalid",
                                   "Fact does not match the source",
                                   "Image incorrect",
                                   "Inflammatory/Derogatory content",
                                   "Landmark Name does not match the fact",
+                                  "Fact has too many grammatical errors/spelling mistakes",
                                   "Other"]
     
     static let disputeReason = ["--- Select a reason ---",
                                 "Factually incorrect",
                                 "Fact belongs to another landmark",
-                                "Derogatory/Offensive text",
+                                "Inflammatory/Derogatory content",
+                                "Source website content is inaccurate",
                                 "Other"]
     
     static func getMarkerDetails(type: String) -> AnnotationType {
         var annotationType = AnnotationType(color: UIColor(), image: UIImage())
         switch type {
-        case Constants.landmarkTypes[1]:
+        case LandmarkTypes.art:
             annotationType.color = .orange
-            annotationType.image = UIImage.fontAwesomeIcon(name: .home, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
-        case Constants.landmarkTypes[2]:
-            annotationType.color = .blue
-            annotationType.image = UIImage.fontAwesomeIcon(name: .building, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
-        case Constants.landmarkTypes[3]:
-            annotationType.color = .black
-            annotationType.image = UIImage.fontAwesomeIcon(name: .footballBall, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
-        case Constants.landmarkTypes[4]:
-            annotationType.color = .green
-            annotationType.image = UIImage.fontAwesomeIcon(name: .book, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
-        case Constants.landmarkTypes[5]:
-            annotationType.color = .cyan
-            annotationType.image = UIImage.fontAwesomeIcon(name: .tree, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
-        case Constants.landmarkTypes[6]:
-            annotationType.color = .gray
-            annotationType.image = UIImage.fontAwesomeIcon(name: .utensils, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
-        case Constants.landmarkTypes[7]:
+            annotationType.image = UIImage.fontAwesomeIcon(name: .theaterMasks, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+        case LandmarkTypes.cool:
             annotationType.color = .purple
-            annotationType.image = UIImage.fontAwesomeIcon(name: .university, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .alicorn, style: .solidp, textColor: .white, size: CGSize(width: 50, height: 50))
+        case LandmarkTypes.historic:
+            annotationType.color = Colors.maroonColor
+            annotationType.image = UIImage.fontAwesomeIcon(name: .monument, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+        case LandmarkTypes.landmark:
+            annotationType.color = Colors.airforceBlueColor
+            annotationType.image = UIImage.fontAwesomeIcon(name: .landmark, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+        case LandmarkTypes.natural:
+            annotationType.color = Colors.azureBlue
+            annotationType.image = UIImage.fontAwesomeIcon(name: .water, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+        case LandmarkTypes.park:
+            annotationType.color = Colors.seagreenColor
+            annotationType.image = UIImage.fontAwesomeIcon(name: .trees, style: .solidp, textColor: .white, size: CGSize(width: 50, height: 50))
+        case LandmarkTypes.promotions:
+            annotationType.color = .yellow
+            annotationType.image = UIImage.fontAwesomeIcon(name: .star, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+        case LandmarkTypes.restaurant:
+            annotationType.color = .darkGray
+            annotationType.image = UIImage.fontAwesomeIcon(name: .utensils, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
         default:
             annotationType.color = .red
         }

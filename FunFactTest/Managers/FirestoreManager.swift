@@ -10,6 +10,7 @@ import Foundation
 import FirebaseFirestore
 import FirebaseStorage
 import FirebaseAuth
+import CoreLocation
 
 protocol FirestoreManagerDelegate: class {
     func documentsDidUpdate()
@@ -27,92 +28,50 @@ class FirestoreManager {
         storage = Storage()
     }
 
-    func downloadImagesIntoCache() {
-        db.collection("funFacts").getDocuments { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
+    func uploadImageIntoCache(imageName: String) {
+        let imageName = "\(imageName).jpeg"
+        var image = UIImage()
+        let storage = Storage.storage()
+        let gsReference = storage.reference(forURL: "gs://funfacts-5b1a9.appspot.com/images/\(imageName)")
+        gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
+            if let error = error {
+                print("error = \(error)")
             } else {
-                for document in querySnapshot!.documents {
-                    let imageName = "\(document.data()["imageName"] ?? "").jpeg"
-                    var image = UIImage()
-                    let storage = Storage.storage()
-                    let gsReference = storage.reference(forURL: "gs://funfacts-5b1a9.appspot.com/images/\(imageName)")
-                    gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
-                        if let error = error {
-                            print("error = \(error)")
-                        } else {
-                            image = UIImage(data: data!)!
-                            CacheManager.shared.cache(object: image, key: imageName)
-                        }
-                    }
-                }
+                image = UIImage(data: data!)!
+                CacheManager.shared.cache(object: image, key: imageName)
             }
         }
     }
+
     
     /// Downloads fun fact data from firestore for a fuc fact reference
     func downloadFunFacts(for ref: DocumentReference, completionHandler: @escaping (FunFact) -> ())  {
-        var funFact = FunFact(landmarkId: "",
-                              id: "",
-                              description: "",
-                              likes: 0,
-                              dislikes: 0,
-                              verificationFlag: "",
-                              image: "",
-                              imageCaption: "",
-                              disputeFlag: "",
-                              submittedBy: "",
-                              dateSubmitted: Timestamp(),
-                              source: "",
-                              tags: [],
-                              approvalCount: 0,
-                              rejectionCount: 0,
-                              approvalUsers: [],
-                              rejectionUsers: [],
-                              rejectionReason: [])
         ref.getDocument { (snapshot, error) in
             if let document = snapshot, document.exists {
-                funFact = FunFact(landmarkId: document.data()?["landmarkId"] as! String,
-                                  id: document.data()?["id"] as! String,
-                                  description: document.data()?["description"] as! String,
-                                  likes: document.data()?["likes"] as! Int,
-                                  dislikes: document.data()?["dislikes"] as! Int,
-                                  verificationFlag: document.data()?["verificationFlag"] as? String ?? "",
-                                  image: document.data()?["imageName"] as! String,
-                                  imageCaption: document.data()?["imageCaption"] as? String ?? "",
-                                  disputeFlag: document.data()?["disputeFlag"] as! String,
-                                  submittedBy: document.data()?["submittedBy"] as! String,
-                                  dateSubmitted: document.data()?["dateSubmitted"] as! Timestamp,
-                                  source: document.data()?["source"] as! String,
-                                  tags: document.data()?["tags"] as! [String],
-                                  approvalCount: document.data()?["approvalCount"] as! Int,
-                                  rejectionCount: document.data()?["rejectionCount"] as! Int,
-                                  approvalUsers: document.data()?["approvalUsers"] as! [String],
-                                  rejectionUsers: document.data()?["rejectionUsers"] as! [String],
-                                  rejectionReason: document.data()?["rejectionReason"] as! [String])
+                let funFact = FunFact(landmarkId: document.data()?["landmarkId"] as! String,
+                                      landmarkName: document.data()?["landmarkName"] as! String,
+                                      id: document.data()?["id"] as! String,
+                                      description: document.data()?["description"] as! String,
+                                      likes: document.data()?["likes"] as! Int,
+                                      dislikes: document.data()?["dislikes"] as! Int,
+                                      verificationFlag: document.data()?["verificationFlag"] as? String ?? "",
+                                      image: document.data()?["imageName"] as! String,
+                                      imageCaption: document.data()?["imageCaption"] as? String ?? "",
+                                      disputeFlag: document.data()?["disputeFlag"] as! String,
+                                      submittedBy: document.data()?["submittedBy"] as! String,
+                                      dateSubmitted: document.data()?["dateSubmitted"] as! Timestamp,
+                                      source: document.data()?["source"] as! String,
+                                      tags: document.data()?["tags"] as! [String],
+                                      approvalCount: document.data()?["approvalCount"] as! Int,
+                                      rejectionCount: document.data()?["rejectionCount"] as! Int,
+                                      approvalUsers: document.data()?["approvalUsers"] as! [String],
+                                      rejectionUsers: document.data()?["rejectionUsers"] as! [String],
+                                      rejectionReason: document.data()?["rejectionReason"] as! [String])
                 completionHandler(funFact)
-//                self.delegate?.documentsDidUpdate()
             } else {
                 print("Document \(ref.documentID) does not exist")
             }
         }
-    }
-    
-    /// Creates a dictionary of landmark ID and landmark name
-    func populateLandmarkDict(completionHandler: @escaping ([String:String]) -> ()) {
-        var landmarkDict = [String:String]()
-        db.collection("landmarks").getDocuments(completion: { (snapshot, error) in
-            if let error = error {
-                print ("Error \(error)")
-            }
-            else {
-                for document in snapshot!.documents {
-                    landmarkDict[document.data()["id"] as! String] = document.data()["name"] as? String
-                }
-                completionHandler(landmarkDict)
-                self.delegate?.documentsDidUpdate()
-            }
-        })
     }
     
     /// Downloads hashtag and count into a dictionary
@@ -190,10 +149,10 @@ class FirestoreManager {
         }
     }
     /// Upload image to Firebase storage
-    func uploadImage(imageName: String, image: UIImage) {
+    func uploadImage(imageName: String, image: UIImage, type: String, completion: @escaping (URL?, String?) -> ()) {
         var data = Data()
         // Create a storage reference from our storage service
-        let storageRef = storage.reference()
+        let storageRef = Storage.storage().reference()
         // Data in memory
         
         do {
@@ -206,29 +165,38 @@ class FirestoreManager {
         }
         
         // Create a reference to the file you want to upload
-        let landmarkRef = storageRef.child("images/\(imageName)")
-        
-        // Upload the file to the path "images/rivers.jpg"
-        landmarkRef.putData(data, metadata: nil) { (metadata, error) in
-            guard let metadata = metadata
-                else {
-                    // Uh-oh, an error occurred!
-                    return
-            }
-            // Metadata contains file metadata such as size, content-type.
-            metadata.contentType = "image/jpeg"
-            metadata.cacheControl = "public,max-age=300"
-            landmarkRef.putData(data, metadata: metadata)
-            // You can also access to download URL after upload.
-            landmarkRef.downloadURL { (url, error) in
-                guard url != nil else {
-                    // Uh-oh, an error occurred!
-                    let error = error
-                    print ("Error: \(String(describing: error))")
-                    return
-                }
-            }
+        var basePath = ""
+        switch type {
+        case ImageType.profile:
+            basePath = ImageType.profile
+        case ImageType.funFact:
+            basePath = ImageType.funFact
+        default:
+            basePath = ImageType.funFact
         }
+        let landmarkRef = storageRef.child("\(basePath)/\(imageName)")
+        let metadata = StorageMetadata()
+        // Metadata contains file metadata such as size, content-type.
+        metadata.contentType = "image/jpeg"
+        metadata.cacheControl = "public,max-age=300"
+        landmarkRef.putData(data,
+                            metadata: metadata,
+                            completion: { (_, error) in
+                                if let error = error {
+                                    completion(nil, error.localizedDescription)
+                                } else {
+                                    landmarkRef.downloadURL { (url, error) in
+                                        if let error = error {
+                                            completion(nil, error.localizedDescription)
+                                        } else {
+                                            let url = url
+                                            completion(url, nil)
+                                        }
+                                    }
+                                }
+        })
+        
+        
     }
     /// Goes through entire list of /landmarks and checks if landmark added already exists in the database. If it exists, fun fact is added to existing landmark
     func checkIfLandmarkExists(address: String, completionHandler: @escaping (String, Int, Int, Int) -> Void) {
@@ -477,8 +445,7 @@ class FirestoreManager {
         if uid == "" {
             return
         }
-        let db = Firestore.firestore()
-        var user = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+        var user = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "",city: "", country: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
         db.collection("users").document(uid).getDocument { (snapshot, error) in
             if let document = snapshot {
                 user.dislikeCount = document.data()?["dislikeCount"] as! Int
@@ -492,6 +459,8 @@ class FirestoreManager {
                 user.provider = document.data()?["provider"] as! String
                 user.uid = document.data()?["uid"] as! String
                 user.userName = document.data()?["userName"] as! String
+                user.city = document.data()?["city"] as! String
+                user.country = document.data()?["country"] as! String
                 user.verifiedCount = document.data()?["verifiedCount"] as! Int
                 user.rejectedCount = document.data()?["rejectedCount"] as! Int
                 
@@ -547,7 +516,7 @@ class FirestoreManager {
         }
     }
     /// Adds Dispute details to /disputes
-    func addDispute(for disputeID: String, funFactID: String, reason: String, description: String, user: String, date: Timestamp, completion: @escaping (String) -> ()) {
+    func addDispute(for disputeID: String, funFactID: String, reason: String, description: String, user: String, date: Timestamp, completion: @escaping (String?) -> ()) {
         db.collection("disputes").document(disputeID).setData([
             "disputeID": disputeID,
             "funFactID": funFactID,
@@ -557,11 +526,9 @@ class FirestoreManager {
             "dateSubmitted": date
         ]){ err in
             if let err = err {
-                print("Error writing document: \(err)")
-                completion("fail")
+                completion(err.localizedDescription)
             } else {
-                print("Document successfully written!")
-                completion("success")
+                completion(nil)
             }
         }
     }
@@ -623,6 +590,7 @@ class FirestoreManager {
     func addFunFact(funFact: FunFact, completion: @escaping (String?) -> ()) {
         db.collection("funFacts").document(funFact.id).setData([
             "landmarkId": funFact.landmarkId,
+            "landmarkName": funFact.landmarkName,
             "id": funFact.id,
             "description": funFact.description,
             "likes": funFact.likes,
@@ -691,6 +659,7 @@ class FirestoreManager {
                     var pageContent = Array<Any>()
                     for document in querySnapshot!.documents {
                         let funFact = FunFact(landmarkId: document.data()["landmarkId"] as! String,
+                                              landmarkName: document.data()["landmarkName"] as! String,
                                               id: document.data()["id"] as! String,
                                               description: document.data()["description"] as! String,
                                               likes: document.data()["likes"] as! Int,
@@ -713,6 +682,134 @@ class FirestoreManager {
                     }
                     completion(funFacts, pageContent, nil)
                 }
+        }
+    }
+    
+    /// Updates user profile from Edit profile page
+    func updateUserProfile(fullName: String, userName: String, city: String, country: String, photoURL: String, completion: @escaping (String?) -> ()) {
+        db.collection("users")
+            .document(Auth.auth().currentUser?.uid ?? "")
+            .setData(["name": fullName,
+                      "userName": userName,
+                      "city": city,
+                      "country": country,
+                      "photoURL": photoURL],
+                     merge: true) { (error) in
+                        if let error = error {
+                            print ("Error while updating user profile \(error.localizedDescription)")
+                        } else {
+                            let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
+                            changeRequest?.displayName = fullName
+                            changeRequest?.photoURL = URL(fileURLWithPath: photoURL)
+                            changeRequest?.commitChanges(completion: { (error) in
+                                if let error = error {
+                                    completion(error.localizedDescription)
+                                } else {
+                                    completion(nil)
+                                }
+                            })
+                        }
+        }
+    }
+    
+    /// Gets all the fun facts tagged by the hashtag
+    func getFunFacts(for hashtag: String, completion: @escaping ([DocumentReference]?, String?) -> ()) {
+        db.collection("hashtags").document(hashtag).collection("funFacts").getDocuments { (snapshot, error) in
+            if let error = error {
+                completion(nil, error.localizedDescription)
+            } else {
+                var refs = [DocumentReference]()
+                for document in snapshot!.documents {
+                    refs.append(document.data()["funFactID"] as! DocumentReference)
+                }
+                completion(refs, nil)
+            }
+        }
+    }
+    
+    /// Retrieve all landmarks within the coordinates sorted by likes desc
+    func getLandmarksInMapArea(neCoordinate: CLLocationCoordinate2D, swCoordinate: CLLocationCoordinate2D, completion: @escaping (Landmark?, String?) -> ()) {
+        let neCoord = CLLocation(latitude: neCoordinate.latitude, longitude: neCoordinate.longitude)
+        let swCoord = CLLocation(latitude: swCoordinate.latitude, longitude: swCoordinate.longitude)
+        if neCoord.distance(from: swCoord) > 200000 {
+            completion(nil, FirestoreErrors.mapTooLarge)
+            return
+        }
+        
+        let neGeoPoint = GeoPoint(latitude: neCoordinate.latitude, longitude: neCoordinate.longitude)
+        let swGeoPoint = GeoPoint(latitude: swCoordinate.latitude, longitude: swCoordinate.longitude)
+        db.collection("landmarks")
+            .whereField("coordinates", isGreaterThan: swGeoPoint)
+            .whereField("coordinates", isLessThan: neGeoPoint)
+            .order(by: "coordinates", descending: false)
+            .order(by: "likes", descending: true)
+            .limit(to: 30)
+            .getDocuments { (snapshot, error) in
+                if let error = error {
+                    print ("error = \(error.localizedDescription)")
+                    completion(nil, error.localizedDescription)
+                } else {
+                    print ("In else")
+                    for document in (snapshot?.documents)! {
+                        print (document.data()["name"] as! String)
+                        for id in AppDataSingleton.appDataSharedInstance.listOfLandmarkIDs {
+                            print ("Inside for")
+                            if document.documentID == id {
+                                print ("in for if")
+                                completion(nil, FirestoreErrors.annotationExists)
+                                return
+                            }
+                        }
+                        let landmark = Landmark(id: document.data()["id"] as! String,
+                                                name: document.data()["name"] as! String,
+                                                address: document.data()["address"] as! String,
+                                                city: document.data()["city"] as! String,
+                                                state: document.data()["state"] as! String,
+                                                zipcode: document.data()["zipcode"] as! String,
+                                                country: document.data()["country"] as! String,
+                                                type: document.data()["type"] as! String,
+                                                coordinates: document.data()["coordinates"] as! GeoPoint,
+                                                image: document.data()["image"] as! String,
+                                                numOfFunFacts: document.data()["numOfFunFacts"] as! Int,
+                                                likes: document.data()["likes"] as! Int,
+                                                dislikes: document.data()["dislikes"] as! Int)
+                        print (landmark.name)
+                        completion(landmark, nil)
+                    }
+                }
+        }
+    }
+    
+    /// Get landmarks based on Landmark IDs
+    func getLandmarks(landmarkIds: [String], completion: @escaping ([Landmark]?, String?) -> ()) {
+        var landmarks = [Landmark]()
+        for landmarkID in landmarkIds {
+            db.collection("landmarks")
+                .document(landmarkID)
+                .getDocument { (snapshot, error) in
+                if let error = error {
+                    completion(nil, error.localizedDescription)
+                } else {
+                    let document = snapshot!
+                    let landmark = Landmark(id: document.data()?["id"] as! String,
+                                            name: document.data()?["name"] as! String,
+                                            address: document.data()?["address"] as! String,
+                                            city: document.data()?["city"] as! String,
+                                            state: document.data()?["state"] as! String,
+                                            zipcode: document.data()?["zipcode"] as! String,
+                                            country: document.data()?["country"] as! String,
+                                            type: document.data()?["type"] as! String,
+                                            coordinates: document.data()?["coordinates"] as! GeoPoint,
+                                            image: document.data()?["image"] as! String,
+                                            numOfFunFacts: document.data()?["numOfFunFacts"] as! Int,
+                                            likes: document.data()?["likes"] as! Int,
+                                            dislikes: document.data()?["dislikes"] as! Int)
+                    landmarks.append(landmark)
+                    if landmarkIds.count == landmarks.count {
+                        completion(landmarks, nil)
+                    }
+                }
+            }
         }
     }
 }

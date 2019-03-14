@@ -11,8 +11,9 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseAuth
 
-class ContentViewController: UIViewController, FirestoreManagerDelegate {
-    @IBOutlet var textLabel: UILabel!
+class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextViewDelegate {
+    
+    @IBOutlet weak var funFactDescriptionTextView: UITextView!
     @IBOutlet var landmarkImage: UIImageView!
     @IBOutlet var submittedBy: UILabel!
     @IBOutlet var likeHeart: UIButton!
@@ -23,12 +24,12 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
     @IBOutlet weak var dislikeCount: UILabel!
     @IBOutlet weak var pageNumber: UILabel!
     @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var imageCaptionLabel: UILabel!
     
     let util = Utils()
     var dataObject: AnyObject?
     var imageObject: AnyObject?
     var imageCaption = ""
-    var landmarkType = ""
     var landmarkID = ""
     var submittedByObject: AnyObject?
     var sourceObject: AnyObject?
@@ -54,6 +55,15 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
     var firestore = FirestoreManager()
     
     @IBAction func likeIt(_ sender: Any) {
+        if Auth.auth().currentUser == nil {
+            let alert = UIAlertController(title: "Error",
+                                          message: "Please sign in to like/dislike a fact.",
+                                          preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
         if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray)
             &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: Colors.redColor) {
             likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
@@ -82,6 +92,15 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     @IBAction func dislikeIt(_ sender: Any) {
+        if Auth.auth().currentUser == nil {
+            let alert = UIAlertController(title: "Error",
+                                          message: "Please sign in to like/dislike a fact.",
+                                          preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+            return
+        }
         if Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray)
             &&  Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Colors.seagreenColor) {
             likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
@@ -110,8 +129,17 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        sourceURL.isScrollEnabled = false
+        funFactDescriptionTextView.delegate = self
         if verifiedFlag == "N" {
             setupVerificationPage()
+        }
+        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
+            if #available(iOS 11.0, *) {
+                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
+            } else {
+                // Fallback on earlier versions
+            }
         }
         if (self.navigationController?.presentingViewController as? FunFactPageViewController) != nil {
             let addFactGesture = UITapGestureRecognizer(target: self, action: #selector(viewAddFactForLandmark))
@@ -128,12 +156,12 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if Auth.auth().currentUser == nil || verifiedFlag == "N" {
-            likeHeart.isEnabled = false
-            dislikeHeart.isEnabled = false
-        } else {
-            likeHeart.isEnabled = true
-            dislikeHeart.isEnabled = true
+        if verifiedFlag == "N" {
+            likeHeart.isHidden = true
+            dislikeHeart.isHidden = true
+            likeCount.isHidden = true
+            dislikeCount.isHidden = true
+            dispute.isHidden = true
         }
         
         scrollView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: self.view.frame.height)
@@ -144,6 +172,8 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
         imageGesture.numberOfTapsRequired = 1
         landmarkImage.isUserInteractionEnabled = true
         landmarkImage.addGestureRecognizer(imageGesture)
+        
+        imageCaptionLabel.text = imageCaption
         
         firestore.downloadUserProfile(submittedByObject as! String) { (userProfile) in
             let submittedBy1 = "Submitted By: "
@@ -175,7 +205,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
         let source1 = "Source: "
         let sourceAtt1 = NSMutableAttributedString(string: source1)
         sourceAtt1.addAttributes(Attributes.attribute12BoldDG, range: (source1 as NSString).range(of: source1))
-        let source2 = sourceObject as! String // swiftlint:disable:this force_cast
+        let source2 = sourceObject as! String
         var substring = ""
         if source2.count > 40 {
             let index = source2.index(source2.startIndex, offsetBy: 40)
@@ -189,30 +219,57 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
         let attributedString = NSMutableAttributedString()
         attributedString.append(sourceAtt1)
         attributedString.append(sourceAtt2)
+        
+        // Fun Fact description Text View
+        funFactDescriptionTextView.layer.borderWidth = 0
+        funFactDescriptionTextView.layer.borderColor = UIColor.black.cgColor
+        funFactDescriptionTextView.isEditable = false
+        funFactDescriptionTextView.isScrollEnabled = false
+        
         let funFactDescAttr = NSMutableAttributedString(string: funFactDesc)
-        let searchPattern = "#\\w+"
-        var ranges: [NSRange] = [NSRange]()
-        let regex = try! NSRegularExpression(pattern: searchPattern, options: [])
-        ranges = regex.matches(in: funFactDescAttr.string,
+        
+        let regularSearchPattern = "\\w+"
+        var regularRanges: [NSRange] = [NSRange]()
+        let regularRegex = try! NSRegularExpression(pattern: regularSearchPattern, options: [])
+        regularRanges = regularRegex.matches(in: funFactDescAttr.string,
+                                             options: [],
+                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
+        
+        for range in regularRanges {
+            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlack,
+                                          range: NSRange(location: range.location,
+                                                         length: range.length))
+        }
+        
+        let hashtagSearchPattern = "#\\w+"
+        var hashtagRanges: [NSRange] = [NSRange]()
+        let hashtagRegex = try! NSRegularExpression(pattern: hashtagSearchPattern, options: [])
+        hashtagRanges = hashtagRegex.matches(in: funFactDescAttr.string,
                                options: [],
                                range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
-        for range in ranges {
-            funFactDescAttr.addAttributes(Attributes.attribute14DemiBlue,
+        
+        for range in hashtagRanges {
+            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlue,
                                           range: NSRange(location: range.location,
                                                          length: range.length))
         }
         let attributedFunFactDesc = NSMutableAttributedString()
         attributedFunFactDesc.append(funFactDescAttr)
         
-        textLabel.attributedText = attributedFunFactDesc
+        funFactDescriptionTextView.attributedText = attributedFunFactDesc
+        let hashtagGesture = UITapGestureRecognizer(target: self, action: #selector(hashtagTapAction))
+        hashtagGesture.numberOfTapsRequired = 1
+        funFactDescriptionTextView.addGestureRecognizer(hashtagGesture)
+        funFactDescriptionTextView.isUserInteractionEnabled = true
+        
         setupImage()
         sourceURL.attributedText = attributedString
         likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
         likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-        likeCount.text = "\(likesObject as! Int)" + " likes" // swiftlint:disable:this force_cast
+        likeCount.text = "\(likesObject as! Int)" + " likes"
         dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
         dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-        dislikeCount.text = "\(dislikesObject as! Int)" + " dislikes" // swiftlint:disable:this force_cast
+        dislikeCount.text = "\(dislikesObject as! Int)" + " dislikes"
         sourceURL.isEditable = false
         sourceURL.dataDetectorTypes = .link
         sourceURL.textContainerInset = UIEdgeInsets.zero
@@ -311,10 +368,13 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
         
         let rejectButton = CustomButton()
         rejectButton.frame = CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50)
-        rejectButton.layer.backgroundColor = Colors.redColor.cgColor
-        let rejectButtonText = NSAttributedString(string: "Reject", attributes: Attributes.loginButtonAttribute)
+        rejectButton.layer.backgroundColor = UIColor.white.cgColor
+        rejectButton.layer.borderColor = Colors.seagreenColor.cgColor
+        rejectButton.layer.borderWidth = 1.0
+        rejectButton.tintColor = Colors.seagreenColor
+        let rejectButtonText = NSAttributedString(string: "Reject", attributes: Attributes.cancelButtonAttribute)
         rejectButton.setAttributedTitle(rejectButtonText, for: .normal)
-        let rejectButtonClickedText = NSAttributedString(string: "Reject", attributes: Attributes.loginButtonClickedAttribute)
+        let rejectButtonClickedText = NSAttributedString(string: "Reject", attributes: Attributes.cancelButtonClickedAttribute)
         rejectButton.setAttributedTitle(rejectButtonClickedText, for: .highlighted)
         rejectButton.setAttributedTitle(rejectButtonClickedText, for: .selected)
         rejectButton.addTarget(self, action: #selector(rejectAction), for: .touchUpInside)
@@ -359,6 +419,22 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
     }
     /// Verify Action - Updates the approval count and user
     @objc func approveAction(_ sender: UIButton) {
+        if Auth.auth().currentUser == nil {
+            let alert = UIAlertController(title: "Error",
+                                          message: "Please sign in to verify a fact.",
+                                          preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+        }
+        if submittedByObject as? String == Auth.auth().currentUser?.uid {
+            let alert = UIAlertController(title: "Error",
+                                          message: "You cannot verify this fact since you are the author. Please wait for others to verify this fact.",
+                                          preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+        }
         for user in self.approvalUsers {
             if Auth.auth().currentUser?.uid == user {
                 let alert = UIAlertController(title: "Error",
@@ -400,6 +476,22 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
     }
     /// Reject Action - Updates the rejection count and user
     @objc func rejectAction(_ sender: UIButton) {
+        if Auth.auth().currentUser == nil {
+            let alert = UIAlertController(title: "Error",
+                                          message: "Please sign in to reject a fact.",
+                                          preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+        }
+        if submittedByObject as? String == Auth.auth().currentUser?.uid {
+            let alert = UIAlertController(title: "Error",
+                                          message: "You cannot reject this fact since you are the author. Please wait for others to verify this fact.",
+                                          preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+        }
         for user in self.rejectionUsers {
             if Auth.auth().currentUser?.uid == user {
                 let alert = UIAlertController(title: "Error",
@@ -435,14 +527,55 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
         popup.dismiss(animated: true)
     }
     @objc func disputeTapAction(sender : UITapGestureRecognizer) {
+        if Auth.auth().currentUser == nil {
+            let alert = UIAlertController(title: "Error",
+                                          message: "Please sign in to dispute a fact.",
+                                          preferredStyle: .alert)
+            let okAction = UIAlertAction(title: "Dismiss", style: .cancel, handler: nil)
+            alert.addAction(okAction)
+            self.present(alert, animated: true, completion: nil)
+        }
         let text = (dispute.text)!
         let clickRange = (text as NSString).range(of: "Here")
         
         if sender.didTapAttributedTextInLabel(label: dispute, inRange: clickRange) {
-            dispute.halfTextColorChange(fullText: dispute.text!, changeText: "Here")
+            changeDisputeColor()
             performSegue(withIdentifier: "disputeViewDetail", sender: nil)
         }
     }
+    @objc func hashtagTapAction(sender : UITapGestureRecognizer) {
+        let location = sender.location(in: funFactDescriptionTextView)
+        let position = CGPoint(x: location.x, y: location.y)
+        let tapPosition = funFactDescriptionTextView.closestPosition(to: position)
+        if tapPosition != nil {
+            let textRange = funFactDescriptionTextView
+                .tokenizer
+                .rangeEnclosingPosition(tapPosition!,
+                                        with: UITextGranularity.word,
+                                        inDirection: UITextDirection(rawValue: 1))
+            if textRange != nil {
+                let tappedWord = funFactDescriptionTextView.text(in: textRange!)
+                funFactDescriptionTextView.halfTextColorChange(fullText: funFactDescriptionTextView.text, changeText: tappedWord!)
+                for tag in tags {
+                    if tappedWord == tag {
+                        firestore.getFunFacts(for: tappedWord!) { (refs, error) in
+                            if let error = error {
+                                print ("Error getting hashtag funfacts \(error)")
+                            } else {
+                                let funFactsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
+                                funFactsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
+                                funFactsVC.refs = refs
+                                funFactsVC.sender = .hashtags
+                                funFactsVC.hashtagName = "#\(tappedWord!)"
+                                self.navigationController?.pushViewController(funFactsVC, animated: true)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     @objc func viewAddFactForLandmark(sender : UITapGestureRecognizer) {
         let addFactVC = AddNewFactViewController()
         if !(self.navigationController!.viewControllers.contains(addFactVC)){
@@ -491,6 +624,24 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate {
     func deleteFunFact() {
         
     }
+    
+    func changeDisputeColor() {
+        let dispute1 = "See something wrong? Dispute this fact "
+        let disAttrString1 = NSAttributedString(string: dispute1, attributes: Attributes.attribute12RegDG)
+        
+        let disputeArrow = String.fontAwesomeIcon(name: .arrowRight)
+        let disputeArrowString = NSAttributedString(string: disputeArrow, attributes: Attributes.smallImageAttribute)
+        
+        let dispute2 = " Here"
+        let disAttrString2 = NSAttributedString(string: dispute2, attributes: Attributes.attribute12Gray)
+        
+        let completeDispute = NSMutableAttributedString()
+        completeDispute.append(disAttrString1)
+        completeDispute.append(disputeArrowString)
+        completeDispute.append(disAttrString2)
+        
+        dispute.attributedText = completeDispute
+    }
 }
 extension UITapGestureRecognizer {
     
@@ -524,15 +675,52 @@ extension UITapGestureRecognizer {
     }
     
 }
-extension UILabel {
+extension UITextView {
     func halfTextColorChange (fullText : String , changeText : String ) {
-        let strNumber: NSString = fullText as NSString
-        let range = (strNumber).range(of: changeText)
         
-        let attribute = NSMutableAttributedString.init(string: fullText)
-        attribute.addAttribute(NSAttributedString.Key.backgroundColor, value: UIColor.lightGray , range: range)
-        attribute.addAttribute(NSAttributedString.Key.foregroundColor, value: Colors.blueColor , range: range)
-        attribute.addAttribute(NSAttributedString.Key.font, value: UIFont(name: "Avenir Next", size: 12.0)! , range: range)
-        self.attributedText = attribute
+        let funFactDescAttr = NSMutableAttributedString(string: fullText)
+        
+        let regularSearchPattern = "\\w+"
+        var regularRanges: [NSRange] = [NSRange]()
+        let regularRegex = try! NSRegularExpression(pattern: regularSearchPattern, options: [])
+        regularRanges = regularRegex.matches(in: funFactDescAttr.string,
+                                             options: [],
+                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
+        
+        for range in regularRanges {
+            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlack,
+                                          range: NSRange(location: range.location,
+                                                         length: range.length))
+        }
+        
+        let hashtagSearchPattern = "#\\w+"
+        var hashtagRanges: [NSRange] = [NSRange]()
+        let hashtagRegex = try! NSRegularExpression(pattern: hashtagSearchPattern, options: [])
+        hashtagRanges = hashtagRegex.matches(in: funFactDescAttr.string,
+                                             options: [],
+                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
+        
+        for range in hashtagRanges {
+            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlue,
+                                          range: NSRange(location: range.location,
+                                                         length: range.length))
+        }
+        
+        let tappedSearchPattern = "#\\b\(changeText)\\b"
+        var tappedRange = [NSRange]()
+        let tappedRegex = try! NSRegularExpression(pattern: tappedSearchPattern, options: [])
+        tappedRange = tappedRegex.matches(in: funFactDescAttr.string,
+                                             options: [],
+                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
+        
+        for range in tappedRange {
+            funFactDescAttr.addAttributes(Attributes.attribute16Gray,
+                                          range: NSRange(location: range.location,
+                                                         length: range.length))
+        }
+        let attributedFunFactDesc = NSMutableAttributedString()
+        attributedFunFactDesc.append(funFactDescAttr)
+        
+        self.attributedText = attributedFunFactDesc
     }
 }

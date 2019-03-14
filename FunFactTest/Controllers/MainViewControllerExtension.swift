@@ -16,20 +16,30 @@ import MapKit
 
 var mapChangedFromUserInteraction = false
 let algoliaManager = AlgoliaSearchManager()
+let geofirestoreManager = GeoFirestoreManager()
 
-extension MainViewController: CLLocationManagerDelegate, AlgoliaSearchManagerDelegate {
+extension MainViewController: CLLocationManagerDelegate, AlgoliaSearchManagerDelegate, GeoFirestoreManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        guard let location = manager.location else{
-            return
+//        guard let location = manager.location else{
+//            return
+//        }
+//        let currentLocationCoordinate = location.coordinate
+//        self.currentLocationCoordinate = currentLocationCoordinate
+        if let location = locations.last {
+            let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
+            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+            self.mapView.setRegion(region, animated: true)
+            let currentLocationCoordinate = location.coordinate
+            self.currentLocationCoordinate = currentLocationCoordinate
+            // 4. setup Firestore data
+            loadDataFromFirestoreAndAddAnnotations()
         }
-        let currentLocationCoordinate = location.coordinate
-        self.currentLocationCoordinate = currentLocationCoordinate
     }
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        downloadLandmarks(caller: "event")
+        downloadLandmarks(caller: .mapEvent)
     }
 
     func mapViewRegionDidChangeFromUserInteraction() -> Bool {
@@ -65,82 +75,75 @@ extension UNNotificationAttachment {
 
 extension MainViewController {
     
-    func downloadLandmarks(caller: String) {
-        if (mapViewRegionDidChangeFromUserInteraction() || caller == "viewDidLoad") {
-            let spinner = showLoader(view: self.mapView)
-            
+    func downloadLandmarks(caller: FirestoreGeoConstants) {
+        if (mapViewRegionDidChangeFromUserInteraction() || caller == .firstLoad) {
+            // GeoFirestore Code
             let mapRect = self.mapView.visibleMapRect
-            let nwMapPoint = MKMapPoint(x: mapRect.origin.x, y: mapRect.maxY)
-            let seMapPoint = MKMapPoint(x: mapRect.maxX, y: mapRect.origin.y)
+            var center = CLLocation()
             
-            let query = Query()
-            let boundingBox = GeoRect(p1: LatLng(lat: nwMapPoint.coordinate.latitude,
-                                                 lng: nwMapPoint.coordinate.longitude),
-                                      p2: LatLng(lat: seMapPoint.coordinate.latitude,
-                                                 lng: seMapPoint.coordinate.longitude))
-            if caller == "viewDidLoad" {
-                query.aroundLatLng = LatLng(lat: self.mapView.userLocation.coordinate.latitude,
-                                            lng: self.mapView.userLocation.coordinate.longitude)
-                query.aroundRadius = .all
-            } else {
-                query.insideBoundingBox = [boundingBox]
+            var region = MKCoordinateRegion(mapRect)
+            if caller == .firstLoad {
+                center = CLLocation(latitude: currentLocationCoordinate.latitude,
+                                    longitude: currentLocationCoordinate.longitude)
+                region = MKCoordinateRegion(center: center.coordinate,
+                                            latitudinalMeters: 500,
+                                            longitudinalMeters: 500)
             }
             
-            var filters = ""
-            if caller != "viewDidLoad" {
-                for annotation in mapView.annotations {
-                    if annotation is MKUserLocation {
-                        print ("MKUserLocation")
-                    } else {
-                        let a = annotation as! FunFactAnnotation
-                        filters = filters + " NOT objectID:" + a.landmarkID + " AND "
+            geofirestoreManager.getLandmarks(in: region) { (landmarks, error) in
+                if let error = error {
+                    if error == FirestoreErrors.annotationExists {
+                    } else{
+                        print ("Error getting data from GeoFirestore \(error)")
                     }
                 }
-                if filters.count > 2 {
-                    query.filters = "(" + filters.dropLast(4) + ")"
-                }
-            }
-            
-            algoliaManager.downloadLandmarks(query: query) { (landmark, error) in
-                if let error = error {
-                    print ("Error getting data from Algolia \(error)")
-                }
                 else {
-                    let landmark = landmark!
-                    self.setupGeoFences(lat: landmark.coordinates.latitude,
-                                        lon: landmark.coordinates.longitude,
-                                        title: landmark.name,
-                                        landmarkID: landmark.id)
-                    
-                    // Add anotations
-                    var annotation: FunFactAnnotation
-                    annotation = FunFactAnnotation(
-                        landmarkID: landmark.id,
-                        title: landmark.name,
-                        address: "\(landmark.address), \(landmark.city), \(landmark.state), \(landmark.country)",
-                        type: landmark.type,
-                        coordinate: CLLocationCoordinate2D(latitude: landmark.coordinates.latitude,
-                                                           longitude: landmark.coordinates.longitude))
-                    self.mapView.addAnnotation(annotation)
-                    spinner.dismissLoader()
+                    if landmarks!.count > 20 {
+                        print(FirestoreErrors.mapTooLarge)
+                    } else {
+                        let spinner = self.showLoader(view: self.mapView)
+                        for landmark in landmarks! {
+                            self.setupGeoFences(lat: landmark.coordinates.latitude,
+                                                lon: landmark.coordinates.longitude,
+                                                title: landmark.name,
+                                                landmarkID: landmark.id)
+                            
+                            // Add anotations
+                            var annotation: FunFactAnnotation
+                            annotation = FunFactAnnotation(
+                                landmarkID: landmark.id,
+                                title: landmark.name,
+                                address: "\(landmark.address), \(landmark.city), \(landmark.state), \(landmark.country)",
+                                type: landmark.type,
+                                coordinate: CLLocationCoordinate2D(latitude: landmark.coordinates.latitude,
+                                                                   longitude: landmark.coordinates.longitude))
+                            self.mapView.addAnnotation(annotation)
+                            AppDataSingleton.appDataSharedInstance.listOfLandmarkIDs.append(landmark.id)
+                        }
+                        spinner.dismissLoader()
+                    }
                 }
             }
         }
     }
     
-    func downloadFunFactsAndSegue(for landmarkID: String, db: Firestore) {
+    func downloadFunFactsAndSegue(for landmarkID: String) {
         let spinner = showLoader(view: self.mapView)
         firestore.downloadFunFacts(for: landmarkID) { (funFacts, pageContent, error) in
             if let error = error {
                 print("Error downloading Fun Facts \(error)")
             } else {
                 let funFacts = funFacts!
+                for funFact in funFacts {
+                    if !CacheManager.shared.checkIfImageExists(imageName: "\(funFact.image).jpeg") {
+                        self.firestore.uploadImageIntoCache(imageName: funFact.image)
+                    }
+                }
                 let destinationVC = self.storyboard?.instantiateViewController(withIdentifier: "funFactPage") as! FunFactPageViewController
                 destinationVC.pageContent = pageContent! as NSArray
                 destinationVC.funFacts = funFacts
                 destinationVC.headingContent = self.landmarkTitle
                 destinationVC.landmarkID = landmarkID
-                destinationVC.landmarkType = self.landmarkType
                 destinationVC.address = self.currentAnnotation?.address ?? ""
                 
                 self.navigationController?.pushViewController(destinationVC, animated: true)

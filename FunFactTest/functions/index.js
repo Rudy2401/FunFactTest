@@ -58,6 +58,43 @@ exports.indexLandmark = functions.firestore.document('/landmarks/{landmarkID}').
         zipcode
     });
 });
+exports.indexLandmarkUpdate = functions.firestore.document('/landmarks/{landmarkID}').onUpdate((change, context) => {
+
+    var _geoloc = {
+        lat: change.after.data().coordinates.latitude,
+        lng: change.after.data().coordinates.longitude
+    };
+
+    const name = change.after.data().name;
+    const address = change.after.data().address;
+    const city = change.after.data().city;
+    const state = change.after.data().state;
+    const country = change.after.data().country;
+    const type = change.after.data().type;
+    const zipcode = change.after.data().zipcode;
+    const image = change.after.data().image;
+    const numOfFunFacts = change.after.data().numOfFunFacts;
+    const likes = change.after.data().likes;
+    const dislikes = change.after.data().dislikes;
+    const objectID = change.after.id;
+
+    // Add data to algolia index
+    return landmarkIndex.addObject({
+        objectID,
+        name,
+        address,
+        _geoloc,
+        city,
+        state,
+        country,
+        type,
+        image,
+        numOfFunFacts,
+        likes,
+        dislikes,
+        zipcode
+    });
+});
 exports.unindexLandmark = functions.firestore.document('/landmarks/{landmarkID}').onDelete((snap, context) => {
     const objectID = snap.id;
 
@@ -86,6 +123,27 @@ exports.indexHashtag = functions.firestore.document('/hashtags/{hashtagID}').onC
         console.log(error);
     });
 });
+exports.indexHashtagUpdate = functions.firestore.document('/hashtags/{hashtagID}').onUpdate((change, context) => {
+    const name = change.after.id;
+    const count = change.after.data().hashtagcount;
+    const objectID = change.after.id;
+    var image = "";
+    admin.firestore().collection('hashtags').doc(objectID).collection('funFacts').get().then(doc => {
+        doc.forEach(element => {
+            image = element.id;
+            // Add data to algolia index
+            return hashtagIndex.addObject({
+                objectID,
+                name,
+                count,
+                image
+            });
+        });
+        return "";
+    }).catch(error => {
+        console.log(error);
+    });
+});
 exports.unindexHashtag = functions.firestore.document('/hashtags/{hashtagID}').onDelete((snap, context) => {
     const objectID = snap.id;
 
@@ -94,10 +152,22 @@ exports.unindexHashtag = functions.firestore.document('/hashtags/{hashtagID}').o
 });
 
 exports.indexUsers = functions.firestore.document('/users/{userID}').onCreate((snap, context) => {
+    const objectID = snap.id;
     const name = snap.data().name;
     const userName = snap.data().userName;
     const photoURL = snap.data().photoURL;
-    const objectID = snap.id;
+    return userIndex.addObject({
+        objectID,
+        name,
+        userName,
+        photoURL
+    });
+});
+exports.indexUsersUpdate = functions.firestore.document('/users/{userID}').onUpdate((change, context) => {
+    const objectID = change.before.id;
+    const name = change.after.data().name;
+    const userName = change.after.data().userName;
+    const photoURL = change.after.data().photoURL;
     return userIndex.addObject({
         objectID,
         name,

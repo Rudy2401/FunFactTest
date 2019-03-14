@@ -14,6 +14,7 @@
 		D8310F11221F9690007336A0 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F10221F9690007336A0 /* UIImage.swift */; };
 		D8310F15222438EC007336A0 /* AddFactPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F14222438EC007336A0 /* AddFactPickerViewController.swift */; };
 		D8310F1722243A84007336A0 /* AddFactTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F1622243A84007336A0 /* AddFactTextViewController.swift */; };
+		D8310F1B2224CF2E007336A0 /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F1A2224CF2E007336A0 /* EditProfileViewController.swift */; };
 		D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */ = {isa = PBXBuildFile; fileRef = D834DFF720F677690091CA40 /* ListOfFunFacts.json */; };
 		D83F06022161BD0700B37FED /* UserStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D83F06012161BD0700B37FED /* UserStruct.swift */; };
 		D848BD3621343FAF00C31CD0 /* ButtonWithShadow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD3521343FAF00C31CD0 /* ButtonWithShadow.swift */; };
@@ -26,13 +27,19 @@
 		D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD462137838B00C31CD0 /* ImageViewViewController.swift */; };
 		D865045F216AC58600B65AAB /* HashtagCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D865045E216AC58600B65AAB /* HashtagCell.swift */; };
 		D8650461216BED5F00B65AAB /* IQKeyboardManagerSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */; };
-		D86DA75D21741BA6001F7B5C /* UserSubsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */; };
+		D86BA1662239891F00026454 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = D86BA1612239891F00026454 /* LICENSE */; };
+		D86BA1672239891F00026454 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D86BA1622239891F00026454 /* README.md */; };
+		D86BA1682239891F00026454 /* Geofirestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BA1652239891F00026454 /* Geofirestore.swift */; };
+		D86DA75D21741BA6001F7B5C /* FunFactsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */; };
 		D86DA75F217424A8001F7B5C /* UserSubsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75E217424A8001F7B5C /* UserSubsCell.swift */; };
 		D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7B92151BF3C00B14B5F /* firebase.json */; };
 		D87ED7BC2151BF5400B14B5F /* functions in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7BB2151BF5400B14B5F /* functions */; };
 		D88DBE7F212EFC48009A2CC2 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE7E212EFC48009A2CC2 /* Constants.swift */; };
 		D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE80212F3727009A2CC2 /* CacheManager.swift */; };
 		D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE83212F68F9009A2CC2 /* FancyButton.swift */; };
+		D89485342228BB3700C215D5 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89485332228BB3700C215D5 /* SettingsViewController.swift */; };
+		D89485362228BF4100C215D5 /* SettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D89485352228BF4100C215D5 /* SettingsTableViewCell.swift */; };
+		D8948539222EFDC000C215D5 /* GeoFirestoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8948538222EFDC000C215D5 /* GeoFirestoreManager.swift */; };
 		D8A2ADE521938268003C4EB1 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A2ADE421938268003C4EB1 /* TabBarController.swift */; };
 		D8A2AE2F2195FF42003C4EB1 /* Font Awesome 5 Pro-Solid-900.otf in Resources */ = {isa = PBXBuildFile; fileRef = D8A2AE292195FF40003C4EB1 /* Font Awesome 5 Pro-Solid-900.otf */; };
 		D8A2AE302195FF42003C4EB1 /* Font Awesome 5 Free-Solid-900.otf in Resources */ = {isa = PBXBuildFile; fileRef = D8A2AE2A2195FF41003C4EB1 /* Font Awesome 5 Free-Solid-900.otf */; };
@@ -125,6 +132,7 @@
 		D8310F10221F9690007336A0 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
 		D8310F14222438EC007336A0 /* AddFactPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactPickerViewController.swift; sourceTree = "<group>"; };
 		D8310F1622243A84007336A0 /* AddFactTextViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFactTextViewController.swift; sourceTree = "<group>"; };
+		D8310F1A2224CF2E007336A0 /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
 		D834DFF720F677690091CA40 /* ListOfFunFacts.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = ListOfFunFacts.json; sourceTree = "<group>"; };
 		D83F06012161BD0700B37FED /* UserStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStruct.swift; sourceTree = "<group>"; };
 		D848BD3521343FAF00C31CD0 /* ButtonWithShadow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonWithShadow.swift; sourceTree = "<group>"; };
@@ -137,7 +145,10 @@
 		D848BD462137838B00C31CD0 /* ImageViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewViewController.swift; sourceTree = "<group>"; };
 		D865045E216AC58600B65AAB /* HashtagCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashtagCell.swift; sourceTree = "<group>"; };
 		D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = IQKeyboardManagerSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSubsTableViewController.swift; sourceTree = "<group>"; };
+		D86BA1612239891F00026454 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		D86BA1622239891F00026454 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		D86BA1652239891F00026454 /* Geofirestore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geofirestore.swift; sourceTree = "<group>"; };
+		D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactsTableViewController.swift; sourceTree = "<group>"; };
 		D86DA75E217424A8001F7B5C /* UserSubsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSubsCell.swift; sourceTree = "<group>"; };
 		D87ED7B92151BF3C00B14B5F /* firebase.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = firebase.json; sourceTree = "<group>"; };
 		D87ED7BB2151BF5400B14B5F /* functions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = functions; sourceTree = "<group>"; };
@@ -145,6 +156,9 @@
 		D88DBE80212F3727009A2CC2 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FunFactTest.entitlements; sourceTree = "<group>"; };
 		D88DBE83212F68F9009A2CC2 /* FancyButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FancyButton.swift; sourceTree = "<group>"; };
+		D89485332228BB3700C215D5 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		D89485352228BF4100C215D5 /* SettingsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTableViewCell.swift; sourceTree = "<group>"; };
+		D8948538222EFDC000C215D5 /* GeoFirestoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoFirestoreManager.swift; sourceTree = "<group>"; };
 		D8A2ADE421938268003C4EB1 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		D8A2AE292195FF40003C4EB1 /* Font Awesome 5 Pro-Solid-900.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Pro-Solid-900.otf"; sourceTree = "<group>"; };
 		D8A2AE2A2195FF41003C4EB1 /* Font Awesome 5 Free-Solid-900.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Font Awesome 5 Free-Solid-900.otf"; sourceTree = "<group>"; };
@@ -258,8 +272,36 @@
 				D8CB08CE221DAA0F00A86F9E /* AlgoliaManager.swift */,
 				D8310F0E221F8645007336A0 /* AlgoliaSearchManager.swift */,
 				D8D18570212A1CFF0093B66C /* FirestoreManager.swift */,
+				D8948538222EFDC000C215D5 /* GeoFirestoreManager.swift */,
 			);
 			path = Managers;
+			sourceTree = "<group>";
+		};
+		D86BA1602239891F00026454 /* Geofirestore */ = {
+			isa = PBXGroup;
+			children = (
+				D86BA1612239891F00026454 /* LICENSE */,
+				D86BA1622239891F00026454 /* README.md */,
+				D86BA1632239891F00026454 /* Geofirestore */,
+			);
+			name = Geofirestore;
+			path = FunFactTest/Geofirestore;
+			sourceTree = "<group>";
+		};
+		D86BA1632239891F00026454 /* Geofirestore */ = {
+			isa = PBXGroup;
+			children = (
+				D86BA1642239891F00026454 /* Classes */,
+			);
+			path = Geofirestore;
+			sourceTree = "<group>";
+		};
+		D86BA1642239891F00026454 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				D86BA1652239891F00026454 /* Geofirestore.swift */,
+			);
+			path = Classes;
 			sourceTree = "<group>";
 		};
 		D88DBE7D212EFC0B009A2CC2 /* Resources */ = {
@@ -330,6 +372,7 @@
 				D8B3103921CAEAA500E85148 /* SearchCellTableViewCell.swift */,
 				D8310F10221F9690007336A0 /* UIImage.swift */,
 				D86DA75E217424A8001F7B5C /* UserSubsCell.swift */,
+				D89485352228BF4100C215D5 /* SettingsTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -368,10 +411,12 @@
 				D848BD392134909E00C31CD0 /* SignInViewController.swift */,
 				D848BD3B213490D100C31CD0 /* SignUpViewController.swift */,
 				D8A2ADE421938268003C4EB1 /* TabBarController.swift */,
-				D86DA75C21741BA6001F7B5C /* UserSubsTableViewController.swift */,
+				D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */,
 				D8CB08C82212638800A86F9E /* VerifyViewController.swift */,
 				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
 				D8310F1622243A84007336A0 /* AddFactTextViewController.swift */,
+				D8310F1A2224CF2E007336A0 /* EditProfileViewController.swift */,
+				D89485332228BB3700C215D5 /* SettingsViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -379,6 +424,7 @@
 		D8FE7F7620DB2712007B4550 = {
 			isa = PBXGroup;
 			children = (
+				D86BA1602239891F00026454 /* Geofirestore */,
 				D8A2AE4D21960132003C4EB1 /* FontAwesome */,
 				D8FE7F8120DB2712007B4550 /* FunFactTest */,
 				D8FE7F8020DB2712007B4550 /* Products */,
@@ -517,6 +563,7 @@
 				D8A2AE322195FF42003C4EB1 /* Font Awesome 5 Pro-Regular-400.otf in Resources */,
 				D8A2AE332195FF42003C4EB1 /* Font Awesome 5 Brands-Regular-400.otf in Resources */,
 				D8A2AE342195FF42003C4EB1 /* Font Awesome 5 Pro-Light-300.otf in Resources */,
+				D86BA1672239891F00026454 /* README.md in Resources */,
 				D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */,
 				D8E78FF921432BF4006F03B9 /* overlay-blue.json in Resources */,
 				D8E78FFB21432CBF006F03B9 /* overlay-dark.json in Resources */,
@@ -524,6 +571,7 @@
 				D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */,
 				D8FE7F8D20DB2716007B4550 /* LaunchScreen.storyboard in Resources */,
 				D8FE7F8A20DB2716007B4550 /* Assets.xcassets in Resources */,
+				D86BA1662239891F00026454 /* LICENSE in Resources */,
 				D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */,
 				D8CB08CD221714C800A86F9E /* RejectionView.xib in Resources */,
 				D87ED7BC2151BF5400B14B5F /* functions in Resources */,
@@ -698,6 +746,7 @@
 				D8A2AE462195FF97003C4EB1 /* FontAwesomeStateRequirement.swift in Sources */,
 				D8CB08C92212638800A86F9E /* VerifyViewController.swift in Sources */,
 				D8A2AE472195FF97003C4EB1 /* FontAwesomeTextRepresentable.swift in Sources */,
+				D89485362228BF4100C215D5 /* SettingsTableViewCell.swift in Sources */,
 				D8A2AE482195FF97003C4EB1 /* FontAwesomeImageRepresentable.swift in Sources */,
 				D8CB08CF221DAA0F00A86F9E /* AlgoliaManager.swift in Sources */,
 				D8A2AE492195FF97003C4EB1 /* Enum.swift in Sources */,
@@ -714,6 +763,7 @@
 				D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */,
 				D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */,
 				D848BD3621343FAF00C31CD0 /* ButtonWithShadow.swift in Sources */,
+				D86BA1682239891F00026454 /* Geofirestore.swift in Sources */,
 				D848BD4321358BF200C31CD0 /* CustomViewBackground.swift in Sources */,
 				D848BD3C213490D100C31CD0 /* SignUpViewController.swift in Sources */,
 				D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */,
@@ -738,13 +788,16 @@
 				D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */,
 				D8CB08CB2217144700A86F9E /* RejectionView.swift in Sources */,
 				D8FE7FAC20E4671C007B4550 /* FunFactPageViewController.swift in Sources */,
+				D89485342228BB3700C215D5 /* SettingsViewController.swift in Sources */,
 				D8ED8FFA210A49780010EF7C /* AddressViewController.swift in Sources */,
 				D848BD3E2134F05800C31CD0 /* CustomTextField.swift in Sources */,
 				D8FE7F8320DB2712007B4550 /* AppDelegate.swift in Sources */,
 				D8B3103821CADFD600E85148 /* SearchViewController.swift in Sources */,
+				D8310F1B2224CF2E007336A0 /* EditProfileViewController.swift in Sources */,
 				D8FE7FAA20E45083007B4550 /* ContentViewController.swift in Sources */,
-				D86DA75D21741BA6001F7B5C /* UserSubsTableViewController.swift in Sources */,
+				D86DA75D21741BA6001F7B5C /* FunFactsTableViewController.swift in Sources */,
 				D83F06022161BD0700B37FED /* UserStruct.swift in Sources */,
+				D8948539222EFDC000C215D5 /* GeoFirestoreManager.swift in Sources */,
 				D848BD452136F50C00C31CD0 /* DisputeStruct.swift in Sources */,
 				D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */,
 			);
