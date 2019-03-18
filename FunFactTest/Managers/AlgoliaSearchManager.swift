@@ -18,7 +18,7 @@ class AlgoliaSearchManager {
     var delegate: AlgoliaSearchManagerDelegate?
     
     init() {
-        
+
     }
     
     /// Get Hashtags based on searchText
@@ -53,8 +53,11 @@ class AlgoliaSearchManager {
             }
             else {
                 guard let hits = res!["hits"] as? [[String: AnyObject]] else { return }
+                if hits.isEmpty {
+                    completion(nil, Errors.noRecordsFound.localizedDescription)
+                    return
+                }
                 for hit in hits {
-                    
                     let geoloc = hit["_geoloc"] as! [String: Double]
                     let coordinates = GeoPoint(latitude: geoloc["lat"]!, longitude: geoloc["lng"]!)
                     

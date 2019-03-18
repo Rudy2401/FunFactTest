@@ -32,5 +32,6 @@ class AppDataSingleton {
                            funFactsVerified: [],
                            funFactsRejected: [])
     
-    var listOfLandmarkIDs = [""]
+    var listOfLandmarkIDs = [String]()
+    var event = Events.firstLoad
 }

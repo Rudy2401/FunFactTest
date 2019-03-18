@@ -37,6 +37,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // get the singleton object
         notificationCenter = UNUserNotificationCenter.current()
         
+        if let launchOptions = launchOptions {
+            let notificationInfo = launchOptions[UIApplication.LaunchOptionsKey.location]
+            AppDataSingleton.appDataSharedInstance.event = .notification
+        }
+        print ("AppDataSingleton.appDataSharedInstance.event = \(AppDataSingleton.appDataSharedInstance.event)")
         // define what do you need permission to use
         let options: UNAuthorizationOptions = [.alert, .sound]
         notificationCenter.delegate = self
@@ -93,6 +98,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
         if region is CLCircularRegion {
+            AppDataSingleton.appDataSharedInstance.event = Events.notification
             handleEvent(forRegion: region)
         }
     }
@@ -103,6 +109,8 @@ extension AppDelegate: CLLocationManagerDelegate {
         }
     }
     func handleEvent(forRegion region: CLRegion!) {
+        print ("identifier = \(region.identifier)")
+        
         if !region.identifier.contains("|") {
             return
         }
@@ -117,14 +125,17 @@ extension AppDelegate: CLLocationManagerDelegate {
         
         db.collection("funFacts")
             .whereField("landmarkId", isEqualTo: landmarkID!)
-            .order(by: "likes", descending: true)
+            .whereField("verificationFlag", isEqualTo: "Y")
             .getDocuments { (snapshot, error) in
                 if let error = error {
                     print ("Error getting document \(error)")
                 } else {
-                    let document = snapshot?.documents.randomElement()
-                    content.body = document?.data()["description"] as! String
-                    imageId = document?.data()["imageName"] as! String
+                    if let document = snapshot?.documents.randomElement(), document.exists {
+                        content.body = document.data()["description"] as! String
+                        imageId = document.data()["imageName"] as! String
+                    } else {
+                        return
+                    }
                 }
                 // Add image to notification
                 let imageName = "\(imageId).jpeg"

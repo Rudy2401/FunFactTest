@@ -52,14 +52,39 @@ enum LandmarkTypes {
     static let promotions = "Promotions"
 }
 
-enum FirestoreGeoConstants {
+enum Events {
     case firstLoad
     case mapEvent
+    case notification
 }
 
 enum FirestoreErrors {
     static let annotationExists = "Annotation already present"
     static let mapTooLarge = "Map area too large"
+}
+
+enum Errors: Error {
+    case noRecordsFound
+}
+
+enum Status {
+    case success
+    case failure
+}
+
+enum ErrorMessages {
+    static let funFactUploadError = "Error while uploading fun fact"
+    static let funFactUploadSuccess = "Fun fact uploaded succesfully!"
+    static let verificationError = "Error while verifying."
+    static let disputeError = "Error uploading dispute."
+    static let disputeSuccess = "Dispute uploaded successfully!"
+    static let updateUserError = "Error while updating user profile."
+    static let updateUserSuccess = "User profile updated successfully!"
+    static let noRecordsFound = "No records found, zoom out to view more"
+    static let userCreateError = "Error while creating user."
+    static let userCreateSuccess = "User created successfully!"
+    static let rejectionSuccess = "Uploaded successfully!"
+    static let rejectionError = "Error while uploading."
 }
 
 enum Attributes {
@@ -102,7 +127,7 @@ enum Attributes {
     static let addFactButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
                                           NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
     static let currentLocationButtonAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
-                                          NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
+                                          NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .solid)]
     
     static let toolBarLabelAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                          NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 10.0)!]

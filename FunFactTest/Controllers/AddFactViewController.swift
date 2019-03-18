@@ -381,10 +381,22 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             self.firestore.addFunFact(funFact: funFact, completion: { (error) in
                 if let error = error {
                     print ("Error writing document: \(error)")
-                    self.showAlert(message: "fail")
+                    let alert = Utils.showAlert(status: .failure, message: ErrorMessages.funFactUploadError)
+                    self.present(alert, animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                            guard self?.presentedViewController == alert else { return }
+                            self?.dismiss(animated: true, completion: nil)
+                        }
+                    }
                 } else {
                     print("Document successfully written!")
-                    self.showAlert(message: "success")
+                    let alert = Utils.showAlert(status: .success, message: ErrorMessages.funFactUploadSuccess)
+                    self.present(alert, animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                            guard self?.presentedViewController == alert else { return }
+                            self?.dismiss(animated: true, completion: nil)
+                        }
+                    }
                 }
             })
             self.firestore.uploadImage(imageName: ffID + ".jpeg",
@@ -508,25 +520,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         alert.addAction(action)
         viewController.present(alert, animated: true, completion: nil)
     }
-    func showAlert(message: String) {
-        if message == "success" {
-            popup = UIAlertController(title: "Success",
-                                      message: "Fun Fact uploaded successfully!",
-                                      preferredStyle: .alert)
-        }
-        if message == "fail" {
-            popup = UIAlertController(title: "Error",
-                                      message: "Error while uploading Fun Fact",
-                                      preferredStyle: .alert)
-        }
-
-        self.present(popup, animated: true, completion: nil)
-        Timer.scheduledTimer(timeInterval: 2.0,
-                             target: self,
-                             selector: #selector(self.dismissAlert),
-                             userInfo: nil,
-                             repeats: false)
-    }
+    
     @objc func dismissAlert() {
         popup.dismiss(animated: true)
         navigationController?.popViewController(animated: true)

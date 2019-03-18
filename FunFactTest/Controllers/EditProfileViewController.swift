@@ -186,9 +186,21 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
                                                                     photoURL: self.photoURL ?? "") { (error) in
                                                                         if let error = error {
                                                                             print ("Error updating user profile \(error)")
-                                                                            self.showAlert(message: "fail")
+                                                                            let alert = Utils.showAlert(status: .failure, message: ErrorMessages.updateUserError)
+                                                                            self.present(alert, animated: true) {
+                                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                                                                    guard self?.presentedViewController == alert else { return }
+                                                                                    self?.dismiss(animated: true, completion: nil)
+                                                                                }
+                                                                            }
                                                                         } else {
-                                                                            self.showAlert(message: "success")
+                                                                            let alert = Utils.showAlert(status: .success, message: ErrorMessages.updateUserSuccess)
+                                                                            self.present(alert, animated: true) {
+                                                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                                                                    guard self?.presentedViewController == alert else { return }
+                                                                                    self?.dismiss(animated: true, completion: nil)
+                                                                                }
+                                                                            }
                                                                             
                                                                             self.firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "", completionHandler: { (userProfile) in
                                                                                 AppDataSingleton.appDataSharedInstance.userProfile = userProfile
@@ -198,25 +210,6 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
                                     }
         })
         
-    }
-    func showAlert(message: String) {
-        if message == "success" {
-            popup = UIAlertController(title: "Success",
-                                      message: "User profile updated successfully!",
-                                      preferredStyle: .alert)
-        }
-        if message == "fail" {
-            popup = UIAlertController(title: "Error",
-                                      message: "Error while updating user profile",
-                                      preferredStyle: .alert)
-        }
-        
-        self.present(popup, animated: true, completion: nil)
-        Timer.scheduledTimer(timeInterval: 2.0,
-                             target: self,
-                             selector: #selector(self.dismissAlert),
-                             userInfo: nil,
-                             repeats: false)
     }
     @objc func dismissAlert() {
         popup.dismiss(animated: true)

@@ -21,12 +21,6 @@ let geofirestoreManager = GeoFirestoreManager()
 extension MainViewController: CLLocationManagerDelegate, AlgoliaSearchManagerDelegate, GeoFirestoreManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        
-//        guard let location = manager.location else{
-//            return
-//        }
-//        let currentLocationCoordinate = location.coordinate
-//        self.currentLocationCoordinate = currentLocationCoordinate
         if let location = locations.last {
             let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
             let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
@@ -39,7 +33,7 @@ extension MainViewController: CLLocationManagerDelegate, AlgoliaSearchManagerDel
     }
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        downloadLandmarks(caller: .mapEvent)
+        
     }
 
     func mapViewRegionDidChangeFromUserInteraction() -> Bool {
@@ -53,7 +47,7 @@ extension MainViewController: CLLocationManagerDelegate, AlgoliaSearchManagerDel
     }
 }
 extension UNNotificationAttachment {
-    
+
     /// Save the image to disk
     static func create(imageFileIdentifier: String, data: NSData, options: [NSObject : AnyObject]?) -> UNNotificationAttachment? {
         let fileManager = FileManager.default
@@ -75,60 +69,69 @@ extension UNNotificationAttachment {
 
 extension MainViewController {
     
-    func downloadLandmarks(caller: FirestoreGeoConstants) {
-        if (mapViewRegionDidChangeFromUserInteraction() || caller == .firstLoad) {
-            // GeoFirestore Code
-            let mapRect = self.mapView.visibleMapRect
-            var center = CLLocation()
-            
-            var region = MKCoordinateRegion(mapRect)
-            if caller == .firstLoad {
-                center = CLLocation(latitude: currentLocationCoordinate.latitude,
-                                    longitude: currentLocationCoordinate.longitude)
-                region = MKCoordinateRegion(center: center.coordinate,
-                                            latitudinalMeters: 500,
-                                            longitudinalMeters: 500)
-            }
-            
-            geofirestoreManager.getLandmarks(in: region) { (landmarks, error) in
-                if let error = error {
-                    if error == FirestoreErrors.annotationExists {
-                    } else{
-                        print ("Error getting data from GeoFirestore \(error)")
-                    }
-                }
-                else {
-                    if landmarks!.count > 20 {
-                        print(FirestoreErrors.mapTooLarge)
-                    } else {
-                        let spinner = self.showLoader(view: self.mapView)
-                        for landmark in landmarks! {
-                            self.setupGeoFences(lat: landmark.coordinates.latitude,
-                                                lon: landmark.coordinates.longitude,
-                                                title: landmark.name,
-                                                landmarkID: landmark.id)
-                            
-                            // Add anotations
-                            var annotation: FunFactAnnotation
-                            annotation = FunFactAnnotation(
-                                landmarkID: landmark.id,
-                                title: landmark.name,
-                                address: "\(landmark.address), \(landmark.city), \(landmark.state), \(landmark.country)",
-                                type: landmark.type,
-                                coordinate: CLLocationCoordinate2D(latitude: landmark.coordinates.latitude,
-                                                                   longitude: landmark.coordinates.longitude))
-                            self.mapView.addAnnotation(annotation)
-                            AppDataSingleton.appDataSharedInstance.listOfLandmarkIDs.append(landmark.id)
+    func downloadLandmarks(caller: Events) {
+        let spinner = Utils.showLoader(view: self.mapView)
+        mapView.removeAnnotations(mapView.annotations)
+        stopMonitoringRegions()
+
+        let mapRect = self.mapView.visibleMapRect
+        let nwMapPoint = MKMapPoint(x: mapRect.origin.x, y: mapRect.maxY)
+        let seMapPoint = MKMapPoint(x: mapRect.maxX, y: mapRect.origin.y)
+        
+        let query = Query()
+        let boundingBox = GeoRect(p1: LatLng(lat: nwMapPoint.coordinate.latitude,
+                                             lng: nwMapPoint.coordinate.longitude),
+                                  p2: LatLng(lat: seMapPoint.coordinate.latitude,
+                                             lng: seMapPoint.coordinate.longitude))
+        
+        if caller == .firstLoad {
+            query.aroundLatLng = LatLng(lat: self.mapView.userLocation.coordinate.latitude,
+                                        lng: self.mapView.userLocation.coordinate.longitude)
+            query.aroundRadius = .explicit(1000)
+        } else {
+            query.insideBoundingBox = [boundingBox]
+        }
+        query.hitsPerPage = 30
+        var count = 0
+        algoliaManager.downloadLandmarks(query: query) { (landmark, error) in
+            if let error = error {
+                if error == Errors.noRecordsFound.localizedDescription {
+                    let alert = Utils.showAlert(status: .failure, message: ErrorMessages.noRecordsFound)
+                    self.present(alert, animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                            guard self?.presentedViewController == alert else { return }
+                            self?.dismiss(animated: true, completion: nil)
                         }
-                        spinner.dismissLoader()
                     }
                 }
+                print ("Error getting data from Algolia \(error)")
+                spinner.dismissLoader()
+            }
+            else {
+                let landmark = landmark!
+                self.setupGeoFences(lat: landmark.coordinates.latitude,
+                                    lon: landmark.coordinates.longitude,
+                                    title: landmark.name,
+                                    landmarkID: landmark.id)
+                count += 1
+                // Add anotations
+                var annotation: FunFactAnnotation
+                annotation = FunFactAnnotation(
+                    landmarkID: landmark.id,
+                    title: "\(count)) \(landmark.name)",
+                    address: "\(landmark.address), \(landmark.city), \(landmark.state), \(landmark.country)",
+                    type: landmark.type,
+                    coordinate: CLLocationCoordinate2D(latitude: landmark.coordinates.latitude,
+                                                       longitude: landmark.coordinates.longitude))
+                self.mapView.addAnnotation(annotation)
+                AppDataSingleton.appDataSharedInstance.listOfLandmarkIDs.append(landmark.id)
+                spinner.dismissLoader()
             }
         }
     }
     
     func downloadFunFactsAndSegue(for landmarkID: String) {
-        let spinner = showLoader(view: self.mapView)
+        let spinner = Utils.showLoader(view: self.mapView)
         firestore.downloadFunFacts(for: landmarkID) { (funFacts, pageContent, error) in
             if let error = error {
                 print("Error downloading Fun Facts \(error)")

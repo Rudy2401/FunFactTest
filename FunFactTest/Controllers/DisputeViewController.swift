@@ -96,26 +96,26 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
                              completion: { (error) in
                                 if let error = error {
                                     print ("Error adding dispute \(error)")
-                                    self.showAlert(message: "fail")
+                                    let alert = Utils.showAlert(status: .failure, message: ErrorMessages.disputeError)
+                                    self.present(alert, animated: true) {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                            guard self?.presentedViewController == alert else { return }
+                                            self?.dismiss(animated: true, completion: nil)
+                                        }
+                                    }
                                 } else {
-                                    self.showAlert(message: "success")
+                                    let alert = Utils.showAlert(status: .success, message: ErrorMessages.disputeSuccess)
+                                    self.present(alert, animated: true) {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                            guard self?.presentedViewController == alert else { return }
+                                            self?.dismiss(animated: true, completion: nil)
+                                        }
+                                    }
                                 }
                             })
         
         firestore.updateDisputeFlag(funFactID: funFactID)
         firestore.addUserDisputes(disputeID: did, userID: Auth.auth().currentUser?.uid ?? "")
-    }
-    
-    func showAlert(message: String) {
-        if message == "success" {
-            popup = UIAlertController(title: "Success", message: "Dispute uploaded successfully!", preferredStyle: .alert)
-        }
-        if message == "fail" {
-            popup = UIAlertController(title: "Error", message: "Error while uploading Dispute", preferredStyle: .alert)
-        }
-        
-        self.present(popup, animated: true, completion: nil)
-        Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(self.dismissAlert), userInfo: nil, repeats: false)
     }
     
     @objc func dismissAlert() {

@@ -120,6 +120,33 @@ class Utils {
         quickHelpView.addAction(dismissAction)
         return quickHelpView
     }
+    static func showAlert(status: Status, message: String) -> UIAlertController {
+        var popup = UIAlertController()
+        switch status {
+        case .success:
+            popup = UIAlertController(title: "Success",
+                                      message: message,
+                                      preferredStyle: .alert)
+        case .failure:
+            popup = UIAlertController(title: "Error",
+                                      message: message,
+                                      preferredStyle: .alert)
+        }
+        return popup
+    }
+    static func showLoader(view: UIView) -> UIActivityIndicatorView {
+        let spinner = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
+        spinner.backgroundColor = UIColor.clear
+        spinner.color = UIColor.black
+        spinner.layer.cornerRadius = 3.0
+        spinner.clipsToBounds = true
+        spinner.hidesWhenStopped = true
+        spinner.style = UIActivityIndicatorView.Style.gray
+        spinner.center = view.center
+        view.addSubview(spinner)
+        spinner.startAnimating()
+        return spinner
+    }
 }
 extension NSMutableAttributedString {
     @discardableResult func bold(_ text: String) -> NSMutableAttributedString {

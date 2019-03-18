@@ -27,9 +27,6 @@
 		D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD462137838B00C31CD0 /* ImageViewViewController.swift */; };
 		D865045F216AC58600B65AAB /* HashtagCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D865045E216AC58600B65AAB /* HashtagCell.swift */; };
 		D8650461216BED5F00B65AAB /* IQKeyboardManagerSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */; };
-		D86BA1662239891F00026454 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = D86BA1612239891F00026454 /* LICENSE */; };
-		D86BA1672239891F00026454 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D86BA1622239891F00026454 /* README.md */; };
-		D86BA1682239891F00026454 /* Geofirestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BA1652239891F00026454 /* Geofirestore.swift */; };
 		D86DA75D21741BA6001F7B5C /* FunFactsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */; };
 		D86DA75F217424A8001F7B5C /* UserSubsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75E217424A8001F7B5C /* UserSubsCell.swift */; };
 		D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7B92151BF3C00B14B5F /* firebase.json */; };
@@ -145,9 +142,6 @@
 		D848BD462137838B00C31CD0 /* ImageViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewViewController.swift; sourceTree = "<group>"; };
 		D865045E216AC58600B65AAB /* HashtagCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashtagCell.swift; sourceTree = "<group>"; };
 		D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = IQKeyboardManagerSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D86BA1612239891F00026454 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
-		D86BA1622239891F00026454 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		D86BA1652239891F00026454 /* Geofirestore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geofirestore.swift; sourceTree = "<group>"; };
 		D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactsTableViewController.swift; sourceTree = "<group>"; };
 		D86DA75E217424A8001F7B5C /* UserSubsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSubsCell.swift; sourceTree = "<group>"; };
 		D87ED7B92151BF3C00B14B5F /* firebase.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = firebase.json; sourceTree = "<group>"; };
@@ -277,33 +271,6 @@
 			path = Managers;
 			sourceTree = "<group>";
 		};
-		D86BA1602239891F00026454 /* Geofirestore */ = {
-			isa = PBXGroup;
-			children = (
-				D86BA1612239891F00026454 /* LICENSE */,
-				D86BA1622239891F00026454 /* README.md */,
-				D86BA1632239891F00026454 /* Geofirestore */,
-			);
-			name = Geofirestore;
-			path = FunFactTest/Geofirestore;
-			sourceTree = "<group>";
-		};
-		D86BA1632239891F00026454 /* Geofirestore */ = {
-			isa = PBXGroup;
-			children = (
-				D86BA1642239891F00026454 /* Classes */,
-			);
-			path = Geofirestore;
-			sourceTree = "<group>";
-		};
-		D86BA1642239891F00026454 /* Classes */ = {
-			isa = PBXGroup;
-			children = (
-				D86BA1652239891F00026454 /* Geofirestore.swift */,
-			);
-			path = Classes;
-			sourceTree = "<group>";
-		};
 		D88DBE7D212EFC0B009A2CC2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -424,7 +391,6 @@
 		D8FE7F7620DB2712007B4550 = {
 			isa = PBXGroup;
 			children = (
-				D86BA1602239891F00026454 /* Geofirestore */,
 				D8A2AE4D21960132003C4EB1 /* FontAwesome */,
 				D8FE7F8120DB2712007B4550 /* FunFactTest */,
 				D8FE7F8020DB2712007B4550 /* Products */,
@@ -563,7 +529,6 @@
 				D8A2AE322195FF42003C4EB1 /* Font Awesome 5 Pro-Regular-400.otf in Resources */,
 				D8A2AE332195FF42003C4EB1 /* Font Awesome 5 Brands-Regular-400.otf in Resources */,
 				D8A2AE342195FF42003C4EB1 /* Font Awesome 5 Pro-Light-300.otf in Resources */,
-				D86BA1672239891F00026454 /* README.md in Resources */,
 				D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */,
 				D8E78FF921432BF4006F03B9 /* overlay-blue.json in Resources */,
 				D8E78FFB21432CBF006F03B9 /* overlay-dark.json in Resources */,
@@ -571,7 +536,6 @@
 				D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */,
 				D8FE7F8D20DB2716007B4550 /* LaunchScreen.storyboard in Resources */,
 				D8FE7F8A20DB2716007B4550 /* Assets.xcassets in Resources */,
-				D86BA1662239891F00026454 /* LICENSE in Resources */,
 				D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */,
 				D8CB08CD221714C800A86F9E /* RejectionView.xib in Resources */,
 				D87ED7BC2151BF5400B14B5F /* functions in Resources */,
@@ -763,7 +727,6 @@
 				D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */,
 				D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */,
 				D848BD3621343FAF00C31CD0 /* ButtonWithShadow.swift in Sources */,
-				D86BA1682239891F00026454 /* Geofirestore.swift in Sources */,
 				D848BD4321358BF200C31CD0 /* CustomViewBackground.swift in Sources */,
 				D848BD3C213490D100C31CD0 /* SignUpViewController.swift in Sources */,
 				D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */,

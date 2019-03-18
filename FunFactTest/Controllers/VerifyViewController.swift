@@ -45,7 +45,19 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
                 rejCount: rejCount,
                 reason: reason,
                 completion: { (status) in
-                    self.showAlert(message: status)
+                    var message = ""
+                    if status == .success {
+                        message = ErrorMessages.rejectionSuccess
+                    } else {
+                        message = ErrorMessages.rejectionError
+                    }
+                    let alert = Utils.showAlert(status: status, message: message)
+                    self.present(alert, animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                            guard self?.presentedViewController == alert else { return }
+                            self?.dismiss(animated: true, completion: nil)
+                        }
+                    }
             })
             self.firestore.addFunFactRejectedToUser(
                 funFactRef: funFactRef,
@@ -62,25 +74,6 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
         
     }
     
-    func showAlert(message: String) {
-        if message == "success" {
-            popup = UIAlertController(title: "Success",
-                                      message: "Successfully uploaded.",
-                preferredStyle: .alert)
-        }
-        if message == "fail" {
-            popup = UIAlertController(title: "Error",
-                                      message: "Error while uploading.",
-                                      preferredStyle: .alert)
-        }
-        
-        self.present(popup, animated: true, completion: nil)
-        Timer.scheduledTimer(timeInterval: 2.0,
-                             target: self,
-                             selector: #selector(self.dismissAlert),
-                             userInfo: nil,
-                             repeats: false)
-    }
     @objc func dismissAlert() {
         popup.dismiss(animated: true)
         navigationController?.popViewController(animated: true)

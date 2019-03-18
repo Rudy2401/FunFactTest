@@ -93,8 +93,33 @@ class SignUpViewController: UIViewController, FirestoreManagerDelegate {
                 changeRequest.commitChanges(completion: { (error) in
                     if let error = error {
                         print("Failed to change the display name: \(error.localizedDescription)")
+                        let alert = Utils.showAlert(status: .failure, message: "Error while creating user.")
+                        self.present(alert, animated: true) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                guard self?.presentedViewController == alert else { return }
+                                self?.dismiss(animated: true, completion: nil)
+                            }
+                        }
                     } else {
-                        self.firestore.updateUserAdditionalFields(for: Auth.auth().currentUser!)
+                        self.firestore.updateUserAdditionalFields(for: Auth.auth().currentUser!, completion: { (error) in
+                            if error != nil {
+                                let alert = Utils.showAlert(status: .failure, message: "Error while creating user.")
+                                self.present(alert, animated: true) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                        guard self?.presentedViewController == alert else { return }
+                                        self?.dismiss(animated: true, completion: nil)
+                                    }
+                                }
+                            } else {
+                                let alert = Utils.showAlert(status: .success, message: "User created successfully!")
+                                self.present(alert, animated: true) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                        guard self?.presentedViewController == alert else { return }
+                                        self?.dismiss(animated: true, completion: nil)
+                                    }
+                                }
+                            }
+                        })
                     }
                 })
             }
@@ -113,25 +138,5 @@ class SignUpViewController: UIViewController, FirestoreManagerDelegate {
             alertController.addAction(okayAction)
             self.present(alertController, animated: true, completion: nil)
         })
-    }
-    func showAlert(message: String) {
-        if message == "success" {
-            popup = UIAlertController(title: "Success",
-                                      message: "User created successfully!",
-                                      preferredStyle: .alert)
-        }
-        if message == "fail" {
-            popup = UIAlertController(title: "Error",
-                                      message: "Error while creating user",
-                                      preferredStyle: .alert)
-        }
-        self.present(popup,
-                     animated: true,
-                     completion: nil)
-        Timer.scheduledTimer(timeInterval: 2.0,
-                             target: self,
-                             selector: #selector(self.dismissAlert),
-                             userInfo: nil,
-                             repeats: false)
     }
 }

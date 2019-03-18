@@ -228,7 +228,7 @@ class FirestoreManager {
         }
     }
     /// When user clicks on Approve button during verification - verificationFlag, approvalCount and approvalUsers are updated
-    func updateVerificationFlag(for funFactID: String, verFlag: String, apprCount: Int, completion: @escaping (String) -> Void) {
+    func updateVerificationFlag(for funFactID: String, verFlag: String, apprCount: Int, completion: @escaping (Status) -> Void) {
         db.collection("funFacts")
             .document(funFactID)
             .setData(["verificationFlag": verFlag,
@@ -237,15 +237,15 @@ class FirestoreManager {
                      merge: true) { err in
                         if let err = err {
                             print("Error writing document: \(err)")
-                            completion("fail")
+                            completion(.failure)
                         } else {
                             print("Document successfully written!")
-                            completion("success")
+                            completion(.success)
                         }
         }
     }
     /// When user clicks on Reject button during verification - verificationFlag, rejectionCount, reason and rejectionUsers are updated
-    func updateRejectionFlag(for funFactID: String, verFlag: String, rejCount: Int, reason: String, completion: @escaping (String) -> Void) {
+    func updateRejectionFlag(for funFactID: String, verFlag: String, rejCount: Int, reason: String, completion: @escaping (Status) -> Void) {
         db.collection("funFacts")
             .document(funFactID)
             .setData(["verificationFlag": verFlag,
@@ -255,10 +255,10 @@ class FirestoreManager {
                      merge: true) { err in
                         if let err = err {
                             print("Error writing document: \(err)")
-                            completion("fail")
+                            completion(.failure)
                         } else {
                             print("Document successfully written!")
-                            completion("success")
+                            completion(.success)
                         }
         }
     }
@@ -491,7 +491,7 @@ class FirestoreManager {
         }
     }
     /// Updates the firestore collection /users with additional user data
-    func updateUserAdditionalFields(for user: User) {
+    func updateUserAdditionalFields(for user: User, completion: @escaping (String?) -> ()) {
         let db = Firestore.firestore()
         let randomNumber = arc4random()
         db.collection("users")
@@ -512,6 +512,9 @@ class FirestoreManager {
                      merge: true) { (error) in
                         if let error = error {
                             print ("Error creating document \(error)")
+                            completion(error.localizedDescription)
+                        } else {
+                            completion(nil)
                         }
         }
     }

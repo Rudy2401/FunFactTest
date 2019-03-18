@@ -574,12 +574,24 @@
                                     <action selector="viewAddFact:" destination="BYZ-38-t0r" eventType="touchUpInside" id="VNl-aD-s7T"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TB8-Pq-Pwd">
-                                <rect key="frame" x="315" y="521" width="50" height="50"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Hb-iR-Xg8">
+                                <rect key="frame" x="112.66666666666669" y="0.0" width="150" height="25"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="50" id="BKE-8L-Dh4"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="50" id="VAn-t1-846"/>
-                                    <constraint firstAttribute="height" constant="50" id="wvD-gO-KAV"/>
+                                    <constraint firstAttribute="height" constant="25" id="EYF-ur-fK6"/>
+                                    <constraint firstAttribute="width" constant="150" id="k76-25-521"/>
+                                </constraints>
+                                <state key="normal" title="Button">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="mapSearchAction:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ct2-90-CAY"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TB8-Pq-Pwd">
+                                <rect key="frame" x="272.66666666666669" y="0.0" width="25" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="25" id="BKE-8L-Dh4"/>
+                                    <constraint firstAttribute="height" constant="25" id="uvQ-hb-dSI"/>
                                 </constraints>
                                 <connections>
                                     <action selector="showCurrentLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="hey-Nj-w4p"/>
@@ -590,14 +602,16 @@
                         <constraints>
                             <constraint firstItem="nLK-Hj-2Ry" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="5q0-Aa-TRJ"/>
                             <constraint firstItem="izq-VE-rwM" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="10" id="82V-AG-Rgx"/>
-                            <constraint firstItem="RNk-DU-zIb" firstAttribute="top" secondItem="TB8-Pq-Pwd" secondAttribute="bottom" constant="10" id="EeH-Je-Xt4"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="TB8-Pq-Pwd" secondAttribute="trailing" constant="10" id="IfA-3q-uF4"/>
+                            <constraint firstItem="TB8-Pq-Pwd" firstAttribute="centerY" secondItem="0Hb-iR-Xg8" secondAttribute="centerY" id="G3J-Qq-kec"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="RNk-DU-zIb" secondAttribute="bottom" constant="10" id="OBS-YK-5xL"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="nLK-Hj-2Ry" secondAttribute="trailing" id="VBe-Td-Zig"/>
                             <constraint firstItem="nLK-Hj-2Ry" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="dt4-Nc-x6Q"/>
                             <constraint firstAttribute="bottom" secondItem="nLK-Hj-2Ry" secondAttribute="bottom" id="goL-be-Vkr"/>
+                            <constraint firstItem="TB8-Pq-Pwd" firstAttribute="leading" secondItem="0Hb-iR-Xg8" secondAttribute="trailing" constant="10" id="iAY-ls-Ghn"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="RNk-DU-zIb" secondAttribute="trailing" constant="10" id="lG8-Jk-eis"/>
+                            <constraint firstItem="0Hb-iR-Xg8" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="oXQ-do-86v"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="izq-VE-rwM" secondAttribute="bottom" constant="10" id="wLr-Se-tuX"/>
+                            <constraint firstItem="0Hb-iR-Xg8" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="z3i-MK-vv6"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="izq-VE-rwM" secondAttribute="trailing" constant="10" id="zf6-Aa-zbs"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -611,6 +625,7 @@
                         <outlet property="distanceLabel" destination="pR1-xJ-BUU" id="8pG-xM-4iM"/>
                         <outlet property="landmarkImageView" destination="tud-h2-dZA" id="942-i5-iHE"/>
                         <outlet property="likeLabel" destination="VnH-Nu-yH2" id="Od1-aJ-6XI"/>
+                        <outlet property="mapSearchButton" destination="0Hb-iR-Xg8" id="dPR-O8-nqB"/>
                         <outlet property="mapView" destination="nLK-Hj-2Ry" id="d5z-Hy-xdJ"/>
                         <outlet property="noOfFunFactsLabel" destination="Ild-id-TBQ" id="6Lg-p8-oIF"/>
                         <outlet property="titleAnnotationLabel" destination="kRP-Nf-mJR" id="gIf-ux-CVg"/>
@@ -622,7 +637,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1944.8" y="189.3553223388306"/>
+            <point key="canvasLocation" x="1944.8" y="188.42364532019704"/>
         </scene>
         <!--Profile View Controller-->
         <scene sceneID="Zka-6i-joe">
@@ -1324,7 +1339,7 @@
             <objects>
                 <viewController storyboardIdentifier="addFactVC" id="6QM-Ug-iYa" customClass="AddNewFactViewController" customModule="FunFactTest" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3bb-87-5Ed">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" translatesAutoresizingMaskIntoConstraints="NO" id="vck-OU-C1L">
@@ -1659,7 +1674,7 @@
             <objects>
                 <viewController id="JIP-QS-RKw" customClass="AddressViewController" customModule="FunFactTest" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="0qG-GX-5Z1">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="724"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Hco-mv-UsC">

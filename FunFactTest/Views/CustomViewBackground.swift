@@ -32,6 +32,6 @@ extension UIView {
 extension UIActivityIndicatorView {
     func dismissLoader() {
         self.stopAnimating()
-        UIApplication.shared.endIgnoringInteractionEvents()
+//        UIApplication.shared.endIgnoringInteractionEvents()
     }
 }

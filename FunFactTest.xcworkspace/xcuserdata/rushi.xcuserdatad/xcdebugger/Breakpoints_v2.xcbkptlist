@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FunFactTest/Managers/FirestoreManager.swift"
-            timestampString = "574221532.077261"
+            timestampString = "574569061.7548749"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "152"
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FunFactTest/Managers/FirestoreManager.swift"
-            timestampString = "574221532.077337"
+            timestampString = "574569061.754945"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "753"
-            endingLineNumber = "753"
+            startingLineNumber = "756"
+            endingLineNumber = "756"
             landmarkName = "getLandmarksInMapArea(neCoordinate:swCoordinate:completion:)"
             landmarkType = "7">
             <Locations>

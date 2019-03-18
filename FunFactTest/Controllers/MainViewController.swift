@@ -31,6 +31,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     @IBOutlet var distanceLabel: UILabel!
     @IBOutlet var typeColor: UIView!
     @IBOutlet var addFactButton: UIButton!
+    @IBOutlet weak var mapSearchButton: UIButton!
     
     
     var landmarkTitle = ""
@@ -78,7 +79,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         addFactButton.clipsToBounds = true
         addFactButton.layer.cornerRadius = 25
         addFactButton.layer.shadowPath = UIBezierPath(roundedRect: addFactButton.bounds, cornerRadius: 25).cgPath
-        addFactButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        addFactButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.15).cgColor
         addFactButton.layer.shadowOffset = CGSize(width: 0, height: 9)
         addFactButton.layer.shadowOpacity = 1.0
         addFactButton.layer.shadowRadius = 10.0
@@ -92,12 +93,12 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         let currentLocationAttr = NSAttributedString(string: currentLocationLabel, attributes: Attributes.currentLocationButtonAttribute)
         let currentLocationAttrClicked = NSAttributedString(string: currentLocationLabel, attributes: Attributes.toolBarImageClickedAttribute)
         
-        currentLocationButton.backgroundColor = UIColor(white: 0.9, alpha: 1.0)
+        currentLocationButton.backgroundColor = UIColor.clear
         currentLocationButton.clipsToBounds = true
-        currentLocationButton.layer.cornerRadius = 25
-        currentLocationButton.layer.shadowPath = UIBezierPath(roundedRect: currentLocationButton.bounds, cornerRadius: 25).cgPath
-        currentLocationButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
-        currentLocationButton.layer.shadowOffset = CGSize(width: 0, height: 9)
+        currentLocationButton.layer.cornerRadius = currentLocationButton.frame.height/2
+        currentLocationButton.layer.shadowPath = UIBezierPath(roundedRect: currentLocationButton.bounds, cornerRadius: currentLocationButton.frame.height/2).cgPath
+        currentLocationButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.15).cgColor
+        currentLocationButton.layer.shadowOffset = CGSize(width: 0, height: 4)
         currentLocationButton.layer.shadowOpacity = 1.0
         currentLocationButton.layer.shadowRadius = 10.0
         currentLocationButton.layer.masksToBounds = false
@@ -110,6 +111,20 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         if let coor = mapView.userLocation.location?.coordinate {
             mapView.setCenter(coor, animated: true)
         }
+        
+        mapSearchButton.titleLabel?.font = UIFont(name: "Avenir Next", size: CGFloat(15))
+        mapSearchButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        mapSearchButton.setTitle("Search this area", for: .normal)
+        mapSearchButton.setTitle("Search this area", for: .highlighted)
+        mapSearchButton.layer.cornerRadius = mapSearchButton.frame.height/2
+        mapSearchButton.layer.shadowPath = UIBezierPath(roundedRect: mapSearchButton.bounds, cornerRadius: mapSearchButton.frame.height/2).cgPath
+        mapSearchButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.15).cgColor
+        mapSearchButton.layer.shadowOffset = CGSize(width: 0, height: 4)
+        mapSearchButton.layer.shadowOpacity = 1.0
+        mapSearchButton.layer.shadowRadius = 10.0
+        mapSearchButton.layer.masksToBounds = false
+        
+        
 //        configureTileOverlay()
     }
     func documentsDidUpdate() {
@@ -127,6 +142,10 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
             self.present(alert, animated: true, completion: nil)
         }
         performSegue(withIdentifier: "addFactDetail", sender: self)
+    }
+    @IBAction func mapSearchAction(_ sender: Any) {
+        AppDataSingleton.appDataSharedInstance.event = .mapEvent
+        downloadLandmarks(caller: .mapEvent)
     }
     
     @IBAction func showCurrentLocation(_ sender: Any) {
@@ -149,7 +168,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         let numOffAttr = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                            NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]
         
-        landmarkTitle = (annotationClicked.title)!
+        landmarkTitle = annotationClicked.title?.components(separatedBy: ") ").last ?? ""
         landmarkID = annotationClicked.landmarkID
         
         setupImage(landmark)
@@ -267,7 +286,6 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
             }, completion: nil)
             UIView.animate(withDuration: 0.5, animations: {
                 self.addFactButton.transform = CGAffineTransform(translationX: 0, y: -110)
-                self.currentLocationButton.transform = CGAffineTransform(translationX: 0, y: -110)
             }, completion: nil)
         } else {
             view.transform = CGAffineTransform(translationX: 0, y: 0)
@@ -277,12 +295,16 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
             }, completion: nil)
             UIView.animate(withDuration: 0.5, animations: {
                 self.addFactButton.transform = CGAffineTransform(translationX: 0, y: 0)
-                self.currentLocationButton.transform = CGAffineTransform(translationX: 0, y: 0)
             }, completion: nil)
         }
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -323,6 +345,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     func loadDataFromFirestoreAndAddAnnotations() {
         //4. Getting data from Firestore
+        AppDataSingleton.appDataSharedInstance.event = .firstLoad
         downloadLandmarks(caller: .firstLoad)
     }
     func setupGeoFences(lat: Double, lon: Double, title: String, landmarkID: String) {
@@ -351,35 +374,14 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
             print("System can't track regions")
         }
     }
-    //     MARK: - Navigation
-    //
-    //     In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-    
+    func stopMonitoringRegions() {
+        for region in locationManager.monitoredRegions {
+            locationManager.stopMonitoring(for: region)
+        }
     }
     
     func setupNavigationbar () {
-        navigationController?.navigationBar.prefersLargeTitles = true
-//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-//        navigationController?.navigationBar.shadowImage = UIImage()
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
-        }
-    }
-    func showLoader(view: UIView) -> UIActivityIndicatorView {
-        let spinner = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 60, height: 60))
-        spinner.backgroundColor = UIColor.clear
-        spinner.color = UIColor.black
-        spinner.layer.cornerRadius = 3.0
-        spinner.clipsToBounds = true
-        spinner.hidesWhenStopped = true
-        spinner.style = UIActivityIndicatorView.Style.gray
-        spinner.center = view.center
-        view.addSubview(spinner)
-        spinner.startAnimating()
-        //        UIApplication.shared.beginIgnoringInteractionEvents()
-        
-        return spinner
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
 }
 extension MainViewController: MKMapViewDelegate {
@@ -388,6 +390,10 @@ extension MainViewController: MKMapViewDelegate {
         
         if view.annotation is MKUserLocation {
             return
+        } else if view.annotation is MKClusterAnnotation {
+            let center = CLLocationCoordinate2D(latitude: (view.annotation?.coordinate.latitude)!, longitude: (view.annotation?.coordinate.longitude)!)
+            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+            self.mapView.setRegion(region, animated: true)
         }
         
         if let annotation = view.annotation as? FunFactAnnotation {
@@ -407,6 +413,9 @@ extension MainViewController: MKMapViewDelegate {
         if annotation is MKUserLocation {
             //return nil so map view draws "blue dot" for standard user location
             return nil
+        }
+        if annotation is MKClusterAnnotation {
+            return mapView.dequeueReusableAnnotationView(withIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier, for: annotation)
         }
         var annotationView = MKMarkerAnnotationView()
         guard annotation is FunFactAnnotation else { return nil }
@@ -429,6 +438,7 @@ extension MainViewController: MKMapViewDelegate {
         annotationView.clusteringIdentifier = identifier
         return annotationView
     }
+    
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         // This is the final step. This code can be copied and pasted into your project
         // without thinking on it so much. It simply instantiates a MKTileOverlayRenderer

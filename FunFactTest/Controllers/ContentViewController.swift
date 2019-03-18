@@ -156,6 +156,47 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setupImage()
+        // Fun Fact description Text View
+        let funFactDescAttr = NSMutableAttributedString(string: funFactDesc)
+        funFactDescriptionTextView.layer.borderWidth = 0
+        funFactDescriptionTextView.layer.borderColor = UIColor.black.cgColor
+        funFactDescriptionTextView.isEditable = false
+        funFactDescriptionTextView.isScrollEnabled = false
+        let attributedFunFactDesc = NSMutableAttributedString()
+        
+        let regularSearchPattern = "\\w+"
+        var regularRanges: [NSRange] = [NSRange]()
+        let regularRegex = try! NSRegularExpression(pattern: regularSearchPattern, options: [])
+        regularRanges = regularRegex.matches(in: funFactDescAttr.string,
+                                             options: [],
+                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
+        
+        for range in regularRanges {
+            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlack,
+                                          range: NSRange(location: range.location,
+                                                         length: range.length))
+        }
+        
+        let hashtagSearchPattern = "#\\w+"
+        var hashtagRanges: [NSRange] = [NSRange]()
+        let hashtagRegex = try! NSRegularExpression(pattern: hashtagSearchPattern, options: [])
+        hashtagRanges = hashtagRegex.matches(in: funFactDescAttr.string,
+                                             options: [],
+                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
+        
+        for range in hashtagRanges {
+            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlue,
+                                          range: NSRange(location: range.location,
+                                                         length: range.length))
+        }
+        attributedFunFactDesc.append(funFactDescAttr)
+        funFactDescriptionTextView.attributedText = attributedFunFactDesc
+        let hashtagGesture = UITapGestureRecognizer(target: self, action: #selector(hashtagTapAction))
+        hashtagGesture.numberOfTapsRequired = 1
+        funFactDescriptionTextView.addGestureRecognizer(hashtagGesture)
+        funFactDescriptionTextView.isUserInteractionEnabled = true
+        
         if verifiedFlag == "N" {
             likeHeart.isHidden = true
             dislikeHeart.isHidden = true
@@ -174,6 +215,9 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         landmarkImage.addGestureRecognizer(imageGesture)
         
         imageCaptionLabel.text = imageCaption
+        let submittedBy1 = "Submitted By: "
+        let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
+        self.submittedBy.attributedText = myAttrString1
         
         firestore.downloadUserProfile(submittedByObject as! String) { (userProfile) in
             let submittedBy1 = "Submitted By: "
@@ -219,50 +263,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         let attributedString = NSMutableAttributedString()
         attributedString.append(sourceAtt1)
         attributedString.append(sourceAtt2)
-        
-        // Fun Fact description Text View
-        funFactDescriptionTextView.layer.borderWidth = 0
-        funFactDescriptionTextView.layer.borderColor = UIColor.black.cgColor
-        funFactDescriptionTextView.isEditable = false
-        funFactDescriptionTextView.isScrollEnabled = false
-        
-        let funFactDescAttr = NSMutableAttributedString(string: funFactDesc)
-        
-        let regularSearchPattern = "\\w+"
-        var regularRanges: [NSRange] = [NSRange]()
-        let regularRegex = try! NSRegularExpression(pattern: regularSearchPattern, options: [])
-        regularRanges = regularRegex.matches(in: funFactDescAttr.string,
-                                             options: [],
-                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
-        
-        for range in regularRanges {
-            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlack,
-                                          range: NSRange(location: range.location,
-                                                         length: range.length))
-        }
-        
-        let hashtagSearchPattern = "#\\w+"
-        var hashtagRanges: [NSRange] = [NSRange]()
-        let hashtagRegex = try! NSRegularExpression(pattern: hashtagSearchPattern, options: [])
-        hashtagRanges = hashtagRegex.matches(in: funFactDescAttr.string,
-                               options: [],
-                               range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
-        
-        for range in hashtagRanges {
-            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlue,
-                                          range: NSRange(location: range.location,
-                                                         length: range.length))
-        }
-        let attributedFunFactDesc = NSMutableAttributedString()
-        attributedFunFactDesc.append(funFactDescAttr)
-        
-        funFactDescriptionTextView.attributedText = attributedFunFactDesc
-        let hashtagGesture = UITapGestureRecognizer(target: self, action: #selector(hashtagTapAction))
-        hashtagGesture.numberOfTapsRequired = 1
-        funFactDescriptionTextView.addGestureRecognizer(hashtagGesture)
-        funFactDescriptionTextView.isUserInteractionEnabled = true
-        
-        setupImage()
+
         sourceURL.attributedText = attributedString
         likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
         likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
@@ -462,8 +463,21 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                 verFlag: verFlag,
                 apprCount: apprCount,
                 completion: { (status) in
-                    self.showAlert(message: status, count: apprCount)
-                })
+                    let status = status
+                    var message = ""
+                    if status == .success {
+                        message = "Verification successful! We need \(3 - apprCount) more approvers to publish this fact on the app."
+                    } else {
+                        message = ErrorMessages.verificationError
+                    }
+                    let alert = Utils.showAlert(status: status, message: message)
+                    self.present(alert, animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                            guard self?.presentedViewController == alert else { return }
+                            self?.dismiss(animated: true, completion: nil)
+                        }
+                    }
+            })
             self.firestore.addFunFactVerifiedToUser(
                 funFactRef: funFactRef,
                 funFactID: self.funFactID,
@@ -504,25 +518,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         }
         self.performSegue(withIdentifier: "verifySegue", sender: nil)
     }
-    func showAlert(message: String, count: Int) {
-        if message == "success" {
-            popup = UIAlertController(title: "Success",
-                                      message: "Verification successful! We need \(3 - count) more approvers to publish this fact on the app.",
-                                      preferredStyle: .alert)
-        }
-        if message == "fail" {
-            popup = UIAlertController(title: "Error",
-                                      message: "Error while verifying.",
-                                      preferredStyle: .alert)
-        }
-        
-        self.present(popup, animated: true, completion: nil)
-        Timer.scheduledTimer(timeInterval: 2.0,
-                             target: self,
-                             selector: #selector(self.dismissAlert),
-                             userInfo: nil,
-                             repeats: false)
-    }
+    
     @objc func dismissAlert() {
         popup.dismiss(animated: true)
     }
