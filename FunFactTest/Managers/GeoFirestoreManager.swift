@@ -10,6 +10,7 @@ import Foundation
 import Geofirestore
 import FirebaseFirestore
 import MapKit
+import Firebase
 
 protocol GeoFirestoreManagerDelegate: class {
     
@@ -55,7 +56,7 @@ class GeoFirestoreManager: FirestoreManagerDelegate {
     /// Retrieve all documents based on center and radius
     func getLandmarks(from center: CLLocation, radius: Double, completion: @escaping (Landmark?, String?, Int?) -> ()) {
         // MARK: Testing GeoFirestore
-        if radius > 200 {
+        if radius > 800 {
             completion(nil, FirestoreErrors.mapTooLarge, 0)
             return
         }
@@ -96,7 +97,6 @@ class GeoFirestoreManager: FirestoreManagerDelegate {
     
     /// Retrieve all landmarks in an array that are in the region specified and sort them by likes desc
     func getLandmarks(in region: MKCoordinateRegion, completion: @escaping ([Landmark]?, String?) -> ()) {
-        let collection = geoFirestoreRef.limit(to: 2)
         let query = geoFirestore?.query(inRegion: region)
         var landmarkIds = [String]()
         var count = 0

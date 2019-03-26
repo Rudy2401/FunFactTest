@@ -45,20 +45,38 @@ class ImageViewViewController: UIViewController, UIScrollViewDelegate{
                                                action: #selector(handleDoubleTap))
         doubleTap.numberOfTapsRequired = 2
         scrollView.addGestureRecognizer(doubleTap)
+        
+        let swipeUpGesture = UISwipeGestureRecognizer(target: self,
+                                                      action: #selector(handleSwipe))
+        swipeUpGesture.direction = .up
+        scrollView.addGestureRecognizer(swipeUpGesture)
+        
+        let swipeDownGesture = UISwipeGestureRecognizer(target: self,
+                                                      action: #selector(handleSwipe))
+        swipeDownGesture.direction = .down
+        scrollView.addGestureRecognizer(swipeDownGesture)
+    }
+    
+    @objc func handleSwipe(_ recognizer: UITapGestureRecognizer) {
+        if scrollView.zoomScale == scrollView.minimumZoomScale {
+            let transition = CATransition()
+            transition.duration = 0.5
+            transition.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            transition.type = .fade
+            transition.subtype = CATransitionSubtype.fromTop
+            navigationController?.view.layer.add(transition, forKey: nil)
+            navigationController?.popViewController(animated: false)
+        }
     }
     
     @objc func handleDoubleTap(_ recognizer: UITapGestureRecognizer) {
         if (scrollView.zoomScale > scrollView.minimumZoomScale) {
-            print ("1")
             scrollView.setZoomScale(scrollView.minimumZoomScale, animated: true)
         } else {
-            print ("2")
-//            scrollView.setZoomScale(scrollView.maximumZoomScale, animated: true)
             let zoomRect = zoomRectForScale(scale: scrollView.maximumZoomScale / 3.0,
                                             center: recognizer.location(in: recognizer.view))
             scrollView.zoom(to: zoomRect, animated: true)
         }
-        
     }
     func zoomRectForScale(scale : CGFloat, center : CGPoint) -> CGRect {
         var zoomRect = CGRect.zero

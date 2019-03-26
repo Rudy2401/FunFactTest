@@ -219,30 +219,34 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
         self.submittedBy.attributedText = myAttrString1
         
-        firestore.downloadUserProfile(submittedByObject as! String) { (userProfile) in
-            let submittedBy1 = "Submitted By: "
-            let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
-            let completeSubmittedBy = NSMutableAttributedString()
-            let userID = userProfile.userName
-            let submittedBy2 = userID
-            let myAttrString2 = NSAttributedString(string: submittedBy2, attributes: Attributes.attribute12RegBlue)
-            let profileGesture = UITapGestureRecognizer(target: self, action: #selector(self.profileView))
-            profileGesture.numberOfTapsRequired = 1
-            
-            self.submittedBy.isUserInteractionEnabled = true
-            self.submittedBy.addGestureRecognizer(profileGesture)
-            
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MMM dd, yyyy"
-            let date = self.dateObject as! Timestamp
-            let date1 = dateFormatter.string(from: date.dateValue())
-            let myAttrString3 = NSAttributedString(string: ", \(date1)", attributes: Attributes.attribute10RegDG)
-            
-            completeSubmittedBy.append(myAttrString1)
-            completeSubmittedBy.append(myAttrString2)
-            completeSubmittedBy.append(myAttrString3)
-            self.submittedBy.frame.size = self.submittedBy.intrinsicContentSize
-            self.submittedBy.attributedText = completeSubmittedBy
+        firestore.downloadUserProfile(submittedByObject as! String) { (userProfile, error) in
+            if let error = error {
+                print ("Error getting user profile \(error)")
+            } else {
+                let submittedBy1 = "Submitted By: "
+                let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
+                let completeSubmittedBy = NSMutableAttributedString()
+                let userID = userProfile!.userName
+                let submittedBy2 = userID
+                let myAttrString2 = NSAttributedString(string: submittedBy2, attributes: Attributes.attribute12RegBlue)
+                let profileGesture = UITapGestureRecognizer(target: self, action: #selector(self.profileView))
+                profileGesture.numberOfTapsRequired = 1
+                
+                self.submittedBy.isUserInteractionEnabled = true
+                self.submittedBy.addGestureRecognizer(profileGesture)
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "MMM dd, yyyy"
+                let date = self.dateObject as! Timestamp
+                let date1 = dateFormatter.string(from: date.dateValue())
+                let myAttrString3 = NSAttributedString(string: ", \(date1)", attributes: Attributes.attribute10RegDG)
+                
+                completeSubmittedBy.append(myAttrString1)
+                completeSubmittedBy.append(myAttrString2)
+                completeSubmittedBy.append(myAttrString3)
+                self.submittedBy.frame.size = self.submittedBy.intrinsicContentSize
+                self.submittedBy.attributedText = completeSubmittedBy
+            }
         }
         
         
@@ -344,7 +348,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         let verifTextLabel = UILabel()
         verifTextLabel.numberOfLines = 0
         verifTextLabel.textAlignment = NSTextAlignment.center
-        let verifText = NSAttributedString(string: "This fact hasn't been verified yet. It will show up on this app only when it's verified by 3 people. You can help verify this fact by clicking below.", attributes: Attributes.attribute16DemiBlack)
+        let verifText = NSAttributedString(string: "This fact hasn't been verified yet. It will show up on this app only when it's verified by 3 people. You can help verify this fact by clicking below.", attributes: Attributes.attribute16DemiBlackAve)
         verifTextLabel.attributedText = verifText
         
         let verifButton = CustomButton()
@@ -584,12 +588,16 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     
     @objc func profileView(sender : UITapGestureRecognizer) {
-        firestore.downloadUserProfile(submittedByObject as! String) { (user) in
-            let profileVC = self.storyboard?.instantiateViewController(withIdentifier: "profileView") as! ProfileViewController
-            profileVC.uid = self.submittedByObject as! String
-            profileVC.mode = "other"
-            profileVC.userProfile = user
-            self.navigationController?.pushViewController(profileVC, animated: true)
+        firestore.downloadUserProfile(submittedByObject as! String) { (user, error) in
+            if let error = error {
+                print ("Error getting user profile \(error)")
+            } else {
+                let profileVC = self.storyboard?.instantiateViewController(withIdentifier: "profileView") as! ProfileViewController
+                profileVC.uid = self.submittedByObject as! String
+                profileVC.mode = .otherUser
+                profileVC.userProfile = user!
+                self.navigationController?.pushViewController(profileVC, animated: true)
+            }
         }
     }
     

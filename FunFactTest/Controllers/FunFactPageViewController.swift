@@ -40,7 +40,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
-        print (totalPages)
         if currentIndex == NSNotFound {
             return nil
         }
@@ -51,7 +50,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     required init?(coder aDecoder: NSCoder) {
-//        pageControl = UIPageControl(frame: CGRect(x: 0,y: UIScreen.main.bounds.maxY - 50,width: UIScreen.main.bounds.width,height: 50))
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
     }
     
@@ -68,14 +66,16 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         setupPageControl()
         
         setupToolbarAndNavigationbar()
+        navigationController?.navigationBar.prefersLargeTitles = true
         navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
         navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.tintColor = .darkGray
-        
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = true
-        } else {
-            // Fallback on earlier versions
+        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
+            if #available(iOS 11.0, *) {
+                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
+            } else {
+                // Fallback on earlier versions
+            }
         }
         self.setViewControllers([viewControllerAtIndex(0)] as? [UIViewController], direction: .forward, animated: true, completion: nil)
     }
@@ -231,8 +231,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     private func setupPageControl() {
         self.pageControl.frame = CGRect(x: 0, y: self.view.frame.size.height - 50, width: self.view.frame.size.width, height: 50)
-        self.pageControl.transform = CGAffineTransform(scaleX: 0.9, y: 0.9)
-        self.pageControl.backgroundColor = .clear
+        self.pageControl.backgroundColor = .white
         self.pageControl.currentPageIndicatorTintColor = UIColor(white: 0.4, alpha: 1.0)
         self.pageControl.pageIndicatorTintColor = UIColor(white: 0.8, alpha: 1.0)
         self.pageControl.hidesForSinglePage = true
@@ -245,6 +244,15 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
             self.pageControl.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
             ])
         self.pageControl.numberOfPages = pageContent.count
+        self.pageControl.addTarget(self, action: #selector(pageControlSelectionAction), for: .touchUpInside)
+    }
+    
+    @objc func pageControlSelectionAction(sender: UIPageControl) {
+        if sender.currentPage > currentIndex {
+            nextPage()
+        } else {
+            prevPage()
+        }
     }
     
     @objc func voiceAction(sender: UIButton) {
@@ -295,7 +303,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
             let editActionButton = UIAlertAction(title: "Edit Fun Fact", style: .default)
             { _ in
                 guard let addFactVC  = self.storyboard?.instantiateViewController(withIdentifier: "addFactVC") as? AddNewFactViewController? else { return }
-                addFactVC?.mode = "edit"
+                addFactVC?.mode = Mode.edit
                 addFactVC?.funFactID = currentVC.funFactID
                 addFactVC?.landmarkName = currentVC.headingObject as? String
                 addFactVC?.imageCaptionText = currentVC.imageCaption
@@ -353,14 +361,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         
         self.present(activityController, animated: true, completion: nil)
     }
-    
-    @objc func prevFunFact(sender : UIButton) {
-        prevPage()
-    }
-    @objc func nextFunFact(sender : UIButton) {
-        nextPage()
-    }
-    
     func nextPage() {
         if currentIndex+1 == totalPages {
             return
@@ -368,7 +368,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         currentIndex += 1
         if let nextViewController = viewControllerAtIndex(currentIndex) {
             setViewControllers([nextViewController], direction: .forward, animated: true, completion: nil)
-//            nextViewController.pageNumberText = "Fact (\(currentIndex+1)/\(totalPages))"
         }
     }
     func prevPage() {
@@ -378,7 +377,6 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         currentIndex -= 1
         if let prevViewController = viewControllerAtIndex(currentIndex) {
             setViewControllers([prevViewController], direction: .reverse, animated: true, completion: nil)
-//            prevViewController.pageNumberText = "Fact (\(currentIndex+1)/\(totalPages))"
         }
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

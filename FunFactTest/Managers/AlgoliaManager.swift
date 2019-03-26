@@ -28,8 +28,9 @@ class AlgoliaManager: NSObject {
         
         landmarkIndex = client.index(withName: "landmark_name")
         landmarkIndex.setSettings([
-            "searchableAttributes": ["name,address,city,country","country"],
-            "ranking": ["desc(likes)"]
+            "searchableAttributes": ["name,address,city,country,type","country"],
+            "ranking": ["desc(likes)"],
+            "attributesForFaceting": ["type"]
             ])
         
         hashtagIndex = client.index(withName: "hashtag_name")

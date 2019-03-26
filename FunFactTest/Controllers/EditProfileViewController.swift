@@ -202,8 +202,12 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
                                                                                 }
                                                                             }
                                                                             
-                                                                            self.firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "", completionHandler: { (userProfile) in
-                                                                                AppDataSingleton.appDataSharedInstance.userProfile = userProfile
+                                                                            self.firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "", completionHandler: { (userProfile, error) in
+                                                                                if let error = error {
+                                                                                    print ("Error getting user profile \(error)")
+                                                                                } else {
+                                                                                    AppDataSingleton.appDataSharedInstance.userProfile = userProfile!
+                                                                                }
                                                                             })
                                                                         }
                                         }

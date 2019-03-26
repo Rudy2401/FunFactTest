@@ -27,8 +27,6 @@ extension MainViewController: CLLocationManagerDelegate, AlgoliaSearchManagerDel
             self.mapView.setRegion(region, animated: true)
             let currentLocationCoordinate = location.coordinate
             self.currentLocationCoordinate = currentLocationCoordinate
-            // 4. setup Firestore data
-            loadDataFromFirestoreAndAddAnnotations()
         }
     }
     
@@ -72,13 +70,13 @@ extension MainViewController {
     func downloadLandmarks(caller: Events) {
         let spinner = Utils.showLoader(view: self.mapView)
         mapView.removeAnnotations(mapView.annotations)
-        stopMonitoringRegions()
-
+        
         let mapRect = self.mapView.visibleMapRect
         let nwMapPoint = MKMapPoint(x: mapRect.origin.x, y: mapRect.maxY)
         let seMapPoint = MKMapPoint(x: mapRect.maxX, y: mapRect.origin.y)
         
         let query = Query()
+        
         let boundingBox = GeoRect(p1: LatLng(lat: nwMapPoint.coordinate.latitude,
                                              lng: nwMapPoint.coordinate.longitude),
                                   p2: LatLng(lat: seMapPoint.coordinate.latitude,
@@ -91,7 +89,16 @@ extension MainViewController {
         } else {
             query.insideBoundingBox = [boundingBox]
         }
+        let interests = UserDefaults.standard.array(forKey: "UserInterests")
+        var filters = ""
+        for interest in interests ?? [] {
+            filters += "type:'\(interest)' OR "
+        }
+        filters = "\(filters.dropLast(4))"
+        query.filters = filters
+        
         query.hitsPerPage = 30
+       
         var count = 0
         algoliaManager.downloadLandmarks(query: query) { (landmark, error) in
             if let error = error {
@@ -109,10 +116,7 @@ extension MainViewController {
             }
             else {
                 let landmark = landmark!
-                self.setupGeoFences(lat: landmark.coordinates.latitude,
-                                    lon: landmark.coordinates.longitude,
-                                    title: landmark.name,
-                                    landmarkID: landmark.id)
+                
                 count += 1
                 // Add anotations
                 var annotation: FunFactAnnotation

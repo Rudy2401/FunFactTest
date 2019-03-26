@@ -20,6 +20,12 @@ enum Colors {
     static let azureBlue = UIColor(displayP3Red: 0/255, green: 128/255, blue: 255/255, alpha: 1.0)
 }
 
+enum UserRole {
+    static let editor = "Editor"
+    static let general = "General"
+    static let admin = "Admin"
+}
+
 enum UserLevel {
     static let rookie = "Rookie"
     static let advanced = "Advanced"
@@ -30,6 +36,10 @@ enum UserLevel {
 enum ImageType {
     static let profile = "profileImages"
     static let funFact = "images"
+}
+enum ProfileMode {
+    case currentUser
+    case otherUser
 }
 
 enum ListOfFunFactsByType {
@@ -85,6 +95,12 @@ enum ErrorMessages {
     static let userCreateSuccess = "User created successfully!"
     static let rejectionSuccess = "Uploaded successfully!"
     static let rejectionError = "Error while uploading."
+    static let interestsSuccess = "User interests updated successfully!"
+}
+
+enum Mode {
+    case edit
+    case add
 }
 
 enum Attributes {
@@ -109,6 +125,8 @@ enum Attributes {
     static let attribute12Gray = [ NSAttributedString.Key.foregroundColor: UIColor.gray,
                                    NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 12.0)!]
     static let attribute16DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
+                                        NSAttributedString.Key.font: UIFont(name: "Charter-Bold", size: 16.0)!]
+    static let attribute16DemiBlackAve = [ NSAttributedString.Key.foregroundColor: UIColor.black,
                                         NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 16.0)!]
     static let attribute14DemiBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
                                        NSAttributedString.Key.font: UIFont(name: "AvenirNext-DemiBold", size: 14.0)!]
@@ -207,33 +225,33 @@ struct Constants {
                                 "Source website content is inaccurate",
                                 "Other"]
     
-    static func getMarkerDetails(type: String) -> AnnotationType {
+    static func getMarkerDetails(type: String, width: Double, height: Double) -> AnnotationType {
         var annotationType = AnnotationType(color: UIColor(), image: UIImage())
         switch type {
         case LandmarkTypes.art:
             annotationType.color = .orange
-            annotationType.image = UIImage.fontAwesomeIcon(name: .theaterMasks, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .theaterMasks, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.cool:
             annotationType.color = .purple
-            annotationType.image = UIImage.fontAwesomeIcon(name: .alicorn, style: .solidp, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .alicorn, style: .solidp, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.historic:
             annotationType.color = Colors.maroonColor
-            annotationType.image = UIImage.fontAwesomeIcon(name: .monument, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .monument, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.landmark:
             annotationType.color = Colors.airforceBlueColor
-            annotationType.image = UIImage.fontAwesomeIcon(name: .landmark, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .landmark, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.natural:
             annotationType.color = Colors.azureBlue
-            annotationType.image = UIImage.fontAwesomeIcon(name: .water, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .water, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.park:
             annotationType.color = Colors.seagreenColor
-            annotationType.image = UIImage.fontAwesomeIcon(name: .trees, style: .solidp, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .trees, style: .solidp, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.promotions:
             annotationType.color = .yellow
-            annotationType.image = UIImage.fontAwesomeIcon(name: .star, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .star, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.restaurant:
             annotationType.color = .darkGray
-            annotationType.image = UIImage.fontAwesomeIcon(name: .utensils, style: .solid, textColor: .white, size: CGSize(width: 50, height: 50))
+            annotationType.image = UIImage.fontAwesomeIcon(name: .utensils, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         default:
             annotationType.color = .red
         }

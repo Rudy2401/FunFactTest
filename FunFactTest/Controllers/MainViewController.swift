@@ -39,7 +39,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     var currentLocationCoordinate = CLLocationCoordinate2D()
     var landmarkImage = UIImage()
     var landmarkType = ""
-    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "",city: "", country: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "",city: "", country: "", roles: [], funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
     var boundingBox: GeoRect?
     var firestore = FirestoreManager()
     var currentAnnotation: FunFactAnnotation?
@@ -54,14 +54,33 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         annotationBottomView.alpha = 0.0
         setupNavigationbar()
         
+        // 1. status is not determined
+        if CLLocationManager.authorizationStatus() == .notDetermined {
+            locationManager.requestAlwaysAuthorization()
+        }
+            // 2. authorization were denied
+        else if CLLocationManager.authorizationStatus() == .denied {
+            let alert = UIAlertController(title: "Warning", message: "Location services were previously denied. Please enable location services for this app in Settings.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+            // 3. we do have authorization
+        else if CLLocationManager.authorizationStatus() == .authorizedAlways {
+            locationManager.startUpdatingLocation()
+        }
+        
         // 2. setup locationManager
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
 
-        firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user) in
-            AppDataSingleton.appDataSharedInstance.userProfile = user
+        firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user, error) in
+            if let error = error {
+                print ("Error getting user profile \(error)")
+            } else {
+                AppDataSingleton.appDataSharedInstance.userProfile = user!
+            }
         }
         
         // 3. setup mapView
@@ -124,7 +143,9 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         mapSearchButton.layer.shadowRadius = 10.0
         mapSearchButton.layer.masksToBounds = false
         
-        
+        delay(2) {
+            self.loadDataFromFirestoreAndAddAnnotations()
+        }
 //        configureTileOverlay()
     }
     func documentsDidUpdate() {
@@ -153,7 +174,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     func setupBottomView (annotationClicked: FunFactAnnotation, landmark: Landmark) {
-        typeColor.backgroundColor = Constants.getMarkerDetails(type: annotationClicked.type).color
+        typeColor.backgroundColor = Constants.getMarkerDetails(type: annotationClicked.type, width: 50, height: 50).color
         annotationBottomView.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
         annotationBottomView.layer.shadowOffset = CGSize(width: 0, height: 3)
         annotationBottomView.layer.shadowOpacity = 1.0
@@ -310,21 +331,6 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        // 1. status is not determined
-        if CLLocationManager.authorizationStatus() == .notDetermined {
-            locationManager.requestAlwaysAuthorization()
-        }
-            // 2. authorization were denied
-        else if CLLocationManager.authorizationStatus() == .denied {
-            let alert = UIAlertController(title: "Warning", message: "Location services were previously denied. Please enable location services for this app in Settings.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        }
-            // 3. we do have authorization
-        else if CLLocationManager.authorizationStatus() == .authorizedAlways {
-            locationManager.startUpdatingLocation()
-        }
-        
     }
     @objc func viewAddFact(recognizer: UITapGestureRecognizer) {
         performSegue(withIdentifier: "addFactDetail", sender: self)
@@ -346,38 +352,11 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     func loadDataFromFirestoreAndAddAnnotations() {
         //4. Getting data from Firestore
         AppDataSingleton.appDataSharedInstance.event = .firstLoad
-        downloadLandmarks(caller: .firstLoad)
+        self.downloadLandmarks(caller: .firstLoad)
     }
-    func setupGeoFences(lat: Double, lon: Double, title: String, landmarkID: String) {
-        // 1. check if system can monitor regions
-        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
-            
-            // 2. region data
-            let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
-            let regionRadius = 100.0
-            
-            let identifier = landmarkID + "|" + title
-            // 3. setup region
-            let region = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lat,
-                                                                         longitude: lon),
-                                          radius: regionRadius,
-                                          identifier: identifier)
-            
-            region.notifyOnEntry = true
-            region.notifyOnExit = false
-            locationManager.startMonitoring(for: region)
-            
-            // 5. setup circle
-            let circle = MKCircle(center: coordinate, radius: regionRadius)
-            mapView.addOverlay(circle)
-        } else {
-            print("System can't track regions")
-        }
-    }
-    func stopMonitoringRegions() {
-        for region in locationManager.monitoredRegions {
-            locationManager.stopMonitoring(for: region)
-        }
+    func delay(_ delay:Double, closure:@escaping ()->()) {
+        let when = DispatchTime.now() + delay
+        DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
     }
     
     func setupNavigationbar () {
@@ -423,8 +402,8 @@ extension MainViewController: MKMapViewDelegate {
         let identifier = "annotation"
         var image = UIImage()
         var color = UIColor.red
-        image = Constants.getMarkerDetails(type: (annotation as! FunFactAnnotation).type).image
-        color = Constants.getMarkerDetails(type: (annotation as! FunFactAnnotation).type).color
+        image = Constants.getMarkerDetails(type: (annotation as! FunFactAnnotation).type, width: 50, height: 50).image
+        color = Constants.getMarkerDetails(type: (annotation as! FunFactAnnotation).type, width: 50, height: 50).color
         
         if let dequedView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView {
             annotationView = dequedView

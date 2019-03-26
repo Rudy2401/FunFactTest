@@ -36,7 +36,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
     var geoFirestore = GeoFirestoreManager()
     var address: String?
     var landmarkName: String?
-    var landmarkID: String!
+    var landmarkID: String?
     var pickerData: [String] = [String]()
     var coordinate = CLLocationCoordinate2D()
     var type: String?
@@ -47,7 +47,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
     var popup = UIAlertController()
     var tag = 100
     var autocompleteHashtags = [SearchHashtag]()
-    var mode = ""
+    var mode = Mode.add
     var funFactID = ""
     var landmarkTypeText = ""
     var imageCaptionText = ""
@@ -83,7 +83,29 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.shadowImage = UIImage()
         navigationController?.navigationBar.tintColor = .darkGray
+        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
+            if #available(iOS 11.0, *) {
+                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
+            } else {
+                
+            }
+        }
+        switch mode {
+        case .edit:
+            navigationItem.title = "Edit Fun Fact"
+        case .add:
+            navigationItem.title = "Add A New Fun Fact"
+            landmarkImage.image = UIImage.fontAwesomeIcon(name: .fileImage,
+                                                          style: .solidp,
+                                                          textColor: .gray,
+                                                          size: CGSize(width: landmarkImage.frame.width,
+                                                                       height: landmarkImage.frame.height),
+                                                          backgroundColor: .clear)
+        }
 
         algoliaManager.delegate = self
         funFactDescription.keyboardDistanceFromTextField = 200
@@ -140,9 +162,6 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         landmarkType?.layer.borderColor = UIColor.darkGray.cgColor
         landmarkType?.layer.cornerRadius = 5
 
-        addressTextField?.text = address
-        landmarkNameTextField?.text = landmarkName
-
         let mytapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewAddressScreen))
         mytapGestureRecognizer.numberOfTapsRequired = 1
         addressTextField?.addGestureRecognizer(mytapGestureRecognizer)
@@ -177,10 +196,36 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         submitButton.backgroundColor = Colors.seagreenColor
 
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
 
-        if mode == "edit" {
-            navigationItem.title = "Edit Fun Fact"
-            firestore.getLandmark(for: landmarkID) { (landmark, error) in
+        // Hide the navigation bar on the this view controller
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        // Show the navigation bar on other view controllers
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        addressTextField?.text = address
+        landmarkNameTextField?.text = landmarkName
+
+        if address == landmarkName && (address != "" && address != nil) {
+            algoliaManager.getLandmarkName(from: address ?? "", zipCode: zipcode ?? "") { (name, error) in
+                if let error = error {
+                    print ("Error getting landmark name from address \(error)")
+                } else {
+                    self.landmarkNameTextField?.text = name
+                    self.addressTextField?.text = self.address
+                }
+            }
+        }
+        if mode == .edit {
+            firestore.getLandmark(for: landmarkID ?? "") { (landmark, error) in
                 if let error = error {
                     print ("Error getting landmark object \(error)")
                 }
@@ -198,28 +243,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                     self.setupImage()
                 }
             }
-            
-        } else {
-            navigationItem.title = "Add A New Fun Fact"
-            landmarkImage.image = UIImage.fontAwesomeIcon(name: .fileImage,
-                                                          style: .solidp,
-                                                          textColor: .gray,
-                                                          size: CGSize(width: landmarkImage.frame.width,
-                                                                       height: landmarkImage.frame.height),
-                                                          backgroundColor: .clear)
         }
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        // Hide the navigation bar on the this view controller
-        self.tabBarController?.tabBar.isHidden = true
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        // Show the navigation bar on other view controllers
-        self.tabBarController?.tabBar.isHidden = false
     }
     func documentsDidUpdate() {
         print ("firestore connection made")
@@ -244,23 +268,6 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             self.zipcode = addDet.zipcode
             self.coordinate = addDet.coordinate!
             self.landmarkNameTextField?.isEnabled = false
-            
-            
-            
-            
-//            let add = addDet.address ?? ""
-//            let city = addDet.city ?? ""
-//            let state = addDet.state ?? ""
-//            let country = addDet.country ?? ""
-//            let zipcode = addDet.zipcode ?? ""
-//            let address = (add+city+state+country+zipcode).lowercased()
-//            self.firestore.checkIfLandmarkExists(address: address, completionHandler:
-//                { (id, numOfFunFacts, landLikes, landDislikes) in
-//                self.landmarkID = id
-//                self.numOfFunFacts = numOfFunFacts
-//                self.landLikes = landLikes
-//                self.landDislikes = landDislikes
-//            })
         }
     }
     func documentsDidDownload() {
@@ -302,6 +309,10 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         if self.validatePage() {
             return
         }
+        if AppDataSingleton.appDataSharedInstance.userProfile.roles.contains(UserRole.admin) ||
+            AppDataSingleton.appDataSharedInstance.userProfile.roles.contains(UserRole.editor) {
+            verificationFlag = "Y"
+        }
         let alertController = UIAlertController(title: "Submission",
                                                 message: "Are you sure you want to submit?",
                                                 preferredStyle: .alert)
@@ -309,21 +320,21 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             let db = Firestore.firestore()
             var tempLandmarkID = ""
-            tempLandmarkID = (self.landmarkID == "") ?
-                db.collection("landmarks").document().documentID : self.landmarkID
+            tempLandmarkID = (self.landmarkID == "" || self.landmarkID == nil) ?
+                db.collection("landmarks").document().documentID : self.landmarkID ?? ""
             self.city = (self.city == "" || self.city == nil) ? self.landmark.city : self.city
             self.address = (self.address == "" || self.address == nil) ? self.landmark.address : self.address
             self.state = (self.state == "" || self.state == nil) ? self.landmark.state : self.state
             self.zipcode = (self.zipcode == "" || self.zipcode == nil) ? self.landmark.zipcode : self.zipcode
             self.country = (self.country == "" || self.country == nil) ? self.landmark.country : self.country
-            self.numOfFunFacts = (self.mode != "edit") ? self.numOfFunFacts: self.landmark.numOfFunFacts
-            self.landLikes = (self.mode != "edit") ? self.landLikes: self.landmark.likes
-            self.landDislikes = (self.mode != "edit") ? self.landDislikes: self.landmark.dislikes
+            self.numOfFunFacts = (self.mode != .edit) ? self.numOfFunFacts: self.landmark.numOfFunFacts
+            self.landLikes = (self.mode != .edit) ? self.landLikes: self.landmark.likes
+            self.landDislikes = (self.mode != .edit) ? self.landDislikes: self.landmark.dislikes
             self.coordinate = (self.coordinate.latitude == 0) ?
                 CLLocationCoordinate2D(latitude: self.landmark.coordinates.latitude,
                                        longitude: self.landmark.coordinates.longitude) : self.coordinate
             //Upload Landmark details - merge if landmark already exists
-            let ffID = (self.mode != "edit") ? db.collection("funFacts").document().documentID : self.funFactID
+            let ffID = (self.mode != .edit) ? db.collection("funFacts").document().documentID : self.funFactID
             let landmark = Landmark(id: tempLandmarkID,
                                     name: self.landmarkName ?? "",
                                     address: self.address ?? "",
@@ -395,6 +406,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
                             guard self?.presentedViewController == alert else { return }
                             self?.dismiss(animated: true, completion: nil)
+                            self!.navigationController?.popViewController(animated: true)
                         }
                     }
                 }
@@ -478,7 +490,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  toFocus: self.landmarkImage!,
                                  type: "imageview")
         }
-        if (type ?? "").isEmpty || type == "--- Select landmark type ---" {
+        if ((type ?? "").isEmpty || type == "--- Select landmark type ---") && mode != .edit {
             errors = true
             message += "Please enter a valid landmark type"
             Utils.alertWithTitle(title: title,
@@ -487,6 +499,16 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  toFocus: self.landmarkType!,
                                  type: "pickerview")
         }
+        if (type == "--- Select landmark type ---") && mode == .edit {
+            errors = true
+            message += "Please enter a valid landmark type"
+            Utils.alertWithTitle(title: title,
+                                 message: message,
+                                 viewController: self,
+                                 toFocus: self.landmarkType!,
+                                 type: "pickerview")
+        }
+
         if funFactDescription.text.count > 300 {
             errors = true
             message += "Please make sure that the fun fact description is limited to 300 characters"

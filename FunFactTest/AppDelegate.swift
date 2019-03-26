@@ -17,30 +17,52 @@ import FirebaseFirestore
 import FirebaseStorage
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelegate {
 
     var window: UIWindow?
     let locationManager = CLLocationManager()
     var notificationCenter: UNUserNotificationCenter!
     var notificationCount = 0
     var manager: AlgoliaManager!
-
+    var geofirestore: GeoFirestoreManager!
+    var megaRegion: CLCircularRegion?
+    
+    override init() {
+        super.init()
+        FirebaseApp.configure()
+        let db = Firestore.firestore()
+        let settings = db.settings
+        settings.areTimestampsInSnapshotsEnabled = true
+        db.settings = settings
+        geofirestore = GeoFirestoreManager()
+    }
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        FirebaseApp.configure()
         // Configure Facebook Sign in
         FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
         // Configure Google Sign in
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         
-        self.locationManager.delegate = self
+        locationManager.delegate = self
+        locationManager.requestAlwaysAuthorization()
+        locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        
+        if CLLocationManager.authorizationStatus() == .notDetermined {
+            locationManager.requestAlwaysAuthorization()
+        }
+            // 2. authorization were denied
+        else if CLLocationManager.authorizationStatus() == .denied {
+            
+        }
+            // 3. we do have authorization
+        else if CLLocationManager.authorizationStatus() == .authorizedAlways {
+            locationManager.startUpdatingLocation()
+        }
+        
         // get the singleton object
         notificationCenter = UNUserNotificationCenter.current()
-        
-        if let launchOptions = launchOptions {
-            let notificationInfo = launchOptions[UIApplication.LaunchOptionsKey.location]
-            AppDataSingleton.appDataSharedInstance.event = .notification
-        }
+
         print ("AppDataSingleton.appDataSharedInstance.event = \(AppDataSingleton.appDataSharedInstance.event)")
         // define what do you need permission to use
         let options: UNAuthorizationOptions = [.alert, .sound]
@@ -76,6 +98,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+//        application.applicationIconBadgeNumber = 0
+//        UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+//        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
@@ -97,20 +122,68 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 extension AppDelegate: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        if region is CLCircularRegion {
-            AppDataSingleton.appDataSharedInstance.event = Events.notification
+        print ("entered region = \(region.identifier)")
+        if region is CLCircularRegion && region != megaRegion {
             handleEvent(forRegion: region)
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didExitRegion region: CLRegion) {
-        if region is CLCircularRegion {
-            //            handleEvent(forRegion: region)
+        if region == megaRegion {
+            megaRegion = nil
+        }
+    }
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let lastLocation = locations.last!
+        if megaRegion != nil && (megaRegion?.contains(lastLocation.coordinate))! {
+            return
+        }
+        megaRegion = CLCircularRegion(center: lastLocation.coordinate, radius: 800, identifier: "megaRegion")
+        megaRegion?.notifyOnExit = true
+        megaRegion?.notifyOnEntry = false
+        locationManager.startMonitoring(for: megaRegion!)
+        
+        stopMonitoringRegions()
+        geofirestore.getLandmarks(from: lastLocation, radius: 800) { (landmark, error, count) in
+            if let error = error {
+                print ("Error getting data from GeoFirestore \(error)")
+            } else {
+                let landmark = landmark!
+                self.setupGeoFences(lat: landmark.coordinates.latitude,
+                                    lon: landmark.coordinates.longitude,
+                                    title: landmark.name,
+                                    landmarkID: landmark.id)
+                
+            }
+        }
+    }
+    func setupGeoFences(lat: Double, lon: Double, title: String, landmarkID: String) {
+        // 1. check if system can monitor regions
+        if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
+            
+            // 2. region data
+            let regionRadius = 100.0
+            
+            let identifier = landmarkID + "|" + title
+            // 3. setup region
+            let region = CLCircularRegion(center: CLLocationCoordinate2D(latitude: lat,
+                                                                         longitude: lon),
+                                          radius: regionRadius,
+                                          identifier: identifier)
+            
+            region.notifyOnEntry = true
+            region.notifyOnExit = false
+            locationManager.startMonitoring(for: region)
+        } else {
+            print("System can't track regions")
+        }
+    }
+    func stopMonitoringRegions() {
+        for region in locationManager.monitoredRegions {
+            locationManager.stopMonitoring(for: region)
         }
     }
     func handleEvent(forRegion region: CLRegion!) {
-        print ("identifier = \(region.identifier)")
-        
         if !region.identifier.contains("|") {
             return
         }

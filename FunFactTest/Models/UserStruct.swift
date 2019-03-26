@@ -28,6 +28,7 @@ struct UserProfile {
     var provider: String
     var city: String
     var country: String
+    var roles: [String]
     var funFactsDisputed: [DocumentReference]
     var funFactsLiked: [DocumentReference]
     var funFactsDisliked: [DocumentReference]

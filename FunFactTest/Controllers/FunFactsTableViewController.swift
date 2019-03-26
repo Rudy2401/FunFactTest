@@ -29,45 +29,69 @@ class FunFactsTableViewController: UITableViewController, FirestoreManagerDelega
         if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
             navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
         }
+        // Uncomment the following line to preserve selection between presentations
+        // self.clearsSelectionOnViewWillAppear = false
+
+        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
+        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         switch sender {
         case .submissions:
             navigationItem.title = "User Submissions"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsSubmitted") { (refs) in
-                for ref in refs {
-                    self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts.append(funFact)
-                        self.tableView.reloadData()
-                    })
+            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsSubmitted") { (refs, error) in
+                if let error = error {
+                    print ("Error getting user data \(error)")
+                } else {
+                    for ref in refs! {
+                        self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
+                            self.funFacts.append(funFact)
+                            self.tableView.reloadData()
+                        })
+                    }
                 }
             }
         case .verifications:
             navigationItem.title = "User Verifications"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsVerified") { (refs) in
-                for ref in refs {
-                    self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts.append(funFact)
-                        self.tableView.reloadData()
-                    })
+            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsVerified") { (refs, error) in
+                if let error = error {
+                    print ("Error getting user data \(error)")
+                } else {
+                    for ref in refs! {
+                        self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
+                            self.funFacts.append(funFact)
+                            self.tableView.reloadData()
+                        })
+                    }
                 }
             }
         case .disputes:
             navigationItem.title = "User Disputes"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsDisputed") { (refs) in
-                for ref in refs {
-                    self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts.append(funFact)
-                        self.tableView.reloadData()
-                    })
+            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsDisputed") { (refs, error) in
+                if let error = error {
+                    print ("Error getting user data \(error)")
+                } else {
+                    for ref in refs! {
+                        self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
+                            self.funFacts.append(funFact)
+                            self.tableView.reloadData()
+                        })
+                    }
                 }
             }
         case .rejections:
             navigationItem.title = "User Rejections"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsRejected") { (refs) in
-                for ref in refs {
-                    self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
-                        self.funFacts.append(funFact)
-                        self.tableView.reloadData()
-                    })
+            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsRejected") { (refs, error) in
+                if let error = error {
+                    print ("Error getting user data \(error)")
+                } else {
+                    for ref in refs! {
+                        self.firestore.downloadFunFacts(for: ref, completionHandler: { (funFact) in
+                            self.funFacts.append(funFact)
+                            self.tableView.reloadData()
+                        })
+                    }
                 }
             }
         case .hashtags:
@@ -82,19 +106,6 @@ class FunFactsTableViewController: UITableViewController, FirestoreManagerDelega
             navigationItem.title = landmarkName
             tableView.reloadData()
         }
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        
     }
     func documentsDidUpdate() {
         

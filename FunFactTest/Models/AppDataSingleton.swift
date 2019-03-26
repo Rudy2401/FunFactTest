@@ -25,6 +25,7 @@ class AppDataSingleton {
                            provider: "",
                            city: "",
                            country: "",
+                           roles: [],
                            funFactsDisputed: [],
                            funFactsLiked: [],
                            funFactsDisliked: [],

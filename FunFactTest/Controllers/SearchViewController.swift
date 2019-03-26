@@ -337,12 +337,16 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
         } else if userButton.isSelected {
             let cell = tableView.cellForRow(at: indexPath) as! SearchCellTableViewCell
             let userID = cell.userID
-            firestore.downloadUserProfile(userID) { (user) in
-                let profileVC = self.storyboard?.instantiateViewController(withIdentifier: "profileView") as! ProfileViewController
-                profileVC.uid = userID
-                profileVC.mode = "other"
-                profileVC.userProfile = user
-                self.navigationController?.pushViewController(profileVC, animated: true)
+            firestore.downloadUserProfile(userID) { (user, error) in
+                if let error = error {
+                    print ("Error getting user profile \(error)")
+                } else {
+                    let profileVC = self.storyboard?.instantiateViewController(withIdentifier: "profileView") as! ProfileViewController
+                    profileVC.uid = userID
+                    profileVC.mode = .otherUser
+                    profileVC.userProfile = user!
+                    self.navigationController?.pushViewController(profileVC, animated: true)
+                }
             }
         }
     }

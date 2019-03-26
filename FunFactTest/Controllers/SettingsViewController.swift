@@ -14,7 +14,7 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var tableView: UITableView!
     
     var settingsData = ["Choose your interests",
-                        "Notifications",
+                        "Notification frequency",
                         "Help",
                         "About"]
     var buttonLeftData = [String.fontAwesomeIcon(name: .landmark),
@@ -64,6 +64,14 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60.0
     }
-    
-    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        switch indexPath.row {
+        case 0:
+            self.performSegue(withIdentifier: "interestVC", sender: indexPath)
+        case 1:
+            self.performSegue(withIdentifier: "notifcationFreqSegue", sender: indexPath)
+        default:
+            return
+        }
+    }
 }

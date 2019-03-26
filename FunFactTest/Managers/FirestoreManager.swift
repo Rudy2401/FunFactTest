@@ -11,6 +11,7 @@ import FirebaseFirestore
 import FirebaseStorage
 import FirebaseAuth
 import CoreLocation
+import Firebase
 
 protocol FirestoreManagerDelegate: class {
     func documentsDidUpdate()
@@ -22,9 +23,6 @@ class FirestoreManager {
     var storage: Storage!
 
     init() {
-        let settings = db.settings
-        settings.areTimestampsInSnapshotsEnabled = true
-        db.settings = settings
         storage = Storage()
     }
 
@@ -441,11 +439,11 @@ class FirestoreManager {
         db.collection("users").document(userID).collection("funFactsDisliked").document(funFactID).delete()
     }
     /// Downloads user profile into the UserProfile object
-    func downloadUserProfile(_ uid: String, completionHandler: @escaping (UserProfile) -> ())  {
+    func downloadUserProfile(_ uid: String, completionHandler: @escaping (UserProfile?, String?) -> ())  {
         if uid == "" {
             return
         }
-        var user = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "",city: "", country: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+        var user = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "",city: "", country: "", roles: [], funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
         db.collection("users").document(uid).getDocument { (snapshot, error) in
             if let document = snapshot {
                 user.dislikeCount = document.data()?["dislikeCount"] as! Int
@@ -463,21 +461,24 @@ class FirestoreManager {
                 user.country = document.data()?["country"] as! String
                 user.verifiedCount = document.data()?["verifiedCount"] as! Int
                 user.rejectedCount = document.data()?["rejectedCount"] as! Int
+                user.roles = document.data()?["roles"] as! [String]
                 
-                completionHandler(user)
+                completionHandler(user, nil)
             }
             else {
                 let err = error
                 print("Error getting documents: \(String(describing: err))")
+                completionHandler(nil, err?.localizedDescription)
             }
         }
     }
     /// Downloads user submitted, verified, disputed, liked and disliked data
-    func downloadOtherUserData(_ uid: String, collection: String, completionHandler: @escaping ([DocumentReference]) -> ()) {
+    func downloadOtherUserData(_ uid: String, collection: String, completionHandler: @escaping ([DocumentReference]?, String?) -> ()) {
         var refs = [DocumentReference]()
         db.collection("users").document(uid).collection(collection).getDocuments() { (snap, error) in
             if let err = error {
                 print("Error getting documents: \(err)")
+                completionHandler(nil, err.localizedDescription)
             } else {
                 for doc in snap!.documents {
                     if collection == "funFactsDisputed" {
@@ -487,13 +488,14 @@ class FirestoreManager {
                     }
                 }
             }
-            completionHandler(refs)
+            completionHandler(refs, nil)
         }
     }
     /// Updates the firestore collection /users with additional user data
     func updateUserAdditionalFields(for user: User, completion: @escaping (String?) -> ()) {
         let db = Firestore.firestore()
         let randomNumber = arc4random()
+        let roles = [UserRole.general]
         db.collection("users")
             .document(user.uid)
             .setData(["uid": user.uid,
@@ -504,6 +506,7 @@ class FirestoreManager {
                       "submittedCount": 0,
                       "verifiedCount": 0,
                       "rejectedCount": 0,
+                      "roles": roles,
                       "email": user.email ?? "",
                       "name": user.displayName ?? "",
                       "userName": "user" + String(randomNumber),

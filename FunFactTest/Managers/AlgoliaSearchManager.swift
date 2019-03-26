@@ -79,4 +79,31 @@ class AlgoliaSearchManager {
             }
         }
     }
+    
+    /// Get landmark name from address
+    func getLandmarkName(from address: String, zipCode: String, completion: @escaping (String?, String?) -> ()) {
+        let landmarkQuery = Query()
+        landmarkQuery.query = address
+        landmarkQuery.hitsPerPage = 15
+        landmarkQuery.attributesToRetrieve = ["name", "zipcode"]
+        AlgoliaManager.sharedInstance.landmarkIndex.search(landmarkQuery) { (res, error) in
+            if let error = error {
+                completion(nil, error.localizedDescription)
+            }
+            else {
+                guard let hits = res!["hits"] as? [[String: AnyObject]] else { return }
+                if hits.isEmpty {
+                    completion(nil, Errors.noRecordsFound.localizedDescription)
+                    return
+                }
+                for hit in hits {
+                    let landmarkName = hit["name"] as! String
+                    let zipcode = hit["zipcode"] as! String
+                    if zipcode == zipCode {
+                        completion(landmarkName, nil)
+                    }
+                }
+            }
+        }
+    }
 }

@@ -25,7 +25,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     @IBOutlet weak var locationLabel: UILabel!
     
     var uid = ""
-    var mode = ""
+    var mode = ProfileMode.currentUser
     var factsSubmitted = 0
     var disputesSubmitted = 0
     var funFactsSubmitted = [FunFact]()
@@ -41,7 +41,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     var userNameString = ""
     var levelString = ""
     var firestore = FirestoreManager()
-    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", city: "", country: "", funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", city: "", country: "", roles: [], funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -80,8 +80,41 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
         edit.addTarget(self, action: #selector(editProfileAction), for: .touchUpInside)
         let editBtn = UIBarButtonItem(customView: edit)
         
-        if mode != "other" {
+        if mode == .currentUser {
             navigationItem.setRightBarButtonItems([editBtn], animated: true)
+        } else {
+            signOutButton.isHidden = true
+        }
+        if Auth.auth().currentUser != nil {
+            let subGesture = UITapGestureRecognizer(target: self,
+                                                    action: #selector(subTapAction))
+            subGesture.numberOfTapsRequired = 1
+            submittedNum.isUserInteractionEnabled = true
+            submittedNum.addGestureRecognizer(subGesture)
+            
+            let dispGesture = UITapGestureRecognizer(target: self,
+                                                     action: #selector(dispTapAction))
+            dispGesture.numberOfTapsRequired = 1
+            disputesNum.isUserInteractionEnabled = true
+            disputesNum.addGestureRecognizer(dispGesture)
+            
+            let verGesture = UITapGestureRecognizer(target: self,
+                                                    action: #selector(verTapAction))
+            verGesture.numberOfTapsRequired = 1
+            verifiedNum.isUserInteractionEnabled = true
+            verifiedNum.addGestureRecognizer(verGesture)
+            
+            let rejGesture = UITapGestureRecognizer(target: self,
+                                                    action: #selector(rejTapAction))
+            rejGesture.numberOfTapsRequired = 1
+            rejectedNum.isUserInteractionEnabled = true
+            rejectedNum.addGestureRecognizer(rejGesture)
+            navigationController?.navigationBar.tintColor = UIColor.darkGray
+            
+            userImageView.layer.cornerRadius = userImageView.frame.height/2
+            signOutButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+            userImageView.layer.borderWidth = 0.5
+            userImageView.layer.borderColor = UIColor.gray.cgColor
         }
     }
     @objc func editProfileAction(sender : UITapGestureRecognizer) {
@@ -114,9 +147,33 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
         
         self.present(alertController, animated: true, completion: nil)
     }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        let spinner = Utils.showLoader(view: self.view)
+        if AppDataSingleton.appDataSharedInstance.userProfile.uid == "" {
+            firestore.downloadUserProfile((Auth.auth().currentUser?.uid) ?? "") { (user, error) in
+                if let error = error {
+                    print ("Error getting user profile \(error)")
+                    spinner.dismissLoader()
+                } else {
+                    AppDataSingleton.appDataSharedInstance.userProfile = user!
+                    self.loadAllData()
+                    spinner.dismissLoader()
+                }
+            }
+        } else {
+            loadAllData()
+            spinner.dismissLoader()
+        }
+        
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if mode == "other" {
+        
+    }
+    func loadAllData() {
+        switch mode {
+        case .otherUser:
             submittedCount = userProfile.submittedCount
             disputeCount = userProfile.disputeCount
             verifiedCount = userProfile.verifiedCount
@@ -126,8 +183,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             userNameString = userProfile.userName
             levelString = userProfile.level
             
-        }
-        else {
+        case .currentUser:
             submittedCount = AppDataSingleton.appDataSharedInstance.userProfile.submittedCount
             disputeCount = AppDataSingleton.appDataSharedInstance.userProfile.disputeCount
             verifiedCount = AppDataSingleton.appDataSharedInstance.userProfile.verifiedCount
@@ -144,30 +200,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             self.disputesNum.text = String(disputeCount)
             self.verifiedNum.text = String(verifiedCount)
             self.rejectedNum.text = String(rejectedCount)
-            
-            let subGesture = UITapGestureRecognizer(target: self,
-                                                    action: #selector(subTapAction))
-            subGesture.numberOfTapsRequired = 1
-            submittedNum.isUserInteractionEnabled = true
-            submittedNum.addGestureRecognizer(subGesture)
-            
-            let dispGesture = UITapGestureRecognizer(target: self,
-                                                     action: #selector(dispTapAction))
-            dispGesture.numberOfTapsRequired = 1
-            disputesNum.isUserInteractionEnabled = true
-            disputesNum.addGestureRecognizer(dispGesture)
-            
-            let verGesture = UITapGestureRecognizer(target: self,
-                                                     action: #selector(verTapAction))
-            verGesture.numberOfTapsRequired = 1
-            verifiedNum.isUserInteractionEnabled = true
-            verifiedNum.addGestureRecognizer(verGesture)
-            
-            let rejGesture = UITapGestureRecognizer(target: self,
-                                                    action: #selector(rejTapAction))
-            rejGesture.numberOfTapsRequired = 1
-            rejectedNum.isUserInteractionEnabled = true
-            rejectedNum.addGestureRecognizer(rejGesture)
             
             let photoUrl = URL(string: photoURL )
             if photoUrl == URL(string: "") {
@@ -189,10 +221,9 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
                 }
             }
             signInView.isHidden = true
-            navigationController?.navigationBar.tintColor = UIColor.darkGray
             userName.text = name
             var location = ""
-            if mode != "other" {
+            if mode == .currentUser {
                 if AppDataSingleton.appDataSharedInstance.userProfile.city == "" {
                     if AppDataSingleton.appDataSharedInstance.userProfile.country.count > 1 {
                         location = AppDataSingleton.appDataSharedInstance.userProfile.country
@@ -231,10 +262,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             locationLabel.text = location
             userProfileName.text = userNameString
             levelLabel.text = "Level: \(levelString)"
-            userImageView.layer.cornerRadius = userImageView.frame.height/2
-            signOutButton.layer.backgroundColor = Colors.seagreenColor.cgColor
-            userImageView.layer.borderWidth = 0.5
-            userImageView.layer.borderColor = UIColor.gray.cgColor
         }
         else {
             signInView.isHidden = false
@@ -244,13 +271,17 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     @objc func subTapAction(sender : UITapGestureRecognizer) {
-        if mode == "other" {
-            firestore.downloadUserProfile(uid) { (userProfile) in
-                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
-                userSubsVC.userProfile = userProfile
-                userSubsVC.funFacts = self.funFactsSubmitted
-                userSubsVC.sender = .submissions
-                self.navigationController?.pushViewController(userSubsVC, animated: true)
+        if mode == .otherUser {
+            firestore.downloadUserProfile(uid) { (userProfile, error) in
+                if let error = error {
+                    print ("Error getting user profile \(error)")
+                } else {
+                    let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
+                    userSubsVC.userProfile = userProfile
+                    userSubsVC.funFacts = self.funFactsSubmitted
+                    userSubsVC.sender = .submissions
+                    self.navigationController?.pushViewController(userSubsVC, animated: true)
+                }
             }
         } else {
             let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
@@ -261,13 +292,17 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
         }
     }
     @objc func dispTapAction(sender : UITapGestureRecognizer) {
-        if mode == "other" {
-            firestore.downloadUserProfile(uid) { (userProfile) in
-                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
-                userSubsVC.userProfile = userProfile
-                userSubsVC.funFacts = self.funFactsSubmitted
-                userSubsVC.sender = .disputes
-                self.navigationController?.pushViewController(userSubsVC, animated: true)
+        if mode == .otherUser {
+            firestore.downloadUserProfile(uid) { (userProfile, error) in
+                if let error = error {
+                    print ("Error getting user profile \(error)")
+                } else {
+                    let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
+                    userSubsVC.userProfile = userProfile
+                    userSubsVC.funFacts = self.funFactsSubmitted
+                    userSubsVC.sender = .disputes
+                    self.navigationController?.pushViewController(userSubsVC, animated: true)
+                }
             }
         } else {
             let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
@@ -278,13 +313,17 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
         }
     }
     @objc func verTapAction(sender : UITapGestureRecognizer) {
-        if mode == "other" {
-            firestore.downloadUserProfile(uid) { (userProfile) in
-                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
-                userSubsVC.userProfile = userProfile
-                userSubsVC.funFacts = self.funFactsSubmitted
-                userSubsVC.sender = .verifications
-                self.navigationController?.pushViewController(userSubsVC, animated: true)
+        if mode == .otherUser {
+            firestore.downloadUserProfile(uid) { (userProfile, error) in
+                if let error = error {
+                    print ("Error getting user profile \(error)")
+                } else {
+                    let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
+                    userSubsVC.userProfile = userProfile
+                    userSubsVC.funFacts = self.funFactsSubmitted
+                    userSubsVC.sender = .verifications
+                    self.navigationController?.pushViewController(userSubsVC, animated: true)
+                }
             }
         } else {
             let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
@@ -295,13 +334,17 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
         }
     }
     @objc func rejTapAction(sender : UITapGestureRecognizer) {
-        if mode == "other" {
-            firestore.downloadUserProfile(uid) { (userProfile) in
-                let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
-                userSubsVC.userProfile = userProfile
-                userSubsVC.funFacts = self.funFactsSubmitted
-                userSubsVC.sender = .rejections
-                self.navigationController?.pushViewController(userSubsVC, animated: true)
+        if mode == .otherUser {
+            firestore.downloadUserProfile(uid) { (userProfile, error) in
+                if let error = error {
+                    print ("Error getting user profile \(error)")
+                } else {
+                    let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
+                    userSubsVC.userProfile = userProfile
+                    userSubsVC.funFacts = self.funFactsSubmitted
+                    userSubsVC.sender = .rejections
+                    self.navigationController?.pushViewController(userSubsVC, animated: true)
+                }
             }
         } else {
             let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
