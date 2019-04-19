@@ -11,48 +11,87 @@ import FirebaseStorage
 import FirebaseFirestore
 import FirebaseAuth
 
-class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextViewDelegate {
+class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextViewDelegate, UIScrollViewDelegate {
     
     @IBOutlet weak var funFactDescriptionTextView: UITextView!
-    @IBOutlet var landmarkImage: UIImageView!
-    @IBOutlet var submittedBy: UILabel!
-    @IBOutlet var likeHeart: UIButton!
-    @IBOutlet var dislikeHeart: UIButton!
-    @IBOutlet var sourceURL: UITextView!
+    @IBOutlet weak var landmarkImage: UIImageView!
+    @IBOutlet weak var submittedBy: UILabel!
+    @IBOutlet weak var likeHeart: UIButton!
+    @IBOutlet weak var dislikeHeart: UIButton!
+    @IBOutlet weak var sourceURL: UITextView!
     @IBOutlet weak var dispute: UILabel!
     @IBOutlet weak var likeCount: UILabel!
     @IBOutlet weak var dislikeCount: UILabel!
-    @IBOutlet weak var pageNumber: UILabel!
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var imageCaptionLabel: UILabel!
     
     let util = Utils()
-    var dataObject: AnyObject?
-    var imageObject: AnyObject?
-    var imageCaption = ""
+    var funFact = FunFact(landmarkId: "",
+                          landmarkName: "",
+                          id: "",
+                          description: "",
+                          likes: 0,
+                          dislikes: 0,
+                          verificationFlag: "",
+                          image: "",
+                          imageCaption: "",
+                          disputeFlag: "",
+                          submittedBy: "",
+                          dateSubmitted: Timestamp(date: Date()),
+                          source: "",
+                          tags: [],
+                          approvalCount: 0,
+                          rejectionCount: 0,
+                          approvalUsers: [],
+                          rejectionUsers: [],
+                          rejectionReason: [])
     var landmarkID = ""
-    var submittedByObject: AnyObject?
-    var sourceObject: AnyObject?
-    var likesObject: AnyObject?
-    var dislikesObject: AnyObject?
-    var headingObject: AnyObject?
-    var dateObject: AnyObject?
-    var funFactID: String = ""
-    var funFactDesc: String = ""
     var address: String = ""
-    var verifiedFlag: String = ""
-    var disputeFlag: String = ""
-    var tags: [String] = [""]
     var currPageNumberText = ""
     var totalPageNumberText = ""
-    var approvalCount = 0
-    var rejectionCount = 0
-    var approvalUsers = [String]()
-    var rejectionUsers = [String]()
-    var rejectionReason = [String]()
     var quickHelpView = UIAlertController()
     var popup = UIAlertController()
     var firestore = FirestoreManager()
+    var stack = UIStackView()
+    var refreshControl: UIRefreshControl!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        sourceURL.isScrollEnabled = false
+        scrollView.backgroundColor = .white
+        scrollView.delegate = self
+        scrollView.alwaysBounceVertical = true
+        scrollView.bounces  = true
+        refreshControl = UIRefreshControl()
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
+        self.scrollView.addSubview(refreshControl)
+        
+        view.backgroundColor = .white
+        
+        let imageGesture = UITapGestureRecognizer(target: self, action: #selector(viewImageViewer))
+        imageGesture.numberOfTapsRequired = 1
+        landmarkImage.isUserInteractionEnabled = true
+        landmarkImage.addGestureRecognizer(imageGesture)
+        
+        funFactDescriptionTextView.layer.borderWidth = 0
+        funFactDescriptionTextView.isEditable = false
+        funFactDescriptionTextView.isScrollEnabled = false
+        funFactDescriptionTextView.delegate = self
+        funFactDescriptionTextView.sizeToFit()
+        
+        if funFact.verificationFlag == "N" {
+            setupVerificationPage()
+        }
+        if (self.navigationController?.presentingViewController as? FunFactPageViewController) != nil {
+            let addFactGesture = UITapGestureRecognizer(target: self, action: #selector(viewAddFactForLandmark))
+            addFactGesture.numberOfTapsRequired = 1
+            let button = navigationController?.toolbar.items?[2].customView as! UIButton // swiftlint:disable:this force_cast
+            button.addGestureRecognizer(addFactGesture)
+        } else {
+//            navigationItem.title = funF
+        }
+    }
     
     @IBAction func likeIt(_ sender: Any) {
         if Auth.auth().currentUser == nil {
@@ -64,31 +103,32 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             self.present(alert, animated: true, completion: nil)
             return
         }
-        if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray)
+        if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray)
             &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: Colors.redColor) {
-            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
             likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
             
-            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
+            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-            dislikeHeart.setTitleColor(.lightGray, for: .normal)
-            firestore.addLikes(funFactID: funFactID, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
-            firestore.deleteDislikes(funFactID: funFactID, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
-        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray)
-            &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray) {
-            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+            dislikeHeart.setTitleColor(.darkGray, for: .normal)
+            firestore.addLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            firestore.deleteDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray)
+            &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
+            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
             likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
-            firestore.addLikes(funFactID: funFactID, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            firestore.addLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
             
         } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Colors.seagreenColor)
-            && Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray) {
-            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
+            && Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
+            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-            likeHeart.setTitleColor(.lightGray, for: .normal)
-            firestore.deleteLikes(funFactID: funFactID, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            likeHeart.setTitleColor(.darkGray, for: .normal)
+            firestore.deleteLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         }
+        didPullToRefresh()
     }
     
     @IBAction func dislikeIt(_ sender: Any) {
@@ -101,69 +141,203 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             self.present(alert, animated: true, completion: nil)
             return
         }
-        if Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray)
+        if Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray)
             &&  Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Colors.seagreenColor) {
-            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
+            likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-            likeHeart.setTitleColor(.lightGray, for: .normal)
+            likeHeart.setTitleColor(.darkGray, for: .normal)
             
-            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
             dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
-            firestore.addDislikes(funFactID: funFactID, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
-            firestore.deleteLikes(funFactID: funFactID, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
-        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray)
-            &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.lightGray) {
-            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
+            firestore.addDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            firestore.deleteLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray)
+            &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
+            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
             dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
-            firestore.addDislikes(funFactID: funFactID, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            firestore.addDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         } else if Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: Colors.redColor)
-            && Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.lightGray) {
-            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
+            && Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray) {
+            dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-            dislikeHeart.setTitleColor(.lightGray, for: .normal)
-            firestore.deleteDislikes(funFactID: funFactID, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            dislikeHeart.setTitleColor(.darkGray, for: .normal)
+            firestore.deleteDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         }
+        didPullToRefresh()
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        sourceURL.isScrollEnabled = false
-        funFactDescriptionTextView.delegate = self
-        if verifiedFlag == "N" {
-            setupVerificationPage()
-        }
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
-            } else {
-                // Fallback on earlier versions
-            }
-        }
-        if (self.navigationController?.presentingViewController as? FunFactPageViewController) != nil {
-            let addFactGesture = UITapGestureRecognizer(target: self, action: #selector(viewAddFactForLandmark))
-            addFactGesture.numberOfTapsRequired = 1
-            let button = navigationController?.toolbar.items?[2].customView as! UIButton // swiftlint:disable:this force_cast
-            button.addGestureRecognizer(addFactGesture)
-        } else {
-            navigationItem.title = headingObject as? String
-        }
-    }
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupImage()
+        populatefunFactDesc()
+        setupVerifScreen()
+        setupImageCaption()
+        setupSubmittedBy()
+        setupSource()
+        setupDisputes()
+        setupLikesAndDislikes()
+    }
+    func setupImageCaption() {
+        imageCaptionLabel.text = funFact.imageCaption
+    }
+    func setupVerifScreen() {
+        if funFact.verificationFlag == "N" {
+            likeHeart.isHidden = true
+            dislikeHeart.isHidden = true
+            likeCount.isHidden = true
+            dislikeCount.isHidden = true
+            dispute.isHidden = true
+            UIView.animate(withDuration: 0.5, animations: {
+                self.sourceURL.transform = CGAffineTransform(translationX: 0, y: -50)
+                self.submittedBy.transform = CGAffineTransform(translationX: 0, y: -50)
+                self.stack.transform = CGAffineTransform(translationX: 0, y: -50)
+            }, completion: nil)
+        }
+    }
+    func setupSubmittedBy() {
+        let submittedBy1 = "Submitted By: "
+        let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
+        self.submittedBy.attributedText = myAttrString1
+        firestore.downloadUserProfile(funFact.submittedBy) { (userProfile, error) in
+            if let error = error {
+                print ("Error getting user profile \(error)")
+            } else {
+                let submittedBy1 = "Submitted By: "
+                let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
+                let completeSubmittedBy = NSMutableAttributedString()
+                let userID = userProfile!.userName
+                let submittedBy2 = userID
+                let myAttrString2 = NSAttributedString(string: submittedBy2, attributes: Attributes.attribute12RegBlue)
+                let profileGesture = UITapGestureRecognizer(target: self, action: #selector(self.profileView))
+                profileGesture.numberOfTapsRequired = 1
+                
+                self.submittedBy.isUserInteractionEnabled = true
+                self.submittedBy.addGestureRecognizer(profileGesture)
+                
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "MMM dd, yyyy"
+                let date = self.funFact.dateSubmitted
+                let date1 = dateFormatter.string(from: date.dateValue())
+                let myAttrString3 = NSAttributedString(string: ", \(date1)", attributes: Attributes.attribute10RegDG)
+                
+                completeSubmittedBy.append(myAttrString1)
+                completeSubmittedBy.append(myAttrString2)
+                completeSubmittedBy.append(myAttrString3)
+                self.submittedBy.frame.size = self.submittedBy.intrinsicContentSize
+                self.submittedBy.attributedText = completeSubmittedBy
+            }
+        }
+    }
+    func setupSource() {
+        let source1 = "Source: "
+        let sourceAtt1 = NSMutableAttributedString(string: source1)
+        sourceAtt1.addAttributes(Attributes.attribute12BoldDG, range: (source1 as NSString).range(of: source1))
+        let source2 = funFact.source
+        var substring = ""
+        if source2.count > 40 {
+            let index = source2.index(source2.startIndex, offsetBy: 40)
+            substring = source2[...index] + "..."
+        } else {
+            substring = source2
+        }
+        let sourceAtt2 = NSMutableAttributedString(string: substring)
+        sourceAtt2.addAttributes(Attributes.attribute12RegDG, range: (substring as NSString).range(of: substring))
+        sourceAtt2.addAttribute(.link, value: source2, range: NSRange(location: 0, length: substring.count))
+        let attributedString = NSMutableAttributedString()
+        attributedString.append(sourceAtt1)
+        attributedString.append(sourceAtt2)
+        
+        sourceURL.attributedText = attributedString
+        
+        sourceURL.isEditable = false
+        sourceURL.dataDetectorTypes = .link
+        sourceURL.textContainerInset = UIEdgeInsets.zero
+        sourceURL.textContainer.lineFragmentPadding = 0
+        sourceURL.textAlignment = .center
+    }
+    func setupDisputes() {
+        let disAttribute = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
+                             NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!] as [NSAttributedString.Key: Any]
+        let dispute1 = "See something wrong? Dispute this fact "
+        let disAttrString1 = NSAttributedString(string: dispute1, attributes: Attributes.attribute12RegDG)
+        
+        let disputeArrow = String.fontAwesomeIcon(name: .arrowRight)
+        let disputeArrowString = NSAttributedString(string: disputeArrow, attributes: Attributes.smallImageAttribute)
+        
+        let dispute2 = " Here"
+        let disAttrString2 = NSAttributedString(string: dispute2, attributes: disAttribute)
+        
+        let completeDispute = NSMutableAttributedString()
+        completeDispute.append(disAttrString1)
+        completeDispute.append(disputeArrowString)
+        completeDispute.append(disAttrString2)
+        
+        dispute.attributedText = completeDispute
+        let disputeGesture = UITapGestureRecognizer(target: self, action: #selector(disputeTapAction))
+        disputeGesture.numberOfTapsRequired = 1
+        dispute.addGestureRecognizer(disputeGesture)
+        dispute.isUserInteractionEnabled = true
+    }
+    func setupLikesAndDislikes() {
+        likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
+        likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+        likeCount.text = "\(funFact.likes)" + " likes"
+        dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
+        dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+        dislikeCount.text = "\(funFact.dislikes)" + " dislikes"
+        for id in (AppDataSingleton.appDataSharedInstance.userProfile.funFactsLiked) {
+            if id.documentID == funFact.id {
+                likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+                likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+                likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
+            }
+        }
+        for id in (AppDataSingleton.appDataSharedInstance.userProfile.funFactsDisliked) {
+            if id.documentID == funFact.id {
+                dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+                dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+                dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
+            }
+        }
+    }
+    @objc func didPullToRefresh() {
+        self.firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "", completionHandler: { (userProfile, error) in
+            if let error = error {
+                print ("Error getting user profile \(error)")
+            } else {
+                AppDataSingleton.appDataSharedInstance.userProfile = userProfile!
+                self.firestore.downloadFunFact(for: self.funFact.id, completionHandler: { (funFact, error) in
+                    if let error = error {
+                        print ("Error getting funFact on refresh \(error)")
+                    } else {
+                        self.funFact = funFact!
+                        self.setupImage()
+                        self.populatefunFactDesc()
+                        self.setupVerifScreen()
+                        self.setupImageCaption()
+                        self.setupSubmittedBy()
+                        self.setupSource()
+                        self.setupDisputes()
+                        self.setupLikesAndDislikes()
+                        self.refreshControl?.endRefreshing()
+                    }
+                })
+            }
+        })
+    }
+    func populatefunFactDesc() {
         // Fun Fact description Text View
-        let funFactDescAttr = NSMutableAttributedString(string: funFactDesc)
-        funFactDescriptionTextView.layer.borderWidth = 0
-        funFactDescriptionTextView.layer.borderColor = UIColor.black.cgColor
-        funFactDescriptionTextView.isEditable = false
-        funFactDescriptionTextView.isScrollEnabled = false
-        let attributedFunFactDesc = NSMutableAttributedString()
+        let funFactDescAttr = NSMutableAttributedString(string: funFact.description)
+        let attributedfunFactDesc = NSMutableAttributedString()
         
         let regularSearchPattern = "\\w+"
         var regularRanges: [NSRange] = [NSRange]()
@@ -190,153 +364,30 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                                           range: NSRange(location: range.location,
                                                          length: range.length))
         }
-        attributedFunFactDesc.append(funFactDescAttr)
-        funFactDescriptionTextView.attributedText = attributedFunFactDesc
+        attributedfunFactDesc.append(funFactDescAttr)
+        funFactDescriptionTextView.attributedText = attributedfunFactDesc
         let hashtagGesture = UITapGestureRecognizer(target: self, action: #selector(hashtagTapAction))
         hashtagGesture.numberOfTapsRequired = 1
         funFactDescriptionTextView.addGestureRecognizer(hashtagGesture)
         funFactDescriptionTextView.isUserInteractionEnabled = true
-        
-        if verifiedFlag == "N" {
-            likeHeart.isHidden = true
-            dislikeHeart.isHidden = true
-            likeCount.isHidden = true
-            dislikeCount.isHidden = true
-            dispute.isHidden = true
-        }
-        
-        scrollView.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: self.view.frame.height)
-        scrollView.contentSize = CGSize(width: UIScreen.main.bounds.width, height: self.view.frame.height)
-        
-        pageNumber.text = "Fact (\(currPageNumberText)/\(totalPageNumberText))"
-        let imageGesture = UITapGestureRecognizer(target: self, action: #selector(viewImageViewer))
-        imageGesture.numberOfTapsRequired = 1
-        landmarkImage.isUserInteractionEnabled = true
-        landmarkImage.addGestureRecognizer(imageGesture)
-        
-        imageCaptionLabel.text = imageCaption
-        let submittedBy1 = "Submitted By: "
-        let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
-        self.submittedBy.attributedText = myAttrString1
-        
-        firestore.downloadUserProfile(submittedByObject as! String) { (userProfile, error) in
-            if let error = error {
-                print ("Error getting user profile \(error)")
-            } else {
-                let submittedBy1 = "Submitted By: "
-                let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
-                let completeSubmittedBy = NSMutableAttributedString()
-                let userID = userProfile!.userName
-                let submittedBy2 = userID
-                let myAttrString2 = NSAttributedString(string: submittedBy2, attributes: Attributes.attribute12RegBlue)
-                let profileGesture = UITapGestureRecognizer(target: self, action: #selector(self.profileView))
-                profileGesture.numberOfTapsRequired = 1
-                
-                self.submittedBy.isUserInteractionEnabled = true
-                self.submittedBy.addGestureRecognizer(profileGesture)
-                
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "MMM dd, yyyy"
-                let date = self.dateObject as! Timestamp
-                let date1 = dateFormatter.string(from: date.dateValue())
-                let myAttrString3 = NSAttributedString(string: ", \(date1)", attributes: Attributes.attribute10RegDG)
-                
-                completeSubmittedBy.append(myAttrString1)
-                completeSubmittedBy.append(myAttrString2)
-                completeSubmittedBy.append(myAttrString3)
-                self.submittedBy.frame.size = self.submittedBy.intrinsicContentSize
-                self.submittedBy.attributedText = completeSubmittedBy
-            }
-        }
-        
-        
-        let source1 = "Source: "
-        let sourceAtt1 = NSMutableAttributedString(string: source1)
-        sourceAtt1.addAttributes(Attributes.attribute12BoldDG, range: (source1 as NSString).range(of: source1))
-        let source2 = sourceObject as! String
-        var substring = ""
-        if source2.count > 40 {
-            let index = source2.index(source2.startIndex, offsetBy: 40)
-            substring = source2[...index] + "..."
-        } else {
-            substring = source2
-        }
-        let sourceAtt2 = NSMutableAttributedString(string: substring)
-        sourceAtt2.addAttributes(Attributes.attribute12RegDG, range: (substring as NSString).range(of: substring))
-        sourceAtt2.addAttribute(.link, value: source2, range: NSRange(location: 0, length: substring.count))
-        let attributedString = NSMutableAttributedString()
-        attributedString.append(sourceAtt1)
-        attributedString.append(sourceAtt2)
-
-        sourceURL.attributedText = attributedString
-        likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
-        likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-        likeCount.text = "\(likesObject as! Int)" + " likes"
-        dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .light)
-        dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-        dislikeCount.text = "\(dislikesObject as! Int)" + " dislikes"
-        sourceURL.isEditable = false
-        sourceURL.dataDetectorTypes = .link
-        sourceURL.textContainerInset = UIEdgeInsets.zero
-        sourceURL.textContainer.lineFragmentPadding = 0
-        sourceURL.textAlignment = .center
-        let disAttribute = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
-                             NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!] as [NSAttributedString.Key: Any]
-        let dispute1 = "See something wrong? Dispute this fact "
-        let disAttrString1 = NSAttributedString(string: dispute1, attributes: Attributes.attribute12RegDG)
-        
-        let disputeArrow = String.fontAwesomeIcon(name: .arrowRight)
-        let disputeArrowString = NSAttributedString(string: disputeArrow, attributes: Attributes.smallImageAttribute)
-        
-        let dispute2 = " Here"
-        let disAttrString2 = NSAttributedString(string: dispute2, attributes: disAttribute)
-        
-        let completeDispute = NSMutableAttributedString()
-        completeDispute.append(disAttrString1)
-        completeDispute.append(disputeArrowString)
-        completeDispute.append(disAttrString2)
-        
-        dispute.attributedText = completeDispute
-        let disputeGesture = UITapGestureRecognizer(target: self, action: #selector(disputeTapAction))
-        disputeGesture.numberOfTapsRequired = 1
-        dispute.addGestureRecognizer(disputeGesture)
-        dispute.isUserInteractionEnabled = true
-        
-        for id in (AppDataSingleton.appDataSharedInstance.userProfile.funFactsLiked) {
-            if id.documentID == funFactID {
-                likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
-                likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-                likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
-            }
-        }
-        for id in (AppDataSingleton.appDataSharedInstance.userProfile.funFactsDisliked) {
-            if id.documentID == funFactID {
-                dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 30, style: .solid)
-                dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-                dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
-            }
-        }
-        
     }
     func documentsDidUpdate() {
         
     }
     func setupImage() {
-        let imageId = funFactID
+        let imageId = funFact.id
         let imageName = "\(imageId).jpeg"
         let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
         if imageFromCache != nil {
             print("******In cache")
             self.landmarkImage.image = imageFromCache
-            self.landmarkImage.layer.cornerRadius = 5
         } else {
-            let imageName = "\(funFactID).jpeg"
+            let imageName = "\(funFact.id).jpeg"
             
             let storage = Storage.storage()
             let storageRef = storage.reference()
             let gsReference = storageRef.child("images/\(imageName)")
             self.landmarkImage.sd_setImage(with: gsReference, placeholderImage: UIImage())
-            self.landmarkImage.layer.cornerRadius = 5
         }
     }
     
@@ -384,7 +435,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         rejectButton.setAttributedTitle(rejectButtonClickedText, for: .selected)
         rejectButton.addTarget(self, action: #selector(rejectAction), for: .touchUpInside)
         
-        let stack = UIStackView(frame: CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50))
+        stack = UIStackView(frame: CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50))
         stack.addArrangedSubview(rejectButton)
         stack.addArrangedSubview(approveButton)
         stack.alignment = .center
@@ -412,7 +463,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                                      verifButton.topAnchor.constraint(equalTo: verifTextLabel.bottomAnchor, constant: 10.0),
                                      approveButton.heightAnchor.constraint(equalToConstant: 50.0),
                                      rejectButton.heightAnchor.constraint(equalToConstant: 50.0),
-                                     stack.topAnchor.constraint(equalTo: dispute.bottomAnchor, constant: 20.0),
+                                     stack.topAnchor.constraint(equalTo: submittedBy.bottomAnchor, constant: 20.0),
                                      stack.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: 10.0),
                                      stack.rightAnchor.constraint(equalTo: self.view.rightAnchor, constant: -10.0),
                                      stack.heightAnchor.constraint(equalToConstant: 50.0)])
@@ -432,7 +483,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             alert.addAction(okAction)
             self.present(alert, animated: true, completion: nil)
         }
-        if submittedByObject as? String == Auth.auth().currentUser?.uid {
+        if funFact.submittedBy == Auth.auth().currentUser?.uid {
             let alert = UIAlertController(title: "Error",
                                           message: "You cannot verify this fact since you are the author. Please wait for others to verify this fact.",
                                           preferredStyle: .alert)
@@ -440,7 +491,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             alert.addAction(okAction)
             self.present(alert, animated: true, completion: nil)
         }
-        for user in self.approvalUsers {
+        for user in self.funFact.approvalUsers {
             if Auth.auth().currentUser?.uid == user {
                 let alert = UIAlertController(title: "Error",
                                              message: "You have already verified this fact.",
@@ -456,36 +507,57 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         
         let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             let db = Firestore.firestore()
-            let funFactRef = db.collection("funFacts").document(self.funFactID)
-            let apprCount = self.approvalCount + 1
+            let funFactRef = db.collection("funFacts").document(self.funFact.id)
+            let apprCount = self.funFact.approvalCount + 1
             var verFlag = "N"
             if apprCount == 3 {
                 verFlag = "Y"
             }
             self.firestore.updateVerificationFlag(
-                for: self.funFactID,
+                for: self.funFact.id,
                 verFlag: verFlag,
                 apprCount: apprCount,
                 completion: { (status) in
                     let status = status
                     var message = ""
                     if status == .success {
-                        message = "Verification successful! We need \(3 - apprCount) more approvers to publish this fact on the app."
+                        switch apprCount {
+                        case 0..<3:
+                            message = "Verification successful! We need \(3 - apprCount) more approvers to publish this fact on the app."
+                        case 3:
+                            message = "Great news! This fact has been verified."
+                        default:
+                            message = "Verification successful! We need \(3 - apprCount) more approvers to publish this fact on the app."
+                        }
+                        
+                        self.firestore.addFunFactVerifiedToUser(
+                            funFactRef: funFactRef,
+                            funFactID: self.funFact.id,
+                            user: Auth.auth().currentUser?.uid ?? "") { (error) in
+                                if let error = error {
+                                    print ("Error updating user \(error)")
+                                } else {
+                                    self.firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "", completionHandler: { (userProfile, error) in
+                                        if let error = error {
+                                            print ("Error getting user \(error)")
+                                        } else {
+                                            AppDataSingleton.appDataSharedInstance.userProfile = userProfile!
+                                            self.didPullToRefresh()
+                                        }
+                                    })
+                                    let alert = Utils.showAlert(status: status, message: message)
+                                    self.present(alert, animated: true) {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                            guard self?.presentedViewController == alert else { return }
+                                            self?.dismiss(animated: true, completion: nil)
+                                        }
+                                    }
+                                }
+                        }
                     } else {
                         message = ErrorMessages.verificationError
                     }
-                    let alert = Utils.showAlert(status: status, message: message)
-                    self.present(alert, animated: true) {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-                            guard self?.presentedViewController == alert else { return }
-                            self?.dismiss(animated: true, completion: nil)
-                        }
-                    }
             })
-            self.firestore.addFunFactVerifiedToUser(
-                funFactRef: funFactRef,
-                funFactID: self.funFactID,
-                user: Auth.auth().currentUser?.uid ?? "")
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alertController.addAction(okayAction)
@@ -502,7 +574,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             alert.addAction(okAction)
             self.present(alert, animated: true, completion: nil)
         }
-        if submittedByObject as? String == Auth.auth().currentUser?.uid {
+        if funFact.submittedBy == Auth.auth().currentUser?.uid {
             let alert = UIAlertController(title: "Error",
                                           message: "You cannot reject this fact since you are the author. Please wait for others to verify this fact.",
                                           preferredStyle: .alert)
@@ -510,7 +582,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             alert.addAction(okAction)
             self.present(alert, animated: true, completion: nil)
         }
-        for user in self.rejectionUsers {
+        for user in self.funFact.rejectionUsers {
             if Auth.auth().currentUser?.uid == user {
                 let alert = UIAlertController(title: "Error",
                                               message: "You have already rejected this fact.",
@@ -556,7 +628,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             if textRange != nil {
                 let tappedWord = funFactDescriptionTextView.text(in: textRange!)
                 funFactDescriptionTextView.halfTextColorChange(fullText: funFactDescriptionTextView.text, changeText: tappedWord!)
-                for tag in tags {
+                for tag in funFact.tags {
                     if tappedWord == tag {
                         firestore.getFunFacts(for: tappedWord!) { (refs, error) in
                             if let error = error {
@@ -588,12 +660,12 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     
     @objc func profileView(sender : UITapGestureRecognizer) {
-        firestore.downloadUserProfile(submittedByObject as! String) { (user, error) in
+        firestore.downloadUserProfile(funFact.submittedBy) { (user, error) in
             if let error = error {
                 print ("Error getting user profile \(error)")
             } else {
                 let profileVC = self.storyboard?.instantiateViewController(withIdentifier: "profileView") as! ProfileViewController
-                profileVC.uid = self.submittedByObject as! String
+                profileVC.uid = self.funFact.submittedBy
                 profileVC.mode = .otherUser
                 profileVC.userProfile = user!
                 self.navigationController?.pushViewController(profileVC, animated: true)
@@ -609,16 +681,21 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as? DisputeViewController
         navigationController?.navigationBar.backItem?.title = ""
-        destinationVC?.funFactID = funFactID
+        destinationVC?.funFactID = funFact.id
         
         let imageViewVC = segue.destination as? ImageViewViewController
         imageViewVC?.image = landmarkImage.image
-        imageViewVC?.imageCaptionText = imageCaption
+        imageViewVC?.imageCaptionText = funFact.imageCaption
 
         let verifVC = segue.destination as? VerifyViewController
-        verifVC?.funFactID = funFactID
-        verifVC?.rejectionCount = rejectionCount
-        verifVC?.verFlag = verifiedFlag
+        verifVC?.callback = { (status) in
+            if status == .success {
+                self.didPullToRefresh()
+            }
+        }
+        verifVC?.funFactID = funFact.id
+        verifVC?.rejectionCount = funFact.rejectionCount
+        verifVC?.verFlag = funFact.verificationFlag
     }
     
     func editFunFact() {
@@ -722,9 +799,9 @@ extension UITextView {
                                           range: NSRange(location: range.location,
                                                          length: range.length))
         }
-        let attributedFunFactDesc = NSMutableAttributedString()
-        attributedFunFactDesc.append(funFactDescAttr)
+        let attributedfunFactDesc = NSMutableAttributedString()
+        attributedfunFactDesc.append(funFactDescAttr)
         
-        self.attributedText = attributedFunFactDesc
+        self.attributedText = attributedfunFactDesc
     }
 }

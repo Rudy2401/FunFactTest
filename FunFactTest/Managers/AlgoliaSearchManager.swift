@@ -46,15 +46,16 @@ class AlgoliaSearchManager {
     }
     
     /// Download landmarks from Algolia based on the query parameters in the current map bounding box
-    func downloadLandmarks(query: InstantSearchClient.Query, completion: @escaping (Landmark?, String?) -> ()) {
+    func downloadLandmarks(query: InstantSearchClient.Query, completion: @escaping (Landmark?, NSError?) -> ()) {
         AlgoliaManager.sharedInstance.landmarkIndex.search(query) { (res, error) in
             if let error = error {
-                completion(nil, error.localizedDescription)
+                let errorCode = (error as NSError)
+                completion(nil, errorCode)
             }
             else {
                 guard let hits = res!["hits"] as? [[String: AnyObject]] else { return }
                 if hits.isEmpty {
-                    completion(nil, Errors.noRecordsFound.localizedDescription)
+                    completion(nil, NSError(domain: "Algolia", code: ErrorCode.noRecordsFound, userInfo: nil))
                     return
                 }
                 for hit in hits {
@@ -101,6 +102,37 @@ class AlgoliaSearchManager {
                     let zipcode = hit["zipcode"] as! String
                     if zipcode == zipCode {
                         completion(landmarkName, nil)
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Get Landmark ID from address
+    func getLandmarkID(from address: String, zipCode: String, completion: @escaping (String?, Int?, Int?, Int?, String?) -> ()) {
+        let landmarkQuery = Query()
+        landmarkQuery.query = address
+        landmarkQuery.hitsPerPage = 15
+        landmarkQuery.attributesToRetrieve = ["objectID", "zipcode", "numOfFunFacts", "likes", "dislikes"]
+        AlgoliaManager.sharedInstance.landmarkIndex.search(landmarkQuery) { (res, error) in
+            if error != nil {
+                let error = error! as NSError
+                completion(nil, nil, nil, nil, error.localizedDescription)
+            }
+            else {
+                guard let hits = res!["hits"] as? [[String: AnyObject]] else { return }
+                if hits.isEmpty {
+                    completion("", nil, nil, nil, nil)
+                    return
+                }
+                for hit in hits {
+                    let landmarkID = hit["objectID"] as! String
+                    let numOfFunFacts = hit["numOfFunFacts"] as! Int
+                    let likes = hit["likes"] as! Int
+                    let dislikes = hit["dislikes"] as! Int
+                    let zipcode = hit["zipcode"] as! String
+                    if zipcode == zipCode {
+                        completion(landmarkID, numOfFunFacts, likes, dislikes, nil)
                     }
                 }
             }

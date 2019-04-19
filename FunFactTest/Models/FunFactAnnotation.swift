@@ -9,12 +9,13 @@
 import Foundation
 import MapKit
 
-class FunFactAnnotation: NSObject, MKAnnotation {
+class FunFactAnnotation: NSObject, MKAnnotation, UIAccessibilityIdentification {
     let landmarkID: String
     let title: String?
     let address: String
     let type: String
     let coordinate: CLLocationCoordinate2D
+    var accessibilityIdentifier: String?
     
     init(landmarkID: String, title: String, address: String, type: String, coordinate: CLLocationCoordinate2D) {
         self.landmarkID = landmarkID

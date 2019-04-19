@@ -27,7 +27,7 @@ import UIKit
     func sharedInit() {
         // Common logic goes here
         refreshCorners(value: cornerRadius)
-        setFont(font: "Avenir Next", size: 17.0)
+        setFont(font: Fonts.regularFont, size: 17.0)
     }
     
     func setFont(font: String, size: Double) {

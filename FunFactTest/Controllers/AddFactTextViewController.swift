@@ -13,18 +13,22 @@ extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
     func textViewDidChange(_ textView: UITextView) {
         funFactDescription.toolbarPlaceholder = "\(300 - textView.text.count) chars remaining"
         if textView.text.count > 300 {
+            let selectedRange = textView.selectedRange
             let str1 = textView.text.substring(toIndex: 300)
             let str2 = textView.text.substring(fromIndex: 300)
             
             let strAttr1 = NSMutableAttributedString(string: str1, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black,
-                                                                                         NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 14.0)! ])
+                                                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
             let strAttr2 = NSMutableAttributedString(string: str2, attributes: [NSAttributedString.Key.foregroundColor: UIColor.red,
-                                                                                NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 14.0)! ])
+                                                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
             
             let str = NSMutableAttributedString()
             str.append(strAttr1)
             str.append(strAttr2)
             textView.attributedText = str
+            textView.selectedRange = selectedRange
+        } else {
+            textView.textColor = .black
         }
     }
     func textViewDidBeginEditing(_ textView: UITextView) {
@@ -46,6 +50,7 @@ extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
             }
             textView.textColor = UIColor.lightGray
         }
+        
         navigationController?.navigationBar.isHidden = false
     }
     func textFieldDidBeginEditing(_ textField: UITextField) {
@@ -68,7 +73,7 @@ extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
         var tagSubstring = ""
         if tags.count > 1 && !((tags.last?.contains(" "))! || (tags.last?.contains("."))!) {
             tagSubstring = tags.last!
-            autocompleteTableView.isHidden = false
+            autocompleteTableView.isHidden = false	
             searchAutocompleteEntriesWithSubstring(substring: tagSubstring)
         }
         return true
@@ -101,9 +106,9 @@ extension String {
     }
     var isValidURL: Bool {
         let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-        if let match = detector.firstMatch(in: self, options: [], range: NSRange(location: 0, length: self.endIndex.encodedOffset)) {
+        if let match = detector.firstMatch(in: self, options: [], range: NSRange(location: 0, length: self.endIndex.utf16Offset(in: self))) {
             // it is a link, if the match covers the whole string
-            return match.range.length == self.endIndex.encodedOffset
+            return match.range.length == self.endIndex.utf16Offset(in: self)
         } else {
             return false
         }

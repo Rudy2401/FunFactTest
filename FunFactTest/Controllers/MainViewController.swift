@@ -49,44 +49,62 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.accessibilityIdentifier = "mapView"
         typeColor.layer.cornerRadius = 2.5
         firestore.delegate = self
         annotationBottomView.alpha = 0.0
-        setupNavigationbar()
+        addNavButtons()
+        addButtonsToView()
         
-        // 1. status is not determined
-        if CLLocationManager.authorizationStatus() == .notDetermined {
-            locationManager.requestAlwaysAuthorization()
-        }
-            // 2. authorization were denied
-        else if CLLocationManager.authorizationStatus() == .denied {
-            let alert = UIAlertController(title: "Warning", message: "Location services were previously denied. Please enable location services for this app in Settings.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-            self.present(alert, animated: true, completion: nil)
-        }
-            // 3. we do have authorization
-        else if CLLocationManager.authorizationStatus() == .authorizedAlways {
-            locationManager.startUpdatingLocation()
-        }
+        setupLocationManager()
         
-        // 2. setup locationManager
-        locationManager.delegate = self
-        locationManager.requestAlwaysAuthorization()
-        locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-
         firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user, error) in
             if let error = error {
                 print ("Error getting user profile \(error)")
             } else {
                 AppDataSingleton.appDataSharedInstance.userProfile = user!
+                self.populateLeaders()
             }
         }
         
-        // 3. setup mapView
+        // setup mapView
         mapView.delegate = self
         mapView.showsUserLocation = true
         mapView.userTrackingMode = .follow
+        
+        delay(1) {
+            self.loadDataFromFirestoreAndAddAnnotations()
+        }
+        
+    }
+    func documentsDidUpdate() {
+        print ("uploaded to cache")
+    }
+    
+    func setupLocationManager() {
+        switch CLLocationManager.authorizationStatus() {
+        case .notDetermined: // 1. status is not determined
+            locationManager.requestAlwaysAuthorization()
+        case .denied: // 2. authorization was denied
+            let alert = UIAlertController(title: "Warning",
+                                          message: "Location services were previously denied. Please enable location services for this app in Settings.",
+                                          preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        case .authorizedAlways: // 3. we do have authorization
+            locationManager.startUpdatingLocation()
+        case .authorizedWhenInUse: // 3. we do have authorization
+            locationManager.startUpdatingLocation()
+        default:
+            print ("default")
+        }
+        
+        locationManager.delegate = self
+        locationManager.distanceFilter = kCLLocationAccuracyHundredMeters
+        locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+    }
+    
+    func addButtonsToView() {
         currentLocationButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
         currentLocationButton.setTitle(String.fontAwesomeIcon(name: .location), for: .normal)
         
@@ -94,6 +112,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         let addFactLabelAttr = NSAttributedString(string: addFactLabel, attributes: Attributes.addFactButtonAttribute)
         let addFactLabelAttrClicked = NSAttributedString(string: addFactLabel, attributes: Attributes.toolBarImageClickedAttribute)
         
+        addFactButton.accessibilityIdentifier = "addFactButton"
         addFactButton.backgroundColor = Colors.seagreenColor
         addFactButton.clipsToBounds = true
         addFactButton.layer.cornerRadius = 25
@@ -126,12 +145,12 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         currentLocationButton.setAttributedTitle(currentLocationAttrClicked, for: .highlighted)
         currentLocationButton.titleLabel?.textAlignment = .center
         
-        mapView.layoutMargins = UIEdgeInsets(top: 200, left: 0, bottom: 20, right: 0)
+        mapView.layoutMargins = UIEdgeInsets(top: 40, left: 0, bottom: 20, right: 0)
         if let coor = mapView.userLocation.location?.coordinate {
             mapView.setCenter(coor, animated: true)
         }
         
-        mapSearchButton.titleLabel?.font = UIFont(name: "Avenir Next", size: CGFloat(15))
+        mapSearchButton.titleLabel?.font = UIFont(name: Fonts.regularFont, size: CGFloat(15))
         mapSearchButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         mapSearchButton.setTitle("Search this area", for: .normal)
         mapSearchButton.setTitle("Search this area", for: .highlighted)
@@ -142,16 +161,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         mapSearchButton.layer.shadowOpacity = 1.0
         mapSearchButton.layer.shadowRadius = 10.0
         mapSearchButton.layer.masksToBounds = false
-        
-        delay(2) {
-            self.loadDataFromFirestoreAndAddAnnotations()
-        }
-//        configureTileOverlay()
     }
-    func documentsDidUpdate() {
-        print ("uploaded to cache")
-    }
-    
     
     @IBAction func viewAddFact(_ sender: Any) {
         if Auth.auth().currentUser == nil {
@@ -174,6 +184,9 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     func setupBottomView (annotationClicked: FunFactAnnotation, landmark: Landmark) {
+        for overlay in mapView.overlays {
+            mapView.removeOverlay(overlay)
+        }
         typeColor.backgroundColor = Constants.getMarkerDetails(type: annotationClicked.type, width: 50, height: 50).color
         annotationBottomView.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
         annotationBottomView.layer.shadowOffset = CGSize(width: 0, height: 3)
@@ -187,7 +200,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         annotationBottomView.layer.borderColor = UIColor.lightGray.cgColor
         annotationBottomView.layer.cornerRadius = 5
         let numOffAttr = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                           NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 12.0)!]
+                           NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!]
         
         landmarkTitle = annotationClicked.title?.components(separatedBy: ") ").last ?? ""
         landmarkID = annotationClicked.landmarkID
@@ -259,30 +272,56 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         mapViewGesture.numberOfTapsRequired = 1
         mapView.addGestureRecognizer(mapViewGesture)
         mapView.isUserInteractionEnabled = true
+        
+        // MARK: Draws direction path
+        setupDirections(destCoordinates: CLLocationCoordinate2D(latitude: landmark.coordinates.latitude, longitude: landmark.coordinates.longitude))
     }
-    
+    func setupDirections(destCoordinates: CLLocationCoordinate2D) {
+        var transportType = MKDirectionsTransportType()
+        switch UserDefaults.standard.string(forKey: SettingsUserDefaults.directionsSetting) {
+        case DirectionSetting.off:
+            return
+        case DirectionSetting.auto:
+            transportType = .automobile
+        case DirectionSetting.walk:
+            transportType = .walking
+        default:
+            return
+        }
+        let sourcePlacemark = MKPlacemark(coordinate: currentLocationCoordinate, addressDictionary: nil)
+        let destinationPlacemark = MKPlacemark(coordinate: destCoordinates,
+                                               addressDictionary: nil)
+        
+        let sourceMapItem = MKMapItem(placemark: sourcePlacemark)
+        let destinationMapItem = MKMapItem(placemark: destinationPlacemark)
+        
+        let directionRequest = MKDirections.Request()
+        directionRequest.source = sourceMapItem
+        directionRequest.destination = destinationMapItem
+        directionRequest.transportType = transportType
+        
+        // Calculate the direction
+        let directions = MKDirections(request: directionRequest)
+        
+        directions.calculate { (response, error) -> Void in
+            guard let response = response else {
+                if let error = error {
+                    print("Error: \(error)")
+                }
+                return
+            }
+            let route = response.routes[0]
+            self.mapView.addOverlay((route.polyline), level: MKOverlayLevel.aboveRoads)
+            
+            let rect = route.polyline.boundingMapRect
+            self.mapView.setRegion(MKCoordinateRegion(rect), animated: true)
+        }
+    }
     func setupImage(_ landmark: Landmark) {
         let imageId = landmark.image
         let imageName = "\(imageId).jpeg"
         let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
         if imageFromCache != nil {
-            self.landmarkImageView.image = imageFromCache
-            self.landmarkImageView!.layer.cornerRadius = 5
-        } else {
-            let storage = Storage.storage()
-            let storageRef = storage.reference()
-            let gsReference = storageRef.child("images/\(imageName)")
-            self.landmarkImageView.sd_setImage(with: gsReference, placeholderImage: UIImage())
-            self.landmarkImageView.layer.cornerRadius = 5
-        }
-    }
-    
-    func setupImage(_ funFact: FunFact) {
-        let imageId = funFact.image
-        let imageName = "\(imageId).jpeg"
-        let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
-        if imageFromCache != nil {
-            // Put your code which should be executed with a delay here
             self.landmarkImageView.image = imageFromCache
             self.landmarkImageView!.layer.cornerRadius = 5
         } else {
@@ -321,16 +360,18 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.navigationBar.prefersLargeTitles = false
+        setupNavigationbar()
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        navigationController?.navigationBar.prefersLargeTitles = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+        if AppDataSingleton.appDataSharedInstance.url != nil {
+            guard let landmarkID = AppDataSingleton.appDataSharedInstance.url?.valueOf("landmarkID") else { return }
+            downloadFunFactsAndSegue(for: landmarkID)
+        }
     }
     @objc func viewAddFact(recognizer: UITapGestureRecognizer) {
         performSegue(withIdentifier: "addFactDetail", sender: self)
@@ -354,19 +395,70 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         AppDataSingleton.appDataSharedInstance.event = .firstLoad
         self.downloadLandmarks(caller: .firstLoad)
     }
-    func delay(_ delay:Double, closure:@escaping ()->()) {
+    func delay(_ delay: Double, closure: @escaping () -> ()) {
         let when = DispatchTime.now() + delay
         DispatchQueue.main.asyncAfter(deadline: when, execute: closure)
     }
     
     func setupNavigationbar () {
         navigationController?.navigationBar.prefersLargeTitles = false
+        navigationItem.title = "Home"
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
+    
+    func addNavButtons() {
+        let leaderLabel1 = String.fontAwesomeIcon(name: .award)
+        let leaderAttr1 = NSAttributedString(string: leaderLabel1, attributes: Attributes.navBarImageLightAttribute)
+        let leaderAttrClicked1 = NSAttributedString(string: leaderLabel1, attributes: Attributes.navBarImageClickedAttribute)
+        
+        let completeleaderLabel = NSMutableAttributedString()
+        completeleaderLabel.append(leaderAttr1)
+        
+        let completeleaderLabelClicked = NSMutableAttributedString()
+        completeleaderLabelClicked.append(leaderAttrClicked1)
+        
+        let leader = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
+        leader.isUserInteractionEnabled = true
+        leader.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+        leader.setAttributedTitle(completeleaderLabel, for: .normal)
+        leader.setAttributedTitle(completeleaderLabelClicked, for: .highlighted)
+        leader.setAttributedTitle(completeleaderLabelClicked, for: .selected)
+        leader.titleLabel?.textAlignment = .center
+        leader.addTarget(self, action: #selector(showLeaderPage), for: .touchUpInside)
+        let leaderBtn = UIBarButtonItem(customView: leader)
+        navigationItem.setRightBarButtonItems([leaderBtn], animated: true)
+        leader.accessibilityIdentifier = "leaderBtn"
+    }
+    @objc func showLeaderPage(_ sender: Any) {
+        performSegue(withIdentifier: "leaderboardSegue", sender: self)
+    }
+    func populateLeaders() {
+        firestore.getLeaders(type: .country) { (leaders, error) in
+            if let error = error {
+                print ("Error getting leader data \(error)")
+            } else {
+                AppDataSingleton.appDataSharedInstance.leadersByCountry = leaders!
+            }
+        }
+        firestore.getLeaders(type: .city) { (leaders, error) in
+            if let error = error {
+                print ("Error getting leader data \(error)")
+            } else {
+                AppDataSingleton.appDataSharedInstance.leadersByCity = leaders!
+            }
+        }
+        firestore.getLeaders(type: .worldwide) { (leaders, error) in
+            if let error = error {
+                print ("Error getting leader data \(error)")
+            } else {
+                AppDataSingleton.appDataSharedInstance.leadersWorldwide = leaders!
+            }
+        }
     }
 }
 extension MainViewController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
-        
         if view.annotation is MKUserLocation {
             return
         } else if view.annotation is MKClusterAnnotation {
@@ -397,6 +489,8 @@ extension MainViewController: MKMapViewDelegate {
             return mapView.dequeueReusableAnnotationView(withIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier, for: annotation)
         }
         var annotationView = MKMarkerAnnotationView()
+        annotationView.accessibilityLabel = "annotation"
+        annotationView.isAccessibilityElement = true
         guard annotation is FunFactAnnotation else { return nil }
         
         let identifier = "annotation"
@@ -422,11 +516,17 @@ extension MainViewController: MKMapViewDelegate {
         // This is the final step. This code can be copied and pasted into your project
         // without thinking on it so much. It simply instantiates a MKTileOverlayRenderer
         // for displaying the tile overlay.
-        if let tileOverlay = overlay as? MKTileOverlay {
-            return MKTileOverlayRenderer(tileOverlay: tileOverlay)
-        } else {
-            return MKOverlayRenderer(overlay: overlay)
-        }
+        
+//        if let tileOverlay = overlay as? MKTileOverlay {
+//            return MKTileOverlayRenderer(tileOverlay: tileOverlay)
+//        } else {
+//            return MKOverlayRenderer(overlay: overlay)
+//        }
+        let renderer = MKPolylineRenderer(overlay: overlay)
+        renderer.strokeColor = Colors.orangeColor
+        renderer.lineWidth = 2.0
+        
+        return renderer
     }
     private func configureTileOverlay() {
         // We first need to have the path of the overlay configuration JSON
@@ -442,5 +542,11 @@ extension MainViewController: MKMapViewDelegate {
         
         // And finally add it to your MKMapView
         mapView.addOverlay(tileOverlay)
+    }
+}
+extension URL {
+    func valueOf(_ queryParamaterName: String) -> String? {
+        guard let url = URLComponents(string: self.absoluteString) else { return nil }
+        return url.queryItems?.first(where: { $0.name == queryParamaterName })?.value
     }
 }

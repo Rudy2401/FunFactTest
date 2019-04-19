@@ -9,8 +9,9 @@
 import UIKit
 import FirebaseAuth
 import FirebaseFirestore
+import IQKeyboardManagerSwift
 
-class SignUpViewController: UIViewController, FirestoreManagerDelegate {
+class SignUpViewController: UIViewController, FirestoreManagerDelegate, UITextFieldDelegate {
     
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
@@ -25,9 +26,13 @@ class SignUpViewController: UIViewController, FirestoreManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         firestore.delegate = self
+        nameTextField.delegate = self
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        
         view.addBackground()
+        emailTextField.keyboardType = .emailAddress
         navigationController?.navigationBar.isHidden = false
-        navigationController?.navigationBar.tintColor = UIColor.darkGray
         nameImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         nameImageButton.setTitle(String.fontAwesomeIcon(name: .idCard), for: .normal)
         emailImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
@@ -42,11 +47,19 @@ class SignUpViewController: UIViewController, FirestoreManagerDelegate {
             action: #selector(cancelAction(_:))
         )
         navigationItem.rightBarButtonItem = cancelItem
+        nameTextField.keyboardToolbar.doneBarButton.setTarget(self, action: #selector(doneButtonClicked))
+        emailTextField.keyboardToolbar.doneBarButton.setTarget(self, action: #selector(doneButtonClicked))
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.title = "Sign Up"
+        navigationController?.isNavigationBarHidden = false
         nameTextField.becomeFirstResponder()
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.isNavigationBarHidden = true
+        self.title = ""
     }
     func documentsDidUpdate() {
         
@@ -138,5 +151,20 @@ class SignUpViewController: UIViewController, FirestoreManagerDelegate {
             alertController.addAction(okayAction)
             self.present(alertController, animated: true, completion: nil)
         })
+    }
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+    }
+    
+    // Finish Editing The Text Field
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        
+    }
+    @objc func doneButtonClicked(_ sender: Any) {
+//        print (view.bounds)
+//        UIView.animate(withDuration: 0.5, animations: {
+//            self.view.transform = CGAffineTransform(translationX: 0,
+//                                                    y: 80)
+//        }, completion: nil)
     }
 }

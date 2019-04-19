@@ -12,6 +12,7 @@ import FirebaseStorage
 import InstantSearchClient
 import CoreLocation
 import MapKit
+import SDWebImage
 
 class SearchViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchControllerDelegate,
 FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegate, MKMapViewDelegate {
@@ -48,8 +49,6 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
 
         // Setup the Search Controller
         navigationItem.hidesSearchBarWhenScrolling = false
-        navigationController?.navigationBar.tintColor = .darkGray
-        navigationController?.navigationBar.isOpaque = false
         searchController.searchBar.sizeToFit()
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.hidesNavigationBarDuringPresentation = false
@@ -95,10 +94,11 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = false
     }
     override func viewWillDisappear(_ animated: Bool) {
-        navigationController?.navigationBar.prefersLargeTitles = true
+        
     }
     func documentsDidDownload() {
         
@@ -268,27 +268,20 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
                 searchText = searchUsers[indexPath.row].userNameHighlighted!
                 secondaryText = searchUsers[indexPath.row].nameHighlighted!
                 photoURL = searchUsers[indexPath.row].photoURL!
+                let url = URL(string: photoURL) ?? URL(string: "")
                 cell.userID = searchUsers[indexPath.row].userID!
-                let photoUrl = URL(string: photoURL)
-                if photoUrl == URL(string: "") {
-                    cell.searchImageView.image = UIImage
-                        .fontAwesomeIcon(name: .user,
-                                         style: .solid,
-                                         textColor: .black,
-                                         size: CGSize(width: 100, height: 100))
-                }
-                else {
-                    let data = try? Data(contentsOf: photoUrl ?? URL(string: "")!)
-                    if data == nil {
-                        cell.searchImageView.image = UIImage
-                            .fontAwesomeIcon(name: .user,
-                                             style: .solid,
-                                             textColor: .darkGray,
-                                             size: CGSize(width: 100, height: 100))
-                    } else {
-                        cell.searchImageView.image = UIImage(data: data!)
-                    }
-                }
+                cell.searchImageView?.sd_setImage(with: url!,
+                                               placeholderImage: UIImage(),
+                                               options: SDWebImageOptions(rawValue: 0),
+                                               completed: { (image, error, cacheType, imageURL) in
+                                                if error != nil {
+                                                    cell.searchImageView.image = UIImage
+                                                        .fontAwesomeIcon(name: .user,
+                                                                         style: .solid,
+                                                                         textColor: .darkGray,
+                                                                         size: CGSize(width: 100, height: 100))
+                                                }
+                })
             }
         } else {
             searchLandmarks = []

@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		8E5497E14104CB13477B2D25 /* Pods_FunFactTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */; };
 		D800724D2209DBB500A20084 /* FirestoreRandomFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */; };
+		D80B8C55225EA809003ACCA0 /* LeaderboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80B8C54225EA809003ACCA0 /* LeaderboardViewController.swift */; };
+		D80B8C57225EAADD003ACCA0 /* LeaderboardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80B8C56225EAADD003ACCA0 /* LeaderboardTableViewCell.swift */; };
+		D80B8C632264D006003ACCA0 /* FunFactTestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80B8C622264D006003ACCA0 /* FunFactTestUITests.swift */; };
 		D8310F0D221F4BCF007336A0 /* AddressDataStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F0C221F4BCF007336A0 /* AddressDataStruct.swift */; };
 		D8310F0F221F8645007336A0 /* AlgoliaSearchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F0E221F8645007336A0 /* AlgoliaSearchManager.swift */; };
 		D8310F11221F9690007336A0 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8310F10221F9690007336A0 /* UIImage.swift */; };
@@ -25,6 +28,7 @@
 		D848BD4321358BF200C31CD0 /* CustomViewBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */; };
 		D848BD452136F50C00C31CD0 /* DisputeStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD442136F50C00C31CD0 /* DisputeStruct.swift */; };
 		D848BD472137838B00C31CD0 /* ImageViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D848BD462137838B00C31CD0 /* ImageViewViewController.swift */; };
+		D856DB1E2254311100B1D0D8 /* LeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D856DB1D2254311100B1D0D8 /* LeaderTableViewCell.swift */; };
 		D865045F216AC58600B65AAB /* HashtagCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D865045E216AC58600B65AAB /* HashtagCell.swift */; };
 		D8650461216BED5F00B65AAB /* IQKeyboardManagerSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */; };
 		D86BA16A22468E0A00026454 /* InterestTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BA16922468E0A00026454 /* InterestTableViewCell.swift */; };
@@ -70,6 +74,7 @@
 		D8D18571212A1CFF0093B66C /* FirestoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18570212A1CFF0093B66C /* FirestoreManager.swift */; };
 		D8D18573212A1E510093B66C /* LandmarkStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18572212A1E510093B66C /* LandmarkStruct.swift */; };
 		D8D18575212A1F2F0093B66C /* FunFactStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D18574212A1F2F0093B66C /* FunFactStruct.swift */; };
+		D8D5498622681B1C00CE0DB4 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D8D5498522681B1B00CE0DB4 /* GoogleService-Info.plist */; };
 		D8DF6A5E210634800031A153 /* DisputeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8DF6A5D210634800031A153 /* DisputeViewController.swift */; };
 		D8E78FED21409D26006F03B9 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */; };
 		D8E78FF12141FC9B006F03B9 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8E78FF02141FC9B006F03B9 /* CustomButton.swift */; };
@@ -85,7 +90,6 @@
 		D8ED8FFC210D16BE0010EF7C /* LocationSearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */; };
 		D8F0078521ED5E7E0031325F /* SearchStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F0078421ED5E7E0031325F /* SearchStruct.swift */; };
 		D8F76AF1210E1A3100A039D2 /* AddressCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8F76AF0210E1A3100A039D2 /* AddressCell.swift */; };
-		D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */; };
 		D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */ = {isa = PBXBuildFile; fileRef = D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */; };
 		D8F76AF72112812400A039D2 /* FirebaseCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F76AF62112812400A039D2 /* FirebaseCore.framework */; };
 		D8F76AF92112812400A039D2 /* FirebaseFirestore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F76AF82112812400A039D2 /* FirebaseFirestore.framework */; };
@@ -104,6 +108,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		D80B8C652264D006003ACCA0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D8FE7F7720DB2712007B4550 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D8FE7F7E20DB2712007B4550;
+			remoteInfo = FunFactTest;
+		};
 		D8B3104321E58B2E00E85148 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */;
@@ -125,6 +136,11 @@
 		6A9A8A65C29502B3DDAE2E25 /* Pods-FunFactTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunFactTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.debug.xcconfig"; sourceTree = "<group>"; };
 		8583EE7FC03419D00EFF4C12 /* Pods-FunFactTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FunFactTest.release.xcconfig"; path = "Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.release.xcconfig"; sourceTree = "<group>"; };
 		D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreRandomFunctions.swift; sourceTree = "<group>"; };
+		D80B8C54225EA809003ACCA0 /* LeaderboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewController.swift; sourceTree = "<group>"; };
+		D80B8C56225EAADD003ACCA0 /* LeaderboardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardTableViewCell.swift; sourceTree = "<group>"; };
+		D80B8C602264D005003ACCA0 /* FunFactTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunFactTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D80B8C622264D006003ACCA0 /* FunFactTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactTestUITests.swift; sourceTree = "<group>"; };
+		D80B8C642264D006003ACCA0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FontAwesome_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = BoltsSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8310F0C221F4BCF007336A0 /* AddressDataStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressDataStruct.swift; sourceTree = "<group>"; };
@@ -143,6 +159,7 @@
 		D848BD4221358BF200C31CD0 /* CustomViewBackground.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomViewBackground.swift; sourceTree = "<group>"; };
 		D848BD442136F50C00C31CD0 /* DisputeStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisputeStruct.swift; sourceTree = "<group>"; };
 		D848BD462137838B00C31CD0 /* ImageViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewViewController.swift; sourceTree = "<group>"; };
+		D856DB1D2254311100B1D0D8 /* LeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderTableViewCell.swift; sourceTree = "<group>"; };
 		D865045E216AC58600B65AAB /* HashtagCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HashtagCell.swift; sourceTree = "<group>"; };
 		D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = IQKeyboardManagerSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D86BA16922468E0A00026454 /* InterestTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestTableViewCell.swift; sourceTree = "<group>"; };
@@ -190,6 +207,7 @@
 		D8D18570212A1CFF0093B66C /* FirestoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreManager.swift; sourceTree = "<group>"; };
 		D8D18572212A1E510093B66C /* LandmarkStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkStruct.swift; sourceTree = "<group>"; };
 		D8D18574212A1F2F0093B66C /* FunFactStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactStruct.swift; sourceTree = "<group>"; };
+		D8D5498522681B1B00CE0DB4 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D8DF6A5D210634800031A153 /* DisputeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisputeViewController.swift; sourceTree = "<group>"; };
 		D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		D8E78FF02141FC9B006F03B9 /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
@@ -205,7 +223,6 @@
 		D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchTableViewController.swift; sourceTree = "<group>"; };
 		D8F0078421ED5E7E0031325F /* SearchStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchStruct.swift; sourceTree = "<group>"; };
 		D8F76AF0210E1A3100A039D2 /* AddressCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressCell.swift; sourceTree = "<group>"; };
-		D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D8F76AF421124AFF00A039D2 /* ListOfLandmarks.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ListOfLandmarks.json; sourceTree = "<group>"; };
 		D8F76AF62112812400A039D2 /* FirebaseCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FirebaseCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8F76AF82112812400A039D2 /* FirebaseFirestore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FirebaseFirestore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -226,6 +243,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		D80B8C5D2264D005003ACCA0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D8FE7F7C20DB2712007B4550 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -263,6 +287,15 @@
 				1ACD8D5BF50813E21A91163C /* Pods_FunFactTest.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D80B8C612264D005003ACCA0 /* FunFactTestUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D80B8C622264D006003ACCA0 /* FunFactTestUITests.swift */,
+				D80B8C642264D006003ACCA0 /* Info.plist */,
+			);
+			path = FunFactTestUITests;
 			sourceTree = "<group>";
 		};
 		D8310F132220943B007336A0 /* Managers */ = {
@@ -347,6 +380,8 @@
 				D86DA75E217424A8001F7B5C /* UserSubsCell.swift */,
 				D89485352228BF4100C215D5 /* SettingsTableViewCell.swift */,
 				D86BA16922468E0A00026454 /* InterestTableViewCell.swift */,
+				D856DB1D2254311100B1D0D8 /* LeaderTableViewCell.swift */,
+				D80B8C56225EAADD003ACCA0 /* LeaderboardTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -369,30 +404,31 @@
 		D8D1856F2129EE020093B66C /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */,
 				D8310F14222438EC007336A0 /* AddFactPickerViewController.swift */,
+				D8310F1622243A84007336A0 /* AddFactTextViewController.swift */,
+				D8ED8FF7210A49480010EF7C /* AddFactViewController.swift */,
 				D8ED8FF9210A49780010EF7C /* AddressViewController.swift */,
 				D8FE7FA920E45082007B4550 /* ContentViewController.swift */,
 				D8DF6A5D210634800031A153 /* DisputeViewController.swift */,
+				D8310F1A2224CF2E007336A0 /* EditProfileViewController.swift */,
 				D800724C2209DBB500A20084 /* FirestoreRandomFunctions.swift */,
 				D8FE7FAB20E4671C007B4550 /* FunFactPageViewController.swift */,
+				D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */,
 				D848BD462137838B00C31CD0 /* ImageViewViewController.swift */,
+				D8C45965224692F000990AD7 /* InterestViewController.swift */,
+				D80B8C54225EA809003ACCA0 /* LeaderboardViewController.swift */,
 				D8ED8FFB210D16BE0010EF7C /* LocationSearchTableViewController.swift */,
 				D8FE7F8420DB2712007B4550 /* MainViewController.swift */,
 				D8CBADCD21C295C900C42F91 /* MainViewControllerExtension.swift */,
+				D8C459672249857F00990AD7 /* NotificationFrequency.swift */,
 				D8E78FEC21409D26006F03B9 /* ProfileViewController.swift */,
 				D8B3103721CADFD600E85148 /* SearchViewController.swift */,
+				D89485332228BB3700C215D5 /* SettingsViewController.swift */,
 				D848BD392134909E00C31CD0 /* SignInViewController.swift */,
 				D848BD3B213490D100C31CD0 /* SignUpViewController.swift */,
 				D8A2ADE421938268003C4EB1 /* TabBarController.swift */,
-				D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */,
 				D8CB08C82212638800A86F9E /* VerifyViewController.swift */,
 				D8F9012021304B9500D83F8E /* WelcomeViewController.swift */,
-				D8310F1622243A84007336A0 /* AddFactTextViewController.swift */,
-				D8310F1A2224CF2E007336A0 /* EditProfileViewController.swift */,
-				D89485332228BB3700C215D5 /* SettingsViewController.swift */,
-				D8C45965224692F000990AD7 /* InterestViewController.swift */,
-				D8C459672249857F00990AD7 /* NotificationFrequency.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -402,6 +438,7 @@
 			children = (
 				D8A2AE4D21960132003C4EB1 /* FontAwesome */,
 				D8FE7F8120DB2712007B4550 /* FunFactTest */,
+				D80B8C612264D005003ACCA0 /* FunFactTestUITests */,
 				D8FE7F8020DB2712007B4550 /* Products */,
 				270B60A5492612E273CC8201 /* Pods */,
 				D569FB58055CD1C61272A23D /* Frameworks */,
@@ -412,6 +449,7 @@
 			isa = PBXGroup;
 			children = (
 				D8FE7F7F20DB2712007B4550 /* FunFactTest.app */,
+				D80B8C602264D005003ACCA0 /* FunFactTestUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -419,13 +457,13 @@
 		D8FE7F8120DB2712007B4550 /* FunFactTest */ = {
 			isa = PBXGroup;
 			children = (
+				D8D5498522681B1B00CE0DB4 /* GoogleService-Info.plist */,
 				D8FE7F8B20DB2716007B4550 /* LaunchScreen.storyboard */,
 				D8FE7F8620DB2712007B4550 /* Main.storyboard */,
 				D87ED7BB2151BF5400B14B5F /* functions */,
 				D8FE7FAD20EAE746007B4550 /* PodFile */,
 				D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */,
 				D87ED7B92151BF3C00B14B5F /* firebase.json */,
-				D8F76AF221113F3E00A039D2 /* GoogleService-Info.plist */,
 				D8FE7F8E20DB2716007B4550 /* Info.plist */,
 				D8FE7F8220DB2712007B4550 /* AppDelegate.swift */,
 				D8FE7F8920DB2716007B4550 /* Assets.xcassets */,
@@ -441,6 +479,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		D80B8C5F2264D005003ACCA0 /* FunFactTestUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D80B8C672264D006003ACCA0 /* Build configuration list for PBXNativeTarget "FunFactTestUITests" */;
+			buildPhases = (
+				D80B8C5C2264D005003ACCA0 /* Sources */,
+				D80B8C5D2264D005003ACCA0 /* Frameworks */,
+				D80B8C5E2264D005003ACCA0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D80B8C662264D006003ACCA0 /* PBXTargetDependency */,
+			);
+			name = FunFactTestUITests;
+			productName = FunFactTestUITests;
+			productReference = D80B8C602264D005003ACCA0 /* FunFactTestUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		D8FE7F7E20DB2712007B4550 /* FunFactTest */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D8FE7F9120DB2716007B4550 /* Build configuration list for PBXNativeTarget "FunFactTest" */;
@@ -471,15 +527,22 @@
 				KnownAssetTags = (
 					New,
 				);
-				LastSwiftUpdateCheck = 0940;
+				LastSwiftUpdateCheck = 1020;
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Rushi Dolas";
 				TargetAttributes = {
+					D80B8C5F2264D005003ACCA0 = {
+						CreatedOnToolsVersion = 10.2;
+						TestTargetID = D8FE7F7E20DB2712007B4550;
+					};
 					D8FE7F7E20DB2712007B4550 = {
 						CreatedOnToolsVersion = 9.4.1;
-						LastSwiftMigration = 1000;
+						LastSwiftMigration = 1020;
 						SystemCapabilities = {
 							com.apple.Keychain = {
+								enabled = 1;
+							};
+							com.apple.SafariKeychain = {
 								enabled = 1;
 							};
 						};
@@ -506,6 +569,7 @@
 			projectRoot = "";
 			targets = (
 				D8FE7F7E20DB2712007B4550 /* FunFactTest */,
+				D80B8C5F2264D005003ACCA0 /* FunFactTestUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -528,6 +592,13 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		D80B8C5E2264D005003ACCA0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D8FE7F7D20DB2712007B4550 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -543,6 +614,7 @@
 				D8E78FFB21432CBF006F03B9 /* overlay-dark.json in Resources */,
 				D8FE7FAE20EAE747007B4550 /* PodFile in Resources */,
 				D8F76AF521124AFF00A039D2 /* ListOfLandmarks.json in Resources */,
+				D8D5498622681B1C00CE0DB4 /* GoogleService-Info.plist in Resources */,
 				D8FE7F8D20DB2716007B4550 /* LaunchScreen.storyboard in Resources */,
 				D8FE7F8A20DB2716007B4550 /* Assets.xcassets in Resources */,
 				D834DFF820F6776A0091CA40 /* ListOfFunFacts.json in Resources */,
@@ -551,7 +623,6 @@
 				D8FE7F8820DB2712007B4550 /* Main.storyboard in Resources */,
 				D8E78FF321430F73006F03B9 /* overlay-google.json in Resources */,
 				D8E78FFD2143323C006F03B9 /* overlay-light.json in Resources */,
-				D8F76AF321113F3E00A039D2 /* GoogleService-Info.plist in Resources */,
 				D8E78FF721432A19006F03B9 /* overlay-brightcolors.json in Resources */,
 				D8E78FFF214349CE006F03B9 /* overlay-sharp.json in Resources */,
 			);
@@ -689,11 +760,7 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-			);
-			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
@@ -704,6 +771,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		D80B8C5C2264D005003ACCA0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D80B8C632264D006003ACCA0 /* FunFactTestUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D8FE7F7B20DB2712007B4550 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -727,6 +802,7 @@
 				D8CB08CF221DAA0F00A86F9E /* AlgoliaManager.swift in Sources */,
 				D8A2AE492195FF97003C4EB1 /* Enum.swift in Sources */,
 				D8A2AE4A2195FF97003C4EB1 /* FontAwesome.h in Sources */,
+				D856DB1E2254311100B1D0D8 /* LeaderTableViewCell.swift in Sources */,
 				D8310F15222438EC007336A0 /* AddFactPickerViewController.swift in Sources */,
 				D8A2AE4B2195FF97003C4EB1 /* FontAwesomeSegmentedControl.swift in Sources */,
 				D8A2AE4C2195FF97003C4EB1 /* FontAwesome.swift in Sources */,
@@ -749,6 +825,7 @@
 				D8E78FED21409D26006F03B9 /* ProfileViewController.swift in Sources */,
 				D8FE7FA220DC4237007B4550 /* Utils.swift in Sources */,
 				D8F9012121304B9500D83F8E /* WelcomeViewController.swift in Sources */,
+				D80B8C55225EA809003ACCA0 /* LeaderboardViewController.swift in Sources */,
 				D8A2ADE521938268003C4EB1 /* TabBarController.swift in Sources */,
 				D8E78FF12141FC9B006F03B9 /* CustomButton.swift in Sources */,
 				D8FE7F8520DB2712007B4550 /* MainViewController.swift in Sources */,
@@ -756,6 +833,7 @@
 				D8310F11221F9690007336A0 /* UIImage.swift in Sources */,
 				D8FE7FA420DC491F007B4550 /* FunFactAnnotation.swift in Sources */,
 				D800724D2209DBB500A20084 /* FirestoreRandomFunctions.swift in Sources */,
+				D80B8C57225EAADD003ACCA0 /* LeaderboardTableViewCell.swift in Sources */,
 				D8FE7F9720DB2795007B4550 /* AnnotationBottomView.swift in Sources */,
 				D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */,
 				D8B3103A21CAEAA500E85148 /* SearchCellTableViewCell.swift in Sources */,
@@ -780,6 +858,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		D80B8C662264D006003ACCA0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D8FE7F7E20DB2712007B4550 /* FunFactTest */;
+			targetProxy = D80B8C652264D006003ACCA0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		D8FE7F8620DB2712007B4550 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -800,6 +886,49 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		D80B8C682264D006003ACCA0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XQECAX5M82;
+				INFOPLIST_FILE = FunFactTestUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "-.FunFactTestUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = FunFactTest;
+			};
+			name = Debug;
+		};
+		D80B8C692264D006003ACCA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XQECAX5M82;
+				INFOPLIST_FILE = FunFactTestUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "-.FunFactTestUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = FunFactTest;
+			};
+			name = Release;
+		};
 		D8FE7F8F20DB2716007B4550 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -929,10 +1058,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.rushi.FunFacts;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rushi.FunFact;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -952,10 +1081,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.rushi.FunFacts;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rushi.FunFact;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -963,6 +1092,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D80B8C672264D006003ACCA0 /* Build configuration list for PBXNativeTarget "FunFactTestUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D80B8C682264D006003ACCA0 /* Debug */,
+				D80B8C692264D006003ACCA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D8FE7F7A20DB2712007B4550 /* Build configuration list for PBXProject "FunFactTest" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

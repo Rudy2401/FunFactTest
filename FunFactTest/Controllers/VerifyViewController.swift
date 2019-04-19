@@ -18,10 +18,11 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
     var rejectionCount = 0
     var verFlag = ""
     var popup = UIAlertController()
+    var callback: ((Status) -> ())?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.title = "Rejecting A Fact"
+        navigationItem.title = "Rejecting A Fact"
         rejectionView.delegate = self
         firestore.delegate = self
     }
@@ -52,17 +53,33 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
                         message = ErrorMessages.rejectionError
                     }
                     let alert = Utils.showAlert(status: status, message: message)
-                    self.present(alert, animated: true) {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-                            guard self?.presentedViewController == alert else { return }
-                            self?.dismiss(animated: true, completion: nil)
-                        }
+                    self.firestore.addFunFactRejectedToUser(
+                        funFactRef: funFactRef,
+                        funFactID: self.funFactID,
+                        user: Auth.auth().currentUser?.uid ?? "") { (error) in
+                            if let error = error {
+                                print ("Error updating user \(error)")
+                            } else {
+                                self.firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "", completionHandler: { (userProfile, error) in
+                                    if let error = error {
+                                        print ("Error getting user \(error)")
+                                    } else {
+                                        self.callback!(status)
+                                        AppDataSingleton.appDataSharedInstance.userProfile = userProfile!
+                                    }
+                                })
+                                self.present(alert, animated: true) {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                        guard self?.presentedViewController == alert else { return }
+                                        self?.dismiss(animated: true, completion: nil)
+                                        self?.navigationController?.popViewController(animated: true)
+                                    }
+                                }
+                            }
                     }
+                    
             })
-            self.firestore.addFunFactRejectedToUser(
-                funFactRef: funFactRef,
-                funFactID: self.funFactID,
-                user: Auth.auth().currentUser?.uid ?? "")
+            
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alertController.addAction(okayAction)

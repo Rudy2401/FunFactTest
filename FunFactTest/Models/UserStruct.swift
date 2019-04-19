@@ -60,3 +60,10 @@ struct FunFactsVerified {
 struct FunFactsRejected {
     var funFactID: DocumentReference
 }
+
+struct Leader {
+    var userID: String
+    var count: Int
+    var location: String
+    var photoURL: String
+}

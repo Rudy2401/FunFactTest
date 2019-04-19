@@ -27,15 +27,6 @@ class InterestViewController: UIViewController, UITableViewDelegate, UITableView
         tableView.delegate = self
         tableView.dataSource = self
         tableView.isScrollEnabled = false
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.tintColor = .darkGray
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
-            }
-        }
         navigationItem.title = "Choose your interests"
         updateButton.cornerRadius = 25
         updateButton.layer.backgroundColor = Colors.seagreenColor.cgColor
@@ -85,7 +76,7 @@ class InterestViewController: UIViewController, UITableViewDelegate, UITableView
         defaults.set(data, forKey: "UserInterests")
         let alert = Utils.showAlert(status: .success, message: ErrorMessages.interestsSuccess)
         self.present(alert, animated: true) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
                 guard self?.presentedViewController == alert else { return }
                 self?.dismiss(animated: true, completion: nil)
                 self!.navigationController?.popViewController(animated: true)

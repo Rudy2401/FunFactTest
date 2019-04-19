@@ -27,11 +27,6 @@ class AddressViewController: UIViewController {
         mapView.bringSubviewToFront(submitButton)
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
         
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.tintColor = .darkGray
-        navigationController?.navigationBar.prefersLargeTitles = false
-        
         locationManager.delegate = self as CLLocationManagerDelegate
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
@@ -43,7 +38,7 @@ class AddressViewController: UIViewController {
         
         let searchBar = resultSearchController!.searchBar
         let textFieldInsideUISearchBar = searchBar.value(forKey: "searchField") as? UITextField
-        textFieldInsideUISearchBar?.font = UIFont(name: "Avenir Next", size: 14.0)
+        textFieldInsideUISearchBar?.font = UIFont(name: Fonts.regularFont, size: 14.0)
         searchBar.sizeToFit()
         searchBar.placeholder = "Search for places"
         navigationItem.titleView = resultSearchController?.searchBar
@@ -71,6 +66,9 @@ class AddressViewController: UIViewController {
     }
 
     @IBAction func submitAction(_ sender: Any) {
+        if selectedPin == nil {
+            return
+        }
         let add = AddressData(address: (selectedPin?.subThoroughfare ?? "") + " " + (selectedPin?.thoroughfare ?? ""),
                               landmarkName: selectedPin!.name ?? "",
                               coordinate: selectedPin!.coordinate,

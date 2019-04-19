@@ -10,21 +10,25 @@ import UIKit
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
+import IQKeyboardManagerSwift
 
-class SignInViewController: UIViewController {
+class SignInViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var signInButton: CustomButton!
     @IBOutlet weak var emailImageButton: UIButton!
     @IBOutlet weak var passwordImageButton: UIButton!
     @IBOutlet weak var signUpButton: CustomButton!
+    @IBOutlet weak var forgotButton: CustomButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addBackground()
-        navigationController?.navigationBar.isHidden = false
+        emailTextField.delegate = self
+        passwordTextField.delegate = self
+        
+        emailTextField.keyboardType = .emailAddress
 
-        navigationController?.navigationBar.tintColor = UIColor.darkGray
         emailImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         emailImageButton.setTitle(String.fontAwesomeIcon(name: .envelope), for: .normal)
         
@@ -33,6 +37,7 @@ class SignInViewController: UIViewController {
         
         signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         signUpButton.layer.backgroundColor = UIColor.darkGray.cgColor
+        forgotButton.layer.backgroundColor = Colors.orangeColor.cgColor
         
         let cancelItem = UIBarButtonItem(
             title: "Cancel",
@@ -41,10 +46,13 @@ class SignInViewController: UIViewController {
             action: #selector(cancelAction(_:))
         )
         navigationItem.rightBarButtonItem = cancelItem
+        
+        emailTextField.keyboardToolbar.doneBarButton.setTarget(self, action: #selector(doneButtonClicked))
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        navigationController?.isNavigationBarHidden = false
         self.title = "Log In"
         emailTextField.becomeFirstResponder()
     }
@@ -52,8 +60,8 @@ class SignInViewController: UIViewController {
         navigationController?.popViewController(animated: true)
     }
     override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
+        super.viewWillDisappear(animated)
+        navigationController?.isNavigationBarHidden = true
         self.title = ""
     }
 
@@ -120,5 +128,53 @@ class SignInViewController: UIViewController {
     }
     @IBAction func signUpAction(_ sender: Any) {
         performSegue(withIdentifier: "signUpSegue", sender: nil)
+    }
+    
+    @IBAction func forgotAction(_ sender: Any) {
+        let email = emailTextField.text
+        if (email?.isEmpty)! {
+            let message = "Please enter a valid email address"
+            Utils.alertWithTitle(title: "Error",
+                                 message: message,
+                                 viewController: self,
+                                 toFocus: self.emailTextField!,
+                                 type: "textfield")
+            return
+        }
+        Auth.auth().sendPasswordReset(withEmail: email!) { error in
+            if error != nil {
+                if let errorCode = AuthErrorCode(rawValue: (error! as NSError).code) {
+                    let message = errorCode.errorMessage
+                    Utils.alertWithTitle(title: "Error",
+                                         message: message,
+                                         viewController: self,
+                                         toFocus: self.emailTextField!,
+                                         type: "textfield")
+                    return
+                }
+            }
+            let message = "Email with link to reset your password has been sent to \(email!)"
+            Utils.alertWithTitle(title: "Success",
+                                 message: message,
+                                 viewController: self,
+                                 toFocus: self.emailTextField!,
+                                 type: "textfield")
+        }
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+    }
+    
+    // Finish Editing The Text Field
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        
+    }
+    
+    @objc func doneButtonClicked(_ sender: Any) {
+//        UIView.animate(withDuration: 0.5, animations: {
+//            self.view.transform = CGAffineTransform(translationX: 0,
+//                                                    y: 80)
+//        }, completion: nil)
     }
 }

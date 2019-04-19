@@ -44,16 +44,6 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
     override func viewDidLoad() {
         super.viewDidLoad()
         firestore.delegate = self
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            navigationController?.navigationBar.largeTitleTextAttributes = [
-                NSAttributedString.Key.foregroundColor: UIColor.black,
-                NSAttributedString.Key.font: customFont
-            ]
-        }
         navigationItem.title = "Edit Profile"
         
         countryPicker.delegate = self
@@ -156,7 +146,7 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
         }
         
         let data = countries[row]
-        let title = NSAttributedString(string: data, attributes: [NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 14)!])
+        let title = NSAttributedString(string: data, attributes: [NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14)!])
         label?.attributedText = title
         label?.textAlignment = .center
         return label!
@@ -199,6 +189,7 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
                                                                                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
                                                                                     guard self?.presentedViewController == alert else { return }
                                                                                     self?.dismiss(animated: true, completion: nil)
+                                                                                    self?.navigationController?.popViewController(animated: true)
                                                                                 }
                                                                             }
                                                                             

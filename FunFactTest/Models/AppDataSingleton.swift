@@ -35,4 +35,9 @@ class AppDataSingleton {
     
     var listOfLandmarkIDs = [String]()
     var event = Events.firstLoad
+    
+    var leadersByCountry = [Leader]()
+    var leadersByCity = [Leader]()
+    var leadersWorldwide = [Leader]()
+    var url: URL?
 }

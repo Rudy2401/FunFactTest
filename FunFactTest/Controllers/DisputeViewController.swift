@@ -24,8 +24,6 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.tintColor = UIColor.darkGray
-
         pickerData = Constants.disputeReason
         self.reasonPicker.delegate = self
         self.reasonPicker.dataSource = self
@@ -42,22 +40,6 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
             action: #selector(cancelAction(_:))
         )
         navigationItem.rightBarButtonItem = cancelItem
-        
-        if #available(iOS 11.0, *) {
-            navigationController?.navigationBar.prefersLargeTitles = true
-        } else {
-            // Fallback on earlier versions
-        }
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.tintColor = .darkGray
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
-            } else {
-                // Fallback on earlier versions
-            }
-        }
         navigationItem.title = "Dispute Fact"
         
         notesText.text = "Enter your comments"
@@ -70,6 +52,36 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         
         submitButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         print(funFactID)
+        
+        let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: UIColor.white,
+                                        NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
+        let backLabel1 = String.fontAwesomeIcon(name: .angleDown)
+        let backAttr1 = NSAttributedString(string: backLabel1, attributes: Attributes.navBarImageLightAttribute)
+        let backAttrClicked1 = NSAttributedString(string: backLabel1, attributes: toolBarAttrImageClicked)
+        let completebackLabel = NSMutableAttributedString()
+        completebackLabel.append(backAttr1)
+        
+        let completebackLabelClicked = NSMutableAttributedString()
+        completebackLabelClicked.append(backAttrClicked1)
+        
+        let back = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
+        back.isUserInteractionEnabled = true
+        back.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
+        back.setAttributedTitle(completebackLabel, for: .normal)
+        back.setAttributedTitle(completebackLabelClicked, for: .highlighted)
+        back.setAttributedTitle(completebackLabelClicked, for: .selected)
+        back.titleLabel?.textAlignment = .center
+        let backBtn = UIBarButtonItem(customView: back)
+//        navigationItem.leftBarButtonItem = backBtn
+        navigationItem.backBarButtonItem?.title = ""
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     func documentsDidUpdate() {
         
@@ -200,7 +212,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         }
         
         let data = pickerData[row]
-        let title = NSAttributedString(string: data, attributes: [NSAttributedString.Key.font: UIFont(name: "Avenir Next", size: 14)!])
+        let title = NSAttributedString(string: data, attributes: [NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14)!])
         label?.attributedText = title
         label?.textAlignment = .center
         return label!

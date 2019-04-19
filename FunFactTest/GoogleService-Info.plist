@@ -2,14 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
-	<string>ca-app-pub-3940256099942544/2934735716</string>
-	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
-	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>920303967337-0030cd3a8qncfa7111fkr46t4a0n8i5b.apps.googleusercontent.com</string>
+	<string>920303967337-sik4ca7d20d5dcms9j448fom6u2j7okc.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.920303967337-0030cd3a8qncfa7111fkr46t4a0n8i5b</string>
+	<string>com.googleusercontent.apps.920303967337-sik4ca7d20d5dcms9j448fom6u2j7okc</string>
 	<key>API_KEY</key>
 	<string>AIzaSyC7UBPpJjIiNSHL5R9Dq_kFGGSmX37_iik</string>
 	<key>GCM_SENDER_ID</key>
@@ -17,23 +13,23 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.rushi.FunFacts</string>
+	<string>com.rushi.FunFact</string>
 	<key>PROJECT_ID</key>
 	<string>funfacts-5b1a9</string>
 	<key>STORAGE_BUCKET</key>
 	<string>funfacts-5b1a9.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<true></true>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
 	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>
-	<false></false>
+	<true></true>
 	<key>IS_GCM_ENABLED</key>
 	<true></true>
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:920303967337:ios:abbb131a6c1ada85</string>
+	<string>1:920303967337:ios:0164a7e544642fb1</string>
 	<key>DATABASE_URL</key>
 	<string>https://funfacts-5b1a9.firebaseio.com</string>
 </dict>

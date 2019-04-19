@@ -25,10 +25,10 @@ class WelcomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationController?.isNavigationBarHidden = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        navigationController?.navigationBar.isHidden = true
         if let currentUser = Auth.auth().currentUser {
             currentUser.getIDTokenForcingRefresh(true) { (con, error) in
                 if let error = error {
@@ -52,7 +52,7 @@ class WelcomeViewController: UIViewController {
             let labelText = "Fun Facts"
             let label = UILabel(frame: CGRect(x: 20, y: (signedInView?.frame.height)!/2, width: (signedInView?.frame.width)!-40, height: 60))
             label.textAlignment = .center
-            label.font = UIFont(name: "AvenirNext-Bold", size: 35)
+            label.font = UIFont(name: Fonts.boldFont, size: 35)
             label.text = labelText
             signedInView?.addSubview(label)
             self.view.addSubview(signedInView!)

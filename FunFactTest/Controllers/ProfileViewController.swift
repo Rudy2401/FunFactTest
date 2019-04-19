@@ -10,19 +10,19 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 
-class ProfileViewController: UIViewController, FirestoreManagerDelegate {
+class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrollViewDelegate {
     @IBOutlet weak var userImageView: UIImageView!
     @IBOutlet weak var userName: UILabel!
     @IBOutlet weak var userProfileName: UILabel!
     @IBOutlet weak var submittedNum: UILabel!
     @IBOutlet weak var disputesNum: UILabel!
     @IBOutlet weak var signOutButton: CustomButton!
-    @IBOutlet weak var signInView: UIView!
     @IBOutlet weak var signInButton: CustomButton!
     @IBOutlet weak var verifiedNum: UILabel!
     @IBOutlet weak var rejectedNum: UILabel!
     @IBOutlet weak var levelLabel: UILabel!
     @IBOutlet weak var locationLabel: UILabel!
+    @IBOutlet weak var scrollView: UIScrollView!
     
     var uid = ""
     var mode = ProfileMode.currentUser
@@ -42,23 +42,32 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     var levelString = ""
     var firestore = FirestoreManager()
     var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "", city: "", country: "", roles: [], funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
+    var refreshControl: UIRefreshControl!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         firestore.delegate = self
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.isOpaque = true
-        navigationController?.view.backgroundColor = .white
+        scrollView.delegate = self
+        scrollView.accessibilityIdentifier = "profileScrollView"
+        submittedNum.accessibilityIdentifier = "submittedNum"
+        disputesNum.accessibilityIdentifier = "disputesNum"
+        verifiedNum.accessibilityIdentifier = "verifiedNum"
+        rejectedNum.accessibilityIdentifier = "rejectedNum"
         submittedNum.textColor = Colors.blueColor
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            navigationController?.navigationBar.largeTitleTextAttributes = [
-                NSAttributedString.Key.foregroundColor: UIColor.black,
-                NSAttributedString.Key.font: customFont
-            ]
-        }
+        
+        scrollView.alwaysBounceVertical = true
+        scrollView.bounces  = true
+        refreshControl = UIRefreshControl()
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
+        refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
+        self.scrollView.insertSubview(refreshControl, at: 0)
+        
         navigationItem.title = "User Profile"
+        scrollView.scrollIndicatorInsets = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 2)
+        scrollView.autoresizingMask = UIView.AutoresizingMask(rawValue:
+            UIView.AutoresizingMask.RawValue(UInt8(UIView.AutoresizingMask.flexibleWidth.rawValue)
+                | UInt8(UIView.AutoresizingMask.flexibleHeight.rawValue)))
+        scrollView.isUserInteractionEnabled = true
         
         let editLabel1 = String.fontAwesomeIcon(name: .edit)
         let editAttr1 = NSAttributedString(string: editLabel1, attributes: Attributes.navBarImageLightAttribute)
@@ -109,13 +118,25 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             rejGesture.numberOfTapsRequired = 1
             rejectedNum.isUserInteractionEnabled = true
             rejectedNum.addGestureRecognizer(rejGesture)
-            navigationController?.navigationBar.tintColor = UIColor.darkGray
             
             userImageView.layer.cornerRadius = userImageView.frame.height/2
             signOutButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+            signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
             userImageView.layer.borderWidth = 0.5
             userImageView.layer.borderColor = UIColor.gray.cgColor
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         }
+    }
+    @objc func didPullToRefresh() {
+        self.firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "", completionHandler: { (userProfile, error) in
+            if let error = error {
+                print ("Error getting user profile \(error)")
+            } else {
+                AppDataSingleton.appDataSharedInstance.userProfile = userProfile!
+                self.loadAllData()
+                self.refreshControl?.endRefreshing()
+            }
+        })
     }
     @objc func editProfileAction(sender : UITapGestureRecognizer) {
         performSegue(withIdentifier: "editProfile", sender: sender)
@@ -149,6 +170,9 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        if Auth.auth().currentUser == nil {
+            return
+        }
         let spinner = Utils.showLoader(view: self.view)
         if AppDataSingleton.appDataSharedInstance.userProfile.uid == "" {
             firestore.downloadUserProfile((Auth.auth().currentUser?.uid) ?? "") { (user, error) in
@@ -169,7 +193,20 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        navigationController?.isNavigationBarHidden = true
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.prefersLargeTitles = true
+        if Auth.auth().currentUser != nil  {
+            for view in scrollView.subviews {
+                view.isHidden = false
+            }
+            signInButton.isHidden = true
+        } else {
+            for view in scrollView.subviews {
+                view.isHidden = true
+            }
+            signInButton.isHidden = false
+        }
     }
     func loadAllData() {
         switch mode {
@@ -220,7 +257,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
                     userImageView.image = UIImage(data: data!)
                 }
             }
-            signInView.isHidden = true
             userName.text = name
             var location = ""
             if mode == .currentUser {
@@ -262,11 +298,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
             locationLabel.text = location
             userProfileName.text = userNameString
             levelLabel.text = "Level: \(levelString)"
-        }
-        else {
-            signInView.isHidden = false
-            view.bringSubviewToFront(signInView)
-            signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         }
     }
     
@@ -363,6 +394,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate {
         
         // Show the navigation bar on other view controllers
         self.navigationController?.toolbar.isHidden = false
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

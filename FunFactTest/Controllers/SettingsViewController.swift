@@ -14,7 +14,7 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
     @IBOutlet weak var tableView: UITableView!
     
     var settingsData = ["Choose your interests",
-                        "Notification frequency",
+                        "More Settings",
                         "Help",
                         "About"]
     var buttonLeftData = [String.fontAwesomeIcon(name: .landmark),
@@ -27,18 +27,14 @@ class SettingsViewController: UIViewController, UITableViewDelegate, UITableView
         tableView.delegate = self
         tableView.dataSource = self
         tableView.isScrollEnabled = false
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.tintColor = .darkGray
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
-            } else {
-                // Fallback on earlier versions
-            }
-        }
+        tableView.accessibilityIdentifier = "settingsTable"
+        
         navigationItem.title = "Settings"
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

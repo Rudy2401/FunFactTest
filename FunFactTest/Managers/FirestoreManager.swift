@@ -42,7 +42,7 @@ class FirestoreManager {
     }
 
     
-    /// Downloads fun fact data from firestore for a fuc fact reference
+    /// Downloads fun fact data from firestore for a fun fact reference
     func downloadFunFacts(for ref: DocumentReference, completionHandler: @escaping (FunFact) -> ())  {
         ref.getDocument { (snapshot, error) in
             if let document = snapshot, document.exists {
@@ -68,6 +68,36 @@ class FirestoreManager {
                 completionHandler(funFact)
             } else {
                 print("Document \(ref.documentID) does not exist")
+            }
+        }
+    }
+    
+    /// Downloads fun fact data from firestore for a fun fact reference
+    func downloadFunFact(for id: String, completionHandler: @escaping (FunFact?, String?) -> ())  {
+        db.collection("funFacts").document(id).getDocument { (snapshot, error) in
+        if let document = snapshot, document.exists {
+                let funFact = FunFact(landmarkId: document.data()?["landmarkId"] as! String,
+                                      landmarkName: document.data()?["landmarkName"] as! String,
+                                      id: document.data()?["id"] as! String,
+                                      description: document.data()?["description"] as! String,
+                                      likes: document.data()?["likes"] as! Int,
+                                      dislikes: document.data()?["dislikes"] as! Int,
+                                      verificationFlag: document.data()?["verificationFlag"] as? String ?? "",
+                                      image: document.data()?["imageName"] as! String,
+                                      imageCaption: document.data()?["imageCaption"] as? String ?? "",
+                                      disputeFlag: document.data()?["disputeFlag"] as! String,
+                                      submittedBy: document.data()?["submittedBy"] as! String,
+                                      dateSubmitted: document.data()?["dateSubmitted"] as! Timestamp,
+                                      source: document.data()?["source"] as! String,
+                                      tags: document.data()?["tags"] as! [String],
+                                      approvalCount: document.data()?["approvalCount"] as! Int,
+                                      rejectionCount: document.data()?["rejectionCount"] as! Int,
+                                      approvalUsers: document.data()?["approvalUsers"] as! [String],
+                                      rejectionUsers: document.data()?["rejectionUsers"] as! [String],
+                                      rejectionReason: document.data()?["rejectionReason"] as! [String])
+                completionHandler(funFact, nil)
+            } else {
+                completionHandler(nil, error?.localizedDescription)
             }
         }
     }
@@ -117,7 +147,7 @@ class FirestoreManager {
         }
     }
     /// Add reference to collection /users/{userID}/funFactsVerified/{funFactID}
-    func addFunFactVerifiedToUser(funFactRef: DocumentReference, funFactID: String, user: String) {
+    func addFunFactVerifiedToUser(funFactRef: DocumentReference, funFactID: String, user: String, completion: @escaping (String?) -> ()) {
         db.collection("users")
             .document(user)
             .collection("funFactsVerified")
@@ -125,14 +155,14 @@ class FirestoreManager {
             .setData(["funFactID": funFactRef],
                      merge: true) { err in
                         if let err = err {
-                            print("Error writing document: \(err)")
+                             completion(err.localizedDescription)
                         } else {
-                            print("Document successfully written!")
+                            completion(nil)
                         }
         }
     }
     /// Add reference to collection /users/{userID}/funFactsRejected/{funFactID}
-    func addFunFactRejectedToUser(funFactRef: DocumentReference, funFactID: String, user: String) {
+    func addFunFactRejectedToUser(funFactRef: DocumentReference, funFactID: String, user: String, completion: @escaping (String?) -> ()) {
         db.collection("users")
             .document(user)
             .collection("funFactsRejected")
@@ -140,9 +170,9 @@ class FirestoreManager {
             .setData(["funFactID": funFactRef],
                      merge: true) { err in
                         if let err = err {
-                            print("Error writing document: \(err)")
+                            completion(err.localizedDescription)
                         } else {
-                            print("Document successfully written!")
+                            completion(nil)
                         }
         }
     }
@@ -463,7 +493,21 @@ class FirestoreManager {
                 user.rejectedCount = document.data()?["rejectedCount"] as! Int
                 user.roles = document.data()?["roles"] as! [String]
                 
-                completionHandler(user, nil)
+                self.downloadOtherUserData(uid, collection: "funFactsLiked") { (refs, error) in
+                    if let error = error {
+                        print ("Error getting user data \(error)")
+                    } else {
+                        user.funFactsLiked = refs ?? []
+                        self.downloadOtherUserData(uid, collection: "funFactsDisliked") { (refs, error) in
+                            if let error = error {
+                                print ("Error getting user data \(error)")
+                            } else {
+                                user.funFactsDisliked = refs ?? []
+                                completionHandler(user, nil)
+                            }
+                        }
+                    }
+                }
             }
             else {
                 let err = error
@@ -508,6 +552,8 @@ class FirestoreManager {
                       "rejectedCount": 0,
                       "roles": roles,
                       "email": user.email ?? "",
+                      "city": "",
+                      "country": "",
                       "name": user.displayName ?? "",
                       "userName": "user" + String(randomNumber),
                       "photoURL": user.photoURL ?? "",
@@ -816,6 +862,101 @@ class FirestoreManager {
                     }
                 }
             }
+        }
+    }
+    
+    /// Get list of users sorted by submitted count dec
+    func getLeaders(type: LeaderType, completion: @escaping ([Leader]?, String?) -> ()) {
+        var leaders = [Leader]()
+        switch type {
+        case .country:
+            db.collection("users")
+                .whereField("country", isEqualTo: AppDataSingleton.appDataSharedInstance.userProfile.country)
+                .order(by: "submittedCount", descending: true)
+                .limit(to: 20)
+                .getDocuments { (snapshot, error) in
+                if let error = error {
+                    completion(nil, error.localizedDescription)
+                } else {
+                    for document in (snapshot?.documents)! {
+                        let leader = Leader(userID: document.data()["userName"] as! String,
+                                             count: document.data()["submittedCount"] as! Int,
+                                             location: document.data()["country"] as! String,
+                                             photoURL: document.data()["photoURL"] as! String)
+                        leaders.append(leader)
+                    }
+                    completion(leaders, nil)
+                }
+            }
+        case .city:
+            db.collection("users")
+                .whereField("city", isEqualTo: AppDataSingleton.appDataSharedInstance.userProfile.city)
+                .order(by: "submittedCount", descending: true)
+                .limit(to: 20)
+                .getDocuments { (snapshot, error) in
+                if let error = error {
+                    completion(nil, error.localizedDescription)
+                } else {
+                    for document in (snapshot?.documents)! {
+                        let leader = Leader(userID: document.data()["userName"] as! String,
+                                             count: document.data()["submittedCount"] as! Int,
+                                             location: document.data()["city"] as! String,
+                                             photoURL: document.data()["photoURL"] as! String)
+                        leaders.append(leader)
+                    }
+                    completion(leaders, nil)
+                }
+            }
+        case .worldwide:
+            db.collection("users")
+                .order(by: "submittedCount", descending: true)
+                .limit(to: 20)
+                .getDocuments { (snapshot, error) in
+                if let error = error {
+                    completion(nil, error.localizedDescription)
+                } else {
+                    for document in (snapshot?.documents)! {
+                        let leader = Leader(userID: document.data()["userName"] as! String,
+                                             count: document.data()["submittedCount"] as! Int,
+                                             location: document.data()["city"] as! String,
+                                             photoURL: document.data()["photoURL"] as! String)
+                        leaders.append(leader)
+                    }
+                    completion(leaders, nil)
+                }
+            }
+        }
+    }
+    
+    /// Get name for landmark ID
+    func getLandmarkName(for landmarkID: String, completion: @escaping (String?, String?) -> ()) {
+        db.collection("landmarks").document(landmarkID).getDocument { (snapshot, error) in
+            if let error = error {
+                completion(nil, error.localizedDescription)
+            } else {
+                let landmarkName = snapshot!.data()!["name"] as? String
+                completion(landmarkName, nil)
+            }
+        }
+    }
+}
+extension AuthErrorCode {
+    var errorMessage: String {
+        switch self {
+        case .emailAlreadyInUse:
+            return "The email is already in use with another account"
+        case .userDisabled:
+            return "Your account has been disabled. Please contact support."
+        case .invalidEmail, .invalidSender, .invalidRecipientEmail:
+            return "Please enter a valid email"
+        case .networkError:
+            return "Network error. Please try again."
+        case .weakPassword:
+            return "Your password is too weak"
+        case .userNotFound:
+            return "User not found. Please enter valid email."
+        default:
+            return "Unknown error occurred"
         }
     }
 }

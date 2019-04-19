@@ -24,9 +24,10 @@ extension MainViewController: CLLocationManagerDelegate, AlgoliaSearchManagerDel
         if let location = locations.last {
             let center = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
             let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-            self.mapView.setRegion(region, animated: true)
             let currentLocationCoordinate = location.coordinate
             self.currentLocationCoordinate = currentLocationCoordinate
+            
+            self.mapView.setRegion(region, animated: false)
         }
     }
     
@@ -102,7 +103,8 @@ extension MainViewController {
         var count = 0
         algoliaManager.downloadLandmarks(query: query) { (landmark, error) in
             if let error = error {
-                if error == Errors.noRecordsFound.localizedDescription {
+                switch error.code {
+                case ErrorCode.noRecordsFound:
                     let alert = Utils.showAlert(status: .failure, message: ErrorMessages.noRecordsFound)
                     self.present(alert, animated: true) {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
@@ -110,9 +112,15 @@ extension MainViewController {
                             self?.dismiss(animated: true, completion: nil)
                         }
                     }
+                case ErrorCode.noNetwork:
+                    print ("Current location = \(self.currentLocationCoordinate)")
+                default:
+                    print ("Default")
+                    
                 }
                 print ("Error getting data from Algolia \(error)")
                 spinner.dismissLoader()
+                return
             }
             else {
                 let landmark = landmark!
@@ -157,5 +165,8 @@ extension MainViewController {
                 spinner.dismissLoader()
             }
         }
+    }
+    func downloadLandmarksFromCache() {
+        
     }
 }

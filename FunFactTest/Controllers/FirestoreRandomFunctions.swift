@@ -306,4 +306,24 @@ extension MainViewController {
             }
         }
     }
+    func addLandmarkNameCollection() {
+        let db = Firestore.firestore()
+        db.collection("landmarks").getDocuments { (snap, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for doc in (snap?.documents)! {
+                    let landmarkName = doc.data()["name"] as! String
+                    let landmarkID = doc.documentID
+                    db.collection("landmarkNames").document(landmarkName).setData(["id": landmarkID], merge: true) { error in
+                        if let error = error {
+                            print("Error adding document: \(error)")
+                        } else {
+                            print("Collection successfully updated")
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

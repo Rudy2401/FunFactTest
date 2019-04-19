@@ -15,10 +15,10 @@ import IQKeyboardManagerSwift
 import Firebase
 import FirebaseFirestore
 import FirebaseStorage
+import FirebaseDynamicLinks
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelegate {
-
     var window: UIWindow?
     let locationManager = CLLocationManager()
     var notificationCenter: UNUserNotificationCenter!
@@ -29,6 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
     
     override init() {
         super.init()
+        FirebaseOptions.defaultOptions()?.deepLinkURLScheme = "com.rushi.FunFact"
         FirebaseApp.configure()
         let db = Firestore.firestore()
         let settings = db.settings
@@ -36,6 +37,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
         db.settings = settings
         geofirestore = GeoFirestoreManager()
     }
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         // Configure Facebook Sign in
@@ -62,8 +64,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
         
         // get the singleton object
         notificationCenter = UNUserNotificationCenter.current()
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(calendarDayDidChange(_ :)),
+                                               name: Notification.Name.NSCalendarDayChanged,
+                                               object: nil)
 
-        print ("AppDataSingleton.appDataSharedInstance.event = \(AppDataSingleton.appDataSharedInstance.event)")
         // define what do you need permission to use
         let options: UNAuthorizationOptions = [.alert, .sound]
         notificationCenter.delegate = self
@@ -79,6 +84,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
         }
         //Enabling IQKeyboard manager
         IQKeyboardManager.shared.enable = true
+        IQKeyboardManager.shared.disabledDistanceHandlingClasses = [SignUpViewController.self, SignInViewController.self]
         return true
     }
 
@@ -108,21 +114,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
     }
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         var handled = false
-        
-        if url.absoluteString.contains("fb") {
+        print ("Received url through custom URL scheme \(url.absoluteString)")
+        if let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url) {
+            self.handleDynamicLink(dynamicLink)
+            return true
+        } else if url.absoluteString.contains("fb") {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
             
-        } else {
+        } else if url.absoluteString.contains("google") {
             handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: [:])
         }
-        
         return handled
+    }
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        
+        if let incomingURL = userActivity.webpageURL {
+            print ("Incoming URL = \(incomingURL)")
+            let linkHandled = DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { (dynamicLink, error) in
+                guard error == nil else {
+                    print ("Found an error \(error!.localizedDescription)")
+                    return
+                }
+                if let dynamicLink = dynamicLink {
+                    self.handleDynamicLink(dynamicLink)
+                }
+            }
+            if linkHandled {
+                return true
+            } else {
+                return false
+            }
+        }
+        return false
+    }
+    func handleDynamicLink(_ dynamicLink: DynamicLink) {
+        guard let url = dynamicLink.url else {
+            print ("No URL")
+            return
+        }
+        AppDataSingleton.appDataSharedInstance.url = url
+    }
+    
+    @objc func calendarDayDidChange(_ notification : NSNotification) {
+        UserDefaults.standard.set(0, forKey: "NotificationCount")
     }
 }
 
 extension AppDelegate: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didEnterRegion region: CLRegion) {
-        print ("entered region = \(region.identifier)")
         if region is CLCircularRegion && region != megaRegion {
             handleEvent(forRegion: region)
         }
@@ -184,6 +223,11 @@ extension AppDelegate: CLLocationManagerDelegate {
         }
     }
     func handleEvent(forRegion region: CLRegion!) {
+        print ("NotificationCount = \(UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount))")
+        print ("NotificationFrequency = \(UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationFrequency))")
+        if UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount) >= UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationFrequency) {
+            return
+        }
         if !region.identifier.contains("|") {
             return
         }
@@ -254,6 +298,28 @@ extension AppDelegate: CLLocationManagerDelegate {
                                 self.notificationCenter?.add(request, withCompletionHandler: { (error) in
                                     if error != nil {
                                         print("Error adding notification with identifier: \(identifier) \(error?.localizedDescription ?? "")")
+                                    } else {
+                                        if UserDefaults.standard.string(forKey: SettingsUserDefaults.notificationDate) == nil {
+                                            let formatter = DateFormatter()
+                                            formatter.dateFormat = "yyyy-MM-dd"
+                                            let now = Date()
+                                            let dateString = formatter.string(from:now)
+                                            UserDefaults.standard.set(dateString, forKey: SettingsUserDefaults.notificationDate)
+                                        } else {
+                                            let notificationDate = UserDefaults.standard.string(forKey: SettingsUserDefaults.notificationDate)
+                                            let formatter = DateFormatter()
+                                            formatter.dateFormat = "yyyy-MM-dd"
+                                            let now = Date()
+                                            let todayDate = formatter.string(from:now)
+                                            
+                                            if notificationDate == todayDate {
+                                                var count = UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount)
+                                                count += 1
+                                                UserDefaults.standard.set(count, forKey: SettingsUserDefaults.notificationCount)
+                                            } else {
+                                                UserDefaults.standard.set(todayDate, forKey: SettingsUserDefaults.notificationDate)
+                                            }
+                                        }
                                     }
                                 })
                             })

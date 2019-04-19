@@ -11,8 +11,9 @@ import UIKit
 import AVFoundation
 import FacebookShare
 import FirebaseStorage
+import FirebaseDynamicLinks
 
-class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate, FirestoreManagerDelegate {
     
     var imageContent = NSArray()
     var submittedByContent = NSArray()
@@ -31,6 +32,8 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     var pageContent = NSArray()
     let pageControl = UIPageControl()
     var quickHelpView = UIAlertController()
+    let pageNumLabel = UILabel()
+    var firestore = FirestoreManager()
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         if (currentIndex == 0) || (currentIndex == NSNotFound) {
@@ -48,13 +51,23 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         }
         return viewControllerAtIndex(currentIndex+1)
     }
+    func documentsDidUpdate() {
+        
+    }
     
     required init?(coder aDecoder: NSCoder) {
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.navigationBar.isHidden = false
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+        navigationController?.isNavigationBarHidden = false
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     
     override func viewDidLoad() {
@@ -66,18 +79,16 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         setupPageControl()
         
         setupToolbarAndNavigationbar()
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.tintColor = .darkGray
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
-            } else {
-                // Fallback on earlier versions
-            }
+        if AppDataSingleton.appDataSharedInstance.url != nil {
+            guard let funFactID = AppDataSingleton.appDataSharedInstance.url?.valueOf("funFactID") else { return }
+            setViewControllers([viewControllerAtIndex(getIndexOfVC(for: funFactID))] as? [UIViewController], direction: .forward, animated: true, completion: nil)
+            pageControl.currentPage = getIndexOfVC(for: funFactID)
+            currentIndex = getIndexOfVC(for: funFactID)
+            pageNumLabel.text = "[\(currentIndex + 1)/\(totalPages)]"
+            AppDataSingleton.appDataSharedInstance.url = nil
+        } else {
+            self.setViewControllers([viewControllerAtIndex(0)] as? [UIViewController], direction: .forward, animated: true, completion: nil)
         }
-        self.setViewControllers([viewControllerAtIndex(0)] as? [UIViewController], direction: .forward, animated: true, completion: nil)
     }
     
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
@@ -91,10 +102,10 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
             if let currentVC = pageViewController.viewControllers?.last {
                 currentIndex = indexOfViewController(viewController: currentVC as! ContentViewController)
                 self.pageControl.currentPage = currentIndex
+                pageNumLabel.text = "[\(currentIndex + 1)/\(totalPages)]"
             }
         }
     }
-
     
     func viewControllerAtIndex(_ index: Int) -> ContentViewController? {
         if (funFacts.count == 0) || (index >= funFacts.count) {
@@ -103,35 +114,34 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         
         let dataViewController = self.storyboard?.instantiateViewController(withIdentifier: "contentView") as! ContentViewController
         navigationItem.title = headingContent
-        dataViewController.dataObject = funFacts[index].id as AnyObject
-        dataViewController.funFactDesc = funFacts[index].description as String
-        dataViewController.imageObject = funFacts[index].image as AnyObject
-        dataViewController.submittedByObject = funFacts[index].submittedBy as AnyObject
-        dataViewController.dateObject = funFacts[index].dateSubmitted as AnyObject
-        dataViewController.sourceObject = funFacts[index].source as AnyObject
-        dataViewController.verifiedFlag = funFacts[index].verificationFlag
-        dataViewController.disputeFlag = funFacts[index].disputeFlag
-        dataViewController.imageCaption = funFacts[index].imageCaption
-        dataViewController.tags = funFacts[index].tags
-        dataViewController.likesObject = funFacts[index].likes as AnyObject
-        dataViewController.dislikesObject = funFacts[index].dislikes as AnyObject
-        dataViewController.funFactID = funFacts[index].id
+        if headingContent == "" {
+            firestore.getLandmarkName(for: landmarkID) { (landmarkName, error) in
+                if let error = error {
+                    print ("Error getting landmark Name \(error)")
+                } else {
+                    self.navigationItem.title = landmarkName
+                    self.headingContent = landmarkName ?? ""
+                }
+            }
+        }
+        
+        dataViewController.funFact = funFacts[index]
         dataViewController.address = address
-        dataViewController.headingObject = headingContent as AnyObject
         dataViewController.landmarkID = landmarkID
         dataViewController.currPageNumberText = String(index+1)
         dataViewController.totalPageNumberText = String(totalPages)
-        dataViewController.approvalCount = funFacts[index].approvalCount
-        dataViewController.rejectionCount = funFacts[index].rejectionCount
-        dataViewController.approvalUsers = funFacts[index].approvalUsers
-        dataViewController.rejectionUsers = funFacts[index].rejectionUsers
-        dataViewController.rejectionReason = funFacts[index].rejectionReason
         currentVC = dataViewController
         return dataViewController
     }
     
+    func getIndexOfVC(for funFactID: String) -> Int {
+        let array = NSMutableArray(array: pageContent)
+        let ids = array as? [String]
+        return ids?.firstIndex(of: funFactID) ?? 0
+    }
+    
     func indexOfViewController(viewController: ContentViewController) -> Int {
-        if let dataObject: AnyObject = viewController.dataObject {
+        if let dataObject = viewController.funFact.id as? AnyObject {
             return pageContent.index(of: dataObject)
         } else {
             return NSNotFound
@@ -139,9 +149,8 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     func setupToolbarAndNavigationbar () {
-        let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
+        let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: UIColor.white,
                                  NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
-        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         
         let shareLabel1 = String.fontAwesomeIcon(name: .shareAlt)
         let shareAttr1 = NSAttributedString(string: shareLabel1, attributes: Attributes.navBarImageLightAttribute)
@@ -223,7 +232,17 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         help.addTarget(self, action: #selector(showAlert), for: .touchUpInside)
         let helpBtn = UIBarButtonItem(customView: help)
         
-        navigationItem.setRightBarButtonItems([menuBtn, flexibleSpace, shareBtn, flexibleSpace, voiceBtn, flexibleSpace, helpBtn], animated: true)
+        pageNumLabel.text = "[\(currentIndex + 1)/\(totalPages)]"
+        pageNumLabel.font = UIFont(name: Fonts.demiBoldFont, size: 16.0)
+        pageNumLabel.textColor = .white
+        pageNumLabel.textAlignment = .right
+        let pageNumBtn = UIBarButtonItem(customView: pageNumLabel)
+        let currWidth = pageNumBtn.customView?.widthAnchor.constraint(equalToConstant: 60)
+        currWidth?.isActive = true
+        
+        navigationItem.setRightBarButtonItems([menuBtn, Flex.flexibleSpace, shareBtn, Flex.flexibleSpace, voiceBtn, Flex.flexibleSpace, helpBtn, Flex.flexibleSpace, pageNumBtn], animated: true)
+        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     @objc func showAlert() {
         quickHelpView = Utils.showQuickHelp()
@@ -263,10 +282,10 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         else {
             sender.isSelected = true
             let currentVC = viewControllerAtIndex(currentIndex)
-            let funFactDescWOHashtags = currentVC?.funFactDesc.replacingOccurrences(of: "\\s?#(?:\\S+)\\s?",
+            let funFactDescWOHashtags = currentVC?.funFact.description.replacingOccurrences(of: "\\s?#(?:\\S+)\\s?",
                                                             with: "",
                                                             options: .regularExpression,
-                                                            range: ((currentVC?.funFactDesc.startIndex)!..<(currentVC?.funFactDesc.endIndex)!)).trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
+                                                            range: ((currentVC?.funFact.description.startIndex)!..<(currentVC?.funFact.description.endIndex)!)).trimmingCharacters(in: NSCharacterSet.whitespacesAndNewlines)
             
             let utterance = AVSpeechUtterance(string: funFactDescWOHashtags!)
             var voiceToUse: AVSpeechSynthesisVoice?
@@ -299,26 +318,18 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         }
         actionSheetController.addAction(addActionButton)
 
-        if currentVC.submittedByObject as? String == AppDataSingleton.appDataSharedInstance.userProfile.uid {
+        if currentVC.funFact.submittedBy == AppDataSingleton.appDataSharedInstance.userProfile.uid {
             let editActionButton = UIAlertAction(title: "Edit Fun Fact", style: .default)
             { _ in
                 guard let addFactVC  = self.storyboard?.instantiateViewController(withIdentifier: "addFactVC") as? AddNewFactViewController? else { return }
                 addFactVC?.mode = Mode.edit
-                addFactVC?.funFactID = currentVC.funFactID
-                addFactVC?.landmarkName = currentVC.headingObject as? String
-                addFactVC?.imageCaptionText = currentVC.imageCaption
-                addFactVC?.funFactDesc = currentVC.funFactDesc
+                addFactVC?.funFactID = currentVC.funFact.id
                 addFactVC?.landmarkID = currentVC.landmarkID
-                addFactVC?.verificationFlag = currentVC.verifiedFlag
-                addFactVC?.disputeFlag = currentVC.disputeFlag
-                addFactVC?.likes = currentVC.likesObject as! Int
-                addFactVC?.dislikes = currentVC.dislikesObject as! Int
-                addFactVC?.source = currentVC.sourceObject as! String
-                addFactVC?.approvalCount = currentVC.approvalCount
-                addFactVC?.rejectionCount = currentVC.rejectionCount
-                addFactVC?.approvalUsers = currentVC.approvalUsers
-                addFactVC?.rejectionUsers = currentVC.rejectionUsers
-                addFactVC?.rejectionReason = currentVC.rejectionReason
+                addFactVC?.approvalCount = currentVC.funFact.approvalCount
+                addFactVC?.rejectionCount = currentVC.funFact.rejectionCount
+                addFactVC?.approvalUsers = currentVC.funFact.approvalUsers
+                addFactVC?.rejectionUsers = currentVC.funFact.rejectionUsers
+                addFactVC?.rejectionReason = currentVC.funFact.rejectionReason
                 self.navigationController?.pushViewController(addFactVC!, animated: true)
                 
             }
@@ -334,32 +345,55 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     }
     
     @objc func shareFactAction(sender : UIButton) {
-        let activityController: UIActivityViewController
         let currentVC = viewControllerAtIndex(currentIndex)!
-        var imageToShare = UIImage()
-        
-        let imageFromCache = CacheManager.shared.getFromCache(key: "\(currentVC.funFactID).jpeg") as? UIImage
-        if imageFromCache != nil {
-            imageToShare = imageFromCache!
-        }
-        else {
-            let storage = Storage.storage()
-            let storageRef = storage.reference()
-            let gsReference = storageRef.child("images/\(currentVC.funFactID).jpeg)")
-            gsReference.getData(maxSize: 1 * 1024 * 1024) { (data, error) in
-                if let error = error {
-                    print ("Error getting image \(error.localizedDescription)")
-                } else {
-                    imageToShare = UIImage(data: data!)!
+        let storage = Storage.storage()
+        let httpsReference = storage.reference(forURL: "https://firebasestorage.googleapis.com/v0/b/funfacts-5b1a9.appspot.com/o/images%2F\(currentVC.funFact.image).jpeg")
+        httpsReference.downloadURL { imageUrl, error in
+            if let error = error {
+                print ("Error getting image \(error.localizedDescription)")
+            } else {
+                guard let link = URL(string: "https://funfactsproject/?landmarkID=\(self.landmarkID)&funFactID=\(currentVC.funFact.id)&apn=com.rushi.FunFact&d=1") else { return }
+                let dynamicLinksDomainURIPrefix = "funfactsproject.page.link"
+                
+                let linkBuilder = DynamicLinkComponents(link: link, domain: dynamicLinksDomainURIPrefix)
+                linkBuilder.iOSParameters = DynamicLinkIOSParameters(bundleID: "com.rushi.FunFact")
+                linkBuilder.iOSParameters?.appStoreID = "962194608"
+                linkBuilder.iOSParameters?.minimumAppVersion = "1.0"
+                
+                //        linkBuilder.androidParameters = DynamicLinkAndroidParameters(packageName: "com.rushi.FunFact")
+                //        linkBuilder.androidParameters?.minimumVersion = 1
+                
+                linkBuilder.socialMetaTagParameters = DynamicLinkSocialMetaTagParameters()
+                linkBuilder.socialMetaTagParameters?.title = self.headingContent
+                linkBuilder.socialMetaTagParameters?.descriptionText = currentVC.funFact.description
+                linkBuilder.socialMetaTagParameters?.imageURL = imageUrl!
+                
+                print ("image URL = \(imageUrl!)")
+                
+                guard let longDynamicLink = linkBuilder.url else { return }
+                print("The long URL is: \(longDynamicLink)")
+                DynamicLinks.performDiagnostics(completion: nil)
+                
+                let options = DynamicLinkComponentsOptions()
+                options.pathLength = .short
+                linkBuilder.options = options
+                
+                linkBuilder.shorten { url, warnings, error in
+                    if let error = error {
+                        print ("Error while shortening \(error.localizedDescription)")
+                    } else {
+                        let shortUrl = url!
+                        print("The short URL is: \(shortUrl.absoluteString)")
+                        var activityController: UIActivityViewController
+                        let funFact = "Checkout this cool fun fact: \(shortUrl)"
+                        activityController = UIActivityViewController(activityItems: [funFact], applicationActivities: nil)
+                        activityController.excludedActivityTypes = [.airDrop, .addToReadingList, .assignToContact, .markupAsPDF, .openInIBooks, .postToFlickr]
+                        
+                        self.present(activityController, animated: true, completion: nil)
+                    }
                 }
             }
         }
-        
-        let funFact = "Did you know this fun fact about " + (currentVC.headingObject as! String) + "? \n" + currentVC.funFactDesc
-        activityController = UIActivityViewController(activityItems: [funFact, imageToShare], applicationActivities: nil)
-        activityController.excludedActivityTypes = [.airDrop, .addToReadingList, .assignToContact, .markupAsPDF, .openInIBooks, .postToFlickr]
-        
-        self.present(activityController, animated: true, completion: nil)
     }
     func nextPage() {
         if currentIndex+1 == totalPages {
@@ -368,6 +402,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         currentIndex += 1
         if let nextViewController = viewControllerAtIndex(currentIndex) {
             setViewControllers([nextViewController], direction: .forward, animated: true, completion: nil)
+            pageNumLabel.text = "[\(currentIndex + 1)/\(totalPages)]"
         }
     }
     func prevPage() {
@@ -377,12 +412,12 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         currentIndex -= 1
         if let prevViewController = viewControllerAtIndex(currentIndex) {
             setViewControllers([prevViewController], direction: .reverse, animated: true, completion: nil)
+            pageNumLabel.text = "[\(currentIndex + 1)/\(totalPages)]"
         }
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let addFactVC = segue.destination as? AddNewFactViewController
         addFactVC?.address = currentVC.address
-        addFactVC?.landmarkName = currentVC.headingObject as? String
     }
     public func createIndex<Key, Element>(elms:[Element], extractKey:(Element) -> Key) -> [Key:Element] where Key : Hashable {
         var dict = [Key:Element]()

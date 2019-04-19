@@ -30,6 +30,8 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
     @IBOutlet weak var landmarkNameBtn: UIButton!
     @IBOutlet weak var sourceBtn: UIButton!
     @IBOutlet weak var autocompleteTableView: UITableView!
+    @IBOutlet weak var staticImage: UIImageView!
+    @IBOutlet weak var chooseImageLabel: UILabel!
     
     var algoliaManager = AlgoliaSearchManager()
     var firestore = FirestoreManager()
@@ -83,30 +85,20 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
-        navigationController?.navigationBar.shadowImage = UIImage()
-        navigationController?.navigationBar.tintColor = .darkGray
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            if #available(iOS 11.0, *) {
-                navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
-            } else {
-                
-            }
-        }
         switch mode {
         case .edit:
             navigationItem.title = "Edit Fun Fact"
         case .add:
-            navigationItem.title = "Add A New Fun Fact"
-            landmarkImage.image = UIImage.fontAwesomeIcon(name: .fileImage,
+            navigationItem.title = "Add New Fun Fact"
+            staticImage.image = UIImage.fontAwesomeIcon(name: .images,
                                                           style: .solidp,
-                                                          textColor: .gray,
-                                                          size: CGSize(width: landmarkImage.frame.width,
-                                                                       height: landmarkImage.frame.height),
+                                                          textColor: .darkGray,
+                                                          size: CGSize(width: staticImage.frame.width,
+                                                                       height: staticImage.frame.height),
                                                           backgroundColor: .clear)
+            landmarkImage.image = UIImage()
+            addDashedBorder()
         }
-
         algoliaManager.delegate = self
         funFactDescription.keyboardDistanceFromTextField = 200
         funFactDescription.keyboardType = .twitter
@@ -166,8 +158,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         mytapGestureRecognizer.numberOfTapsRequired = 1
         addressTextField?.addGestureRecognizer(mytapGestureRecognizer)
         addressTextField?.isUserInteractionEnabled = true
-        landmarkImage.layer.borderWidth = 0.5
-        landmarkImage.layer.borderColor = UIColor.lightGray.cgColor
+        
         landmarkImage.layer.cornerRadius = 5
 
         let imagePickerTapGesture = UITapGestureRecognizer(target: self, action: #selector(viewImagePicker))
@@ -179,7 +170,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         imageCaption.layer.borderColor = UIColor.darkGray.cgColor
         imageCaption.layer.cornerRadius = 5
 
-        imageCaption.text = "Click on the icon to select image. Enter image caption here."
+        imageCaption.text = "Enter image caption here. Please make sure to add Credits to pictures taken off the internet."
         imageCaption.textColor = UIColor.lightGray
 
         funFactDescription.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable."
@@ -194,20 +185,24 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         sourceTextField.layer.cornerRadius = 5
 
         submitButton.backgroundColor = Colors.seagreenColor
-
+        submitButton.accessibilityIdentifier = "submit"
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         // Hide the navigation bar on the this view controller
+        navigationController?.isNavigationBarHidden = true
+        navigationController?.isNavigationBarHidden = false
         self.tabBarController?.tabBar.isHidden = true
+        navigationController?.navigationBar.prefersLargeTitles = true
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
         // Show the navigation bar on other view controllers
         self.tabBarController?.tabBar.isHidden = false
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -300,6 +295,8 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             UIImagePickerController.InfoKey.editedImage)]
             as? UIImage else { return }
         landmarkImage.image = selectedImage
+        staticImage.isHidden = true
+        chooseImageLabel.isHidden = true
         self.dismiss(animated: true, completion: nil)
     }
     @objc func cancelAction(_ sender: Any) {
@@ -319,6 +316,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         
         let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             let db = Firestore.firestore()
+            
             var tempLandmarkID = ""
             tempLandmarkID = (self.landmarkID == "" || self.landmarkID == nil) ?
                 db.collection("landmarks").document().documentID : self.landmarkID ?? ""
@@ -333,99 +331,111 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             self.coordinate = (self.coordinate.latitude == 0) ?
                 CLLocationCoordinate2D(latitude: self.landmark.coordinates.latitude,
                                        longitude: self.landmark.coordinates.longitude) : self.coordinate
-            //Upload Landmark details - merge if landmark already exists
-            let ffID = (self.mode != .edit) ? db.collection("funFacts").document().documentID : self.funFactID
-            let landmark = Landmark(id: tempLandmarkID,
-                                    name: self.landmarkName ?? "",
-                                    address: self.address ?? "",
-                                    city: self.city ?? "",
-                                    state: self.state ?? "",
-                                    zipcode: self.zipcode ?? "",
-                                    country: self.country ?? "",
-                                    type: self.type ?? "",
-                                    coordinates: GeoPoint(latitude: self.coordinate.latitude as Double,
-                                                          longitude: self.coordinate.longitude as Double),
-                                    image: ffID,
-                                    numOfFunFacts: self.numOfFunFacts,
-                                    likes: self.landLikes,
-                                    dislikes: self.landDislikes)
-            self.firestore.addLandmark(landmark: landmark, completion: { (error) in
-                if let error = error {
-                    print ("Error writing document: \(error)")
-                } else {
-                    print("Document successfully written!")
-                    // Upload GeoFirestore related data
-                    self.geoFirestore
-                        .addGeoFirestoreData(for: tempLandmarkID,
-                                             coordinates: GeoPoint(latitude: self.coordinate.latitude as Double,
-                                                                   longitude: self.coordinate.longitude as Double),
-                                             completion: { (error) in
-                                                if let error = error {
-                                                    print ("Error writing Geofirestore document: \(error)")
-                                                } else {
-                                                    print("GeoFirestore data successfully written!")
-                                                }
-                        })
-                }
-            })
             
-            //Upload fun fact details
-            let funFact = FunFact(landmarkId: tempLandmarkID,
-                                  landmarkName: self.landmarkName ?? "",
-                                  id: ffID,
-                                  description: self.funFactDescription.text,
-                                  likes: self.likes,
-                                  dislikes: self.dislikes,
-                                  verificationFlag: self.verificationFlag,
-                                  image: ffID,
-                                  imageCaption: self.imageCaption.text,
-                                  disputeFlag: self.disputeFlag,
-                                  submittedBy: Auth.auth().currentUser?.uid ?? "",
-                                  dateSubmitted: Timestamp(date: Date()),
-                                  source: self.sourceTextField.text ?? "",
-                                  tags: self.funFactDescription.text.hashtags(),
-                                  approvalCount: self.approvalCount,
-                                  rejectionCount: self.rejectionCount,
-                                  approvalUsers: self.approvalUsers,
-                                  rejectionUsers: self.rejectionUsers,
-                                  rejectionReason: self.rejectionReason)
-            self.firestore.addFunFact(funFact: funFact, completion: { (error) in
+            self.algoliaManager.getLandmarkID(from: self.address ?? "", zipCode: self.zipcode ?? "") { (id, numOfFunFacts, likes, dislikes, error) in
                 if let error = error {
-                    print ("Error writing document: \(error)")
-                    let alert = Utils.showAlert(status: .failure, message: ErrorMessages.funFactUploadError)
-                    self.present(alert, animated: true) {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-                            guard self?.presentedViewController == alert else { return }
-                            self?.dismiss(animated: true, completion: nil)
-                        }
-                    }
+                    print ("Algolia error getting landmark ID \(error)")
                 } else {
-                    print("Document successfully written!")
-                    let alert = Utils.showAlert(status: .success, message: ErrorMessages.funFactUploadSuccess)
-                    self.present(alert, animated: true) {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-                            guard self?.presentedViewController == alert else { return }
-                            self?.dismiss(animated: true, completion: nil)
-                            self!.navigationController?.popViewController(animated: true)
-                        }
+                    if id != "" {
+                        tempLandmarkID = id!
+                        self.numOfFunFacts = numOfFunFacts!
+                        self.likes = likes!
+                        self.dislikes = dislikes!
                     }
-                }
-            })
-            self.firestore.uploadImage(imageName: ffID + ".jpeg",
-                                       image: self.landmarkImage.image ?? UIImage(),
-                                       type: ImageType.funFact,
-                                       completion: { (url, error) in
-                                        if let error = error {
-                                            print ("Error uploading image \(error)")
-                                        } else {
-                                            print ("Image uploaded successfully")
-                                            if CacheManager.shared.checkIfImageExists(imageName: ffID + ".jpeg") {
-                                                CacheManager.shared.replaceImage(imageName: ffID + ".jpeg", image: self.landmarkImage.image ?? UIImage())
-                                            }
+                    //Upload Landmark details - merge if landmark already exists
+                    let ffID = (self.mode != .edit) ? db.collection("funFacts").document().documentID : self.funFactID
+                    let landmark = Landmark(id: tempLandmarkID,
+                                            name: self.landmarkName ?? "",
+                                            address: self.address ?? "",
+                                            city: self.city ?? "",
+                                            state: self.state ?? "",
+                                            zipcode: self.zipcode ?? "",
+                                            country: self.country ?? "",
+                                            type: self.type ?? "",
+                                            coordinates: GeoPoint(latitude: self.coordinate.latitude as Double,
+                                                                  longitude: self.coordinate.longitude as Double),
+                                            image: ffID,
+                                            numOfFunFacts: self.numOfFunFacts,
+                                            likes: self.landLikes,
+                                            dislikes: self.landDislikes)
+                    self.firestore.addLandmark(landmark: landmark, completion: { (error) in
+                        if let error = error {
+                            print ("Error writing document: \(error)")
+                        } else {
+                            print("Document successfully written!")
+                            // Upload GeoFirestore related data
+                            self.geoFirestore
+                                .addGeoFirestoreData(for: tempLandmarkID,
+                                                     coordinates: GeoPoint(latitude: self.coordinate.latitude as Double,
+                                                                           longitude: self.coordinate.longitude as Double),
+                                                     completion: { (error) in
+                                                        if let error = error {
+                                                            print ("Error writing Geofirestore document: \(error)")
+                                                        } else {
+                                                            print("GeoFirestore data successfully written!")
+                                                        }
+                                })
+                            //Upload fun fact details
+                            let funFact = FunFact(landmarkId: tempLandmarkID,
+                                                  landmarkName: self.landmarkName ?? "",
+                                                  id: ffID,
+                                                  description: self.funFactDescription.text,
+                                                  likes: self.likes,
+                                                  dislikes: self.dislikes,
+                                                  verificationFlag: self.verificationFlag,
+                                                  image: ffID,
+                                                  imageCaption: self.imageCaption.text,
+                                                  disputeFlag: self.disputeFlag,
+                                                  submittedBy: Auth.auth().currentUser?.uid ?? "",
+                                                  dateSubmitted: Timestamp(date: Date()),
+                                                  source: self.sourceTextField.text ?? "",
+                                                  tags: self.funFactDescription.text.hashtags(),
+                                                  approvalCount: self.approvalCount,
+                                                  rejectionCount: self.rejectionCount,
+                                                  approvalUsers: self.approvalUsers,
+                                                  rejectionUsers: self.rejectionUsers,
+                                                  rejectionReason: self.rejectionReason)
+                            self.firestore.addFunFact(funFact: funFact, completion: { (error) in
+                                if let error = error {
+                                    print ("Error writing document: \(error)")
+                                    let alert = Utils.showAlert(status: .failure, message: ErrorMessages.funFactUploadError)
+                                    self.present(alert, animated: true) {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                            guard self?.presentedViewController == alert else { return }
+                                            self?.dismiss(animated: true, completion: nil)
                                         }
-            })
-            self.firestore.addHashtags(funFactID: ffID, hashtags: self.funFactDescription.text.hashtags())
-            self.firestore.addUserSubmitted(funFactID: ffID, userID: Auth.auth().currentUser?.uid ?? "")
+                                    }
+                                } else {
+                                    print("Document successfully written!")
+                                    self.firestore.addHashtags(funFactID: ffID, hashtags: self.funFactDescription.text.hashtags())
+                                    self.firestore.addUserSubmitted(funFactID: ffID, userID: Auth.auth().currentUser?.uid ?? "")
+                                    self.firestore.uploadImage(imageName: ffID + ".jpeg",
+                                                               image: self.landmarkImage.image ?? UIImage(),
+                                                               type: ImageType.funFact,
+                                                               completion: { (url, error) in
+                                                                if let error = error {
+                                                                    print ("Error uploading image \(error)")
+                                                                } else {
+                                                                    print ("Image uploaded successfully")
+                                                                    if CacheManager.shared.checkIfImageExists(imageName: ffID + ".jpeg") {
+                                                                        CacheManager.shared.replaceImage(imageName: ffID + ".jpeg", image: self.landmarkImage.image ?? UIImage())
+                                                                    }
+                                                                }
+                                    })
+                                    let alert = Utils.showAlert(status: .success, message: ErrorMessages.funFactUploadSuccess)
+                                    self.present(alert, animated: true) {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                            guard self?.presentedViewController == alert else { return }
+                                            self?.dismiss(animated: true, completion: nil)
+                                            self!.navigationController?.popViewController(animated: true)
+                                        }
+                                    }
+                                }
+                            })
+                        }
+                    })
+                }
+            }
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alertController.addAction(okayAction)
@@ -437,14 +447,6 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         var errors = false
         let title = "Error"
         var message = ""
-        let image = UIImage.fontAwesomeIcon(name: .fileImage,
-                                            style: .solidp,
-                                            textColor: .darkGray,
-                                            size: CGSize(width: landmarkImage.bounds.width,
-                                                         height: landmarkImage.bounds.height),
-                                            backgroundColor: .clear)
-        let imageData = image.jpegData(compressionQuality: 1.0)
-        let formImageData = landmarkImage.image!.jpegData(compressionQuality: 1.0)
         if (addressTextField?.text?.isEmpty)! {
             errors = true
             message += "Please enter a street address"
@@ -481,7 +483,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  toFocus: self.sourceTextField!,
                                  type: "textfield")
         }
-        if imageData == formImageData  {
+        if !staticImage.isHidden  {
             errors = true
             message += "Please select an image for your fun fact"
             Utils.alertWithTitle(title: title,
@@ -564,6 +566,24 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             self.landmarkImage.layer.cornerRadius = 5
         }
     }
+    
+    func addDashedBorder() {
+        let color = UIColor.gray.cgColor
+        let shapeLayer:CAShapeLayer = CAShapeLayer()
+        let frameSize = landmarkImage.frame.size
+        let shapeRect = CGRect(x: 0, y: 0, width: frameSize.width, height: frameSize.height)
+        
+        shapeLayer.bounds = shapeRect
+        shapeLayer.position = CGPoint(x: frameSize.width/2, y: frameSize.height/2)
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.strokeColor = color
+        shapeLayer.lineWidth = 2
+        shapeLayer.lineJoin = CAShapeLayerLineJoin.round
+        shapeLayer.lineDashPattern = [6,3]
+        shapeLayer.path = UIBezierPath(roundedRect: shapeRect, cornerRadius: 5).cgPath
+        
+        landmarkImage.layer.addSublayer(shapeLayer)
+    }
 }
 
 extension String {
@@ -610,6 +630,24 @@ extension AddNewFactViewController: UITableViewDelegate, UITableViewDataSource {
 
         self.funFactDescription.text = tempStr + selectedCell.hashtag.text!
         autocompleteTableView.isHidden = true
+        self.funFactDescription.text += " "
+        if funFactDescription.text.count > 300 {
+            let selectedRange = funFactDescription.selectedRange
+            let str1 = funFactDescription.text.substring(toIndex: 300)
+            let str2 = funFactDescription.text.substring(fromIndex: 300)
+            
+            let strAttr1 = NSMutableAttributedString(string: str1, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black,
+                                                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
+            let strAttr2 = NSMutableAttributedString(string: str2, attributes: [NSAttributedString.Key.foregroundColor: UIColor.red,
+                                                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
+            let str = NSMutableAttributedString()
+            str.append(strAttr1)
+            str.append(strAttr2)
+            funFactDescription.attributedText = str
+            funFactDescription.selectedRange = selectedRange
+        } else {
+            funFactDescription.textColor = .black
+        }
     }
     func searchAutocompleteEntriesWithSubstring(substring: String) {
         autocompleteHashtags.removeAll(keepingCapacity: true)

@@ -10,11 +10,12 @@ import Foundation
 import UIKit
 
 extension UIView {
-    func addBackground(imageName: String = "LoginPage", contentMode: UIView.ContentMode = .scaleToFill) {
+    func addBackground(imageName: String = "Login2", contentMode: UIView.ContentMode = .scaleToFill) {
         // setup the UIImageView
         let backgroundImageView = UIImageView(frame: UIScreen.main.bounds)
         backgroundImageView.image = UIImage(named: imageName)
         backgroundImageView.contentMode = contentMode
+        backgroundImageView.addBlurEffect()
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
         
         addSubview(backgroundImageView)
@@ -27,6 +28,14 @@ extension UIView {
         let bottomConstraint = NSLayoutConstraint(item: backgroundImageView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1.0, constant: 0.0)
         
         NSLayoutConstraint.activate([leadingConstraint, trailingConstraint, topConstraint, bottomConstraint])
+    }
+    func addBlurEffect() {
+        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.regular)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = self.bounds
+        
+        blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight] // for supporting device rotation
+        self.addSubview(blurEffectView)
     }
 }
 extension UIActivityIndicatorView {

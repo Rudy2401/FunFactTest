@@ -90,7 +90,7 @@ class Utils {
         let titleString = NSMutableAttributedString(
             string: title,
             attributes: [
-                NSAttributedString.Key.font: UIFont(name: "AvenirNext-Bold", size: 16.0)!,
+                NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 16.0)!,
                 NSAttributedString.Key.foregroundColor: UIColor.black
             ]
         )
@@ -150,7 +150,7 @@ class Utils {
 }
 extension NSMutableAttributedString {
     @discardableResult func bold(_ text: String) -> NSMutableAttributedString {
-        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont(name: "AvenirNext-Bold", size: 14)!]
+        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont(name: Fonts.boldFont, size: 14)!]
         let boldString = NSMutableAttributedString(string: text, attributes: attrs)
         append(boldString)
         
@@ -158,7 +158,7 @@ extension NSMutableAttributedString {
     }
     
     @discardableResult func normal(_ text: String) -> NSMutableAttributedString {
-        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont(name: "Avenir Next", size: 14)!]
+        let attrs: [NSAttributedString.Key: Any] = [.font: UIFont(name: Fonts.regularFont, size: 14)!]
         let normal = NSAttributedString(string: text, attributes: attrs)
         append(normal)
         

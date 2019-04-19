@@ -17,4 +17,6 @@ target 'FunFactTest' do
     pod 'InstantSearch', '~> 3.0'
     pod 'Geofirestore'
     #pod 'SwiftLint'
+    #pod 'BitlySDK'
+    pod 'Firebase/DynamicLinks'
 end

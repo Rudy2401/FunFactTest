@@ -105,7 +105,7 @@ class RejectionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
         
         let data = pickerData[row]
         let title = NSAttributedString(string: data,
-                                       attributes: [NSAttributedString.Key.font: UIFont(name: "Avenir Next",
+                                       attributes: [NSAttributedString.Key.font: UIFont(name: Fonts.regularFont,
                                                                                         size: 14)!])
         label?.attributedText = title
         label?.textAlignment = .center

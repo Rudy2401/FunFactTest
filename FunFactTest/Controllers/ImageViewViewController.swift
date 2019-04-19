@@ -28,6 +28,9 @@ class ImageViewViewController: UIViewController, UIScrollViewDelegate{
         imageCaption?.text = imageCaptionText
         scrollView.contentSize = imageView.frame.size
         navigationController?.navigationBar.backItem?.title = ""
+        imageCaption?.textColor = .white
+        scrollView.backgroundColor = .black
+        view.backgroundColor = .black
         view.bringSubviewToFront(imageCaption!)
         setupGestureRecognizer()
     }
@@ -91,16 +94,16 @@ class ImageViewViewController: UIViewController, UIScrollViewDelegate{
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        // Hide the navigation bar on the this view controller
-        self.navigationController?.toolbar.isHidden = true
+        navigationController?.navigationBar.backgroundColor = .black
+        navigationController?.navigationBar.barTintColor = .black
+        tabBarController?.tabBar.isHidden = true
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
-        // Show the navigation bar on other view controllers
-        self.navigationController?.toolbar.isHidden = false
+        tabBarController?.tabBar.isHidden = false
+        navigationController?.navigationBar.backgroundColor = Colors.seagreenColor
+        navigationController?.navigationBar.barTintColor = Colors.seagreenColor
     }
 
 }

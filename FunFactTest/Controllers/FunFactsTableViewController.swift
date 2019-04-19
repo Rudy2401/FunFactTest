@@ -23,17 +23,14 @@ class FunFactsTableViewController: UITableViewController, FirestoreManagerDelega
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationController?.navigationBar.isOpaque = true
-        
-        if let customFont = UIFont(name: "AvenirNext-Bold", size: 30.0) {
-            navigationController?.navigationBar.largeTitleTextAttributes = [ NSAttributedString.Key.foregroundColor: UIColor.black, NSAttributedString.Key.font: customFont ]
-        }
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -152,21 +149,9 @@ class FunFactsTableViewController: UITableViewController, FirestoreManagerDelega
             let index = (sender as! NSIndexPath).row
             let contentVC = segue.destination as? ContentViewController
             
-            contentVC!.dataObject = self.funFacts[index].id as AnyObject
-            contentVC!.funFactDesc = self.funFacts[index].description as String
-            contentVC!.imageObject = self.funFacts[index].image as AnyObject
-            contentVC!.submittedByObject = self.funFacts[index].submittedBy as AnyObject
-            contentVC!.dateObject = self.funFacts[index].dateSubmitted as AnyObject
-            contentVC!.sourceObject = self.funFacts[index].source as AnyObject
-            contentVC!.verifiedFlag = self.funFacts[index].verificationFlag
-            contentVC!.disputeFlag = self.funFacts[index].disputeFlag
-            contentVC!.imageCaption = self.funFacts[index].imageCaption
-            contentVC!.tags = self.funFacts[index].tags
+            contentVC!.funFact = self.funFacts[index]
             contentVC?.landmarkID = self.funFacts[index].landmarkId
-            contentVC!.likesObject = self.funFacts[index].likes as AnyObject
-            contentVC!.dislikesObject = self.funFacts[index].dislikes as AnyObject
-            contentVC!.funFactID = self.funFacts[index].id
-            contentVC!.headingObject = self.funFacts[index].landmarkName as AnyObject
+//            contentVC!.headingObject = self.funFacts[index].landmarkName as AnyObject
         }
     }
     func setupImage(index: Int) -> UIImage {
