@@ -37,7 +37,10 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         
         signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
         signUpButton.layer.backgroundColor = UIColor.darkGray.cgColor
-        forgotButton.layer.backgroundColor = Colors.orangeColor.cgColor
+        forgotButton.layer.backgroundColor = UIColor.clear.cgColor
+        forgotButton.layer.borderColor = Colors.seagreenColor.cgColor
+        forgotButton.layer.borderWidth = 1.0
+        forgotButton.tintColor = Colors.seagreenColor
         
         let cancelItem = UIBarButtonItem(
             title: "Cancel",

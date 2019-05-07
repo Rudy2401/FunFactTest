@@ -19,4 +19,6 @@ target 'FunFactTest' do
     #pod 'SwiftLint'
     #pod 'BitlySDK'
     pod 'Firebase/DynamicLinks'
+    pod 'CropViewController'
+    #pod 'WSTagsField'
 end

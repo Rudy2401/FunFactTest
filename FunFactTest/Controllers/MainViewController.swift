@@ -55,8 +55,13 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         annotationBottomView.alpha = 0.0
         addNavButtons()
         addButtonsToView()
-        
+        setupSettingsDefault()
         setupLocationManager()
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showFunFact),
+                                               name: UIApplication.willEnterForegroundNotification,
+                                               object: nil)
         
         firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user, error) in
             if let error = error {
@@ -79,6 +84,15 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     }
     func documentsDidUpdate() {
         print ("uploaded to cache")
+    }
+    
+    func setupSettingsDefault() {
+        if UserDefaults.standard.object(forKey: SettingsUserDefaults.notificationFrequency) == nil {
+            UserDefaults.standard.set(7, forKey: SettingsUserDefaults.notificationFrequency)
+        }
+        if UserDefaults.standard.object(forKey: SettingsUserDefaults.directionsSetting) == nil {
+            UserDefaults.standard.set(DirectionSetting.walk, forKey: SettingsUserDefaults.directionsSetting)
+        }
     }
     
     func setupLocationManager() {
@@ -210,7 +224,10 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         titleAnnotationLabel.text = landmark.name
         typeLabel.text = landmark.type
         landmarkType = landmark.type
-        addressLabel.text = landmark.address + ", " + landmark.city + ", " + landmark.state + ", " + landmark.country + ", " + landmark.zipcode
+        addressLabel.text = ((landmark.address.replacingOccurrences(of: " ", with: "") == "") ? landmark.name : landmark.address) +
+            ", " + landmark.city +
+            ", " + landmark.state +
+            ", " + landmark.zipcode
         let coordinate₁ = CLLocation(latitude: landmark.coordinates.latitude, longitude: landmark.coordinates.longitude) 
         let distanceInMeters = CLLocation(latitude: currentLocationCoordinate.latitude, longitude: currentLocationCoordinate.longitude).distance(from: coordinate₁)
         
@@ -368,6 +385,9 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        
+    }
+    @objc func showFunFact() {
         if AppDataSingleton.appDataSharedInstance.url != nil {
             guard let landmarkID = AppDataSingleton.appDataSharedInstance.url?.valueOf("landmarkID") else { return }
             downloadFunFactsAndSegue(for: landmarkID)

@@ -41,4 +41,8 @@ final class CacheManager {
     func replaceImage(imageName: String, image: AnyObject) {
         CacheManager.cache.setObject(image, forKey: imageName as NSString)
     }
+    
+    func removeImage(key: String) {
+        CacheManager.cache.removeObject(forKey: key as NSString)
+    }
 }

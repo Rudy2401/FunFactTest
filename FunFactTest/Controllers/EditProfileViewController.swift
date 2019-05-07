@@ -8,8 +8,9 @@
 
 import UIKit
 import FirebaseAuth
+import CropViewController
 
-class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, FirestoreManagerDelegate {
+class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, FirestoreManagerDelegate, CropViewControllerDelegate {
     @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var fullNameButton: UIButton!
     @IBOutlet weak var fullNameTextField: UITextField!
@@ -40,6 +41,10 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
     var firestore = FirestoreManager()
     var popup = UIAlertController()
     var selectedImage: UIImage?
+    var croppingStyle = CropViewCroppingStyle.circular
+    var image: UIImage?
+    var croppedRect = CGRect.zero
+    var croppedAngle = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,7 +113,9 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
                                          textColor: .darkGray,
                                          size: CGSize(width: 100, height: 100))
                 } else {
-                    profileImageView.image = UIImage(data: data!)
+                    if self.image == nil {
+                        profileImageView.image = UIImage(data: data!)
+                    }
                 }
             }
         }
@@ -218,7 +225,7 @@ extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigati
             imag.delegate = self
             imag.sourceType = .photoLibrary
             //imag.mediaTypes = [kUTTypeImage];
-            imag.allowsEditing = true
+            imag.allowsEditing = false
             self.present(imag, animated: true, completion: nil)
         }
     }
@@ -228,12 +235,48 @@ extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigati
         // Local variable inserted by Swift 4.2 migrator.
         let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
         
-        guard let selectedImage = info[convertFromUIImagePickerControllerInfoKey(
-            UIImagePickerController.InfoKey.editedImage)]
-            as? UIImage else { return }
-        self.selectedImage = selectedImage
-        self.dismiss(animated: true, completion: nil)
+        guard let image = (info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as? UIImage) else { return }
+        let cropController = CropViewController(croppingStyle: croppingStyle, image: image)
+        cropController.delegate = self
+        
+        self.image = image
+        
+        picker.dismiss(animated: true, completion: {
+            self.present(cropController, animated: true, completion: nil)
+        })
     }
+    
+    func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+        self.croppedRect = cropRect
+        self.croppedAngle = angle
+        updateImageViewWithImage(image, fromCropViewController: cropViewController)
+    }
+    
+    func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+        self.croppedRect = cropRect
+        self.croppedAngle = angle
+        updateImageViewWithImage(image, fromCropViewController: cropViewController)
+    }
+    
+    func updateImageViewWithImage(_ image: UIImage, fromCropViewController cropViewController: CropViewController) {
+        profileImageView.image = image
+        self.navigationItem.rightBarButtonItem?.isEnabled = true
+        
+        if cropViewController.croppingStyle != .circular {
+            profileImageView.isHidden = true
+            
+            cropViewController.dismissAnimatedFrom(self, withCroppedImage: image,
+                                                   toView: profileImageView,
+                                                   toFrame: CGRect.zero,
+                                                   setup: { },
+                                                   completion: { self.profileImageView.isHidden = false })
+        }
+        else {
+            self.profileImageView.isHidden = false
+            cropViewController.dismiss(animated: true, completion: nil)
+        }
+    }
+    
     // Helper function inserted by Swift 4.2 migrator.
     fileprivate func convertFromUIImagePickerControllerInfoKeyDictionary(
         _ input: [UIImagePickerController.InfoKey: Any]) -> [String: Any] {

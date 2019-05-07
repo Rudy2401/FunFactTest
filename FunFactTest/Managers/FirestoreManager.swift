@@ -50,6 +50,7 @@ class FirestoreManager {
                                       landmarkName: document.data()?["landmarkName"] as! String,
                                       id: document.data()?["id"] as! String,
                                       description: document.data()?["description"] as! String,
+                                      funFactTitle: document.data()?["funFactTitle"] as? String ?? "",
                                       likes: document.data()?["likes"] as! Int,
                                       dislikes: document.data()?["dislikes"] as! Int,
                                       verificationFlag: document.data()?["verificationFlag"] as? String ?? "",
@@ -72,7 +73,7 @@ class FirestoreManager {
         }
     }
     
-    /// Downloads fun fact data from firestore for a fun fact reference
+    /// Downloads fun fact data from firestore for a funFactID
     func downloadFunFact(for id: String, completionHandler: @escaping (FunFact?, String?) -> ())  {
         db.collection("funFacts").document(id).getDocument { (snapshot, error) in
         if let document = snapshot, document.exists {
@@ -80,6 +81,7 @@ class FirestoreManager {
                                       landmarkName: document.data()?["landmarkName"] as! String,
                                       id: document.data()?["id"] as! String,
                                       description: document.data()?["description"] as! String,
+                                      funFactTitle: document.data()?["funFactTitle"] as? String ?? "",
                                       likes: document.data()?["likes"] as! Int,
                                       dislikes: document.data()?["dislikes"] as! Int,
                                       verificationFlag: document.data()?["verificationFlag"] as? String ?? "",
@@ -183,14 +185,15 @@ class FirestoreManager {
         let storageRef = Storage.storage().reference()
         // Data in memory
         
-        do {
-            try image.compressImage(300, completion: { (image, compressRatio) in
-                print(image.size)
-                data = image.jpegData(compressionQuality: compressRatio)!
-            })
-        } catch {
-            print("Error")
-        }
+//        do {
+//            try image.compressImage(800, completion: { (image, compressRatio) in
+//                print(image.size)
+//                data = image.jpegData(compressionQuality: compressRatio)!
+//            })
+//        } catch {
+//            print("Error")
+//        }
+        data = image.jpegData(compressionQuality: 0.3)!
         
         // Create a reference to the file you want to upload
         var basePath = ""
@@ -223,8 +226,6 @@ class FirestoreManager {
                                     }
                                 }
         })
-        
-        
     }
     /// Goes through entire list of /landmarks and checks if landmark added already exists in the database. If it exists, fun fact is added to existing landmark
     func checkIfLandmarkExists(address: String, completionHandler: @escaping (String, Int, Int, Int) -> Void) {
@@ -645,6 +646,7 @@ class FirestoreManager {
             "landmarkName": funFact.landmarkName,
             "id": funFact.id,
             "description": funFact.description,
+            "funFactTitle": funFact.funFactTitle,
             "likes": funFact.likes,
             "dislikes": funFact.dislikes,
             "verificationFlag": funFact.verificationFlag,
@@ -714,6 +716,7 @@ class FirestoreManager {
                                               landmarkName: document.data()["landmarkName"] as! String,
                                               id: document.data()["id"] as! String,
                                               description: document.data()["description"] as! String,
+                                              funFactTitle: document.data()["funFactTitle"] as? String ?? "",
                                               likes: document.data()["likes"] as! Int,
                                               dislikes: document.data()["dislikes"] as! Int,
                                               verificationFlag: document.data()["verificationFlag"] as? String ?? "",
@@ -936,6 +939,56 @@ class FirestoreManager {
             } else {
                 let landmarkName = snapshot!.data()!["name"] as? String
                 completion(landmarkName, nil)
+            }
+        }
+    }
+    
+    /// Download all landmarks from Cache
+    func downloadLandmarksFromCache(coordinates: GeoPoint, completion: @escaping (Landmark?, String?) -> ()) {
+        db.collection("landmarks")
+            .whereField("coordinates", isGreaterThan: coordinates)
+            .limit(to: 20)
+            .getDocuments { (snapshot, error) in
+            if let error = error {
+                completion(nil, error.localizedDescription)
+            } else {
+                for document in (snapshot?.documents)! {
+                    let landmark = Landmark(id: document.data()["id"] as! String,
+                                            name: document.data()["name"] as! String,
+                                            address: document.data()["address"] as! String,
+                                            city: document.data()["city"] as! String,
+                                            state: document.data()["state"] as! String,
+                                            zipcode: document.data()["zipcode"] as! String,
+                                            country: document.data()["country"] as! String,
+                                            type: document.data()["type"] as! String,
+                                            coordinates: document.data()["coordinates"] as! GeoPoint,
+                                            image: document.data()["image"] as! String,
+                                            numOfFunFacts: document.data()["numOfFunFacts"] as! Int,
+                                            likes: document.data()["likes"] as! Int,
+                                            dislikes: document.data()["dislikes"] as! Int)
+                    print (landmark.name)
+                    completion(landmark, nil)
+                }
+            }
+        }
+    }
+    
+    /// Delete fun fact and landmark if only one fun fact exists
+    func deleteFunFact(funFactID: String, landmarkID: String, numOfFunFacts: Int, completion: @escaping (String?) -> ()) {
+        db.collection("funFacts").document(funFactID).delete { (error) in
+            if let error = error {
+                completion(error.localizedDescription)
+            } else {
+                if numOfFunFacts == 1 {
+                    self.db.collection("landmarks").document(landmarkID).delete { (error) in
+                        if let error = error {
+                            completion(error.localizedDescription)
+                        } else {
+                            completion(nil)
+                        }
+                    }
+                }
+                completion(nil)
             }
         }
     }

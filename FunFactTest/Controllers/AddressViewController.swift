@@ -69,7 +69,14 @@ class AddressViewController: UIViewController {
         if selectedPin == nil {
             return
         }
-        let add = AddressData(address: (selectedPin?.subThoroughfare ?? "") + " " + (selectedPin?.thoroughfare ?? ""),
+        var streetAddress = ""
+        if (selectedPin?.subThoroughfare == nil || selectedPin?.subThoroughfare == "") && (selectedPin?.thoroughfare == nil || selectedPin?.thoroughfare == "") {
+            streetAddress = selectedPin!.name ?? ""
+        } else {
+            streetAddress = (selectedPin?.subThoroughfare ?? "") + " " + (selectedPin?.thoroughfare ?? "")
+        }
+        print (streetAddress)
+        let add = AddressData(address: streetAddress,
                               landmarkName: selectedPin!.name ?? "",
                               coordinate: selectedPin!.coordinate,
                               city: selectedPin!.locality ?? "",

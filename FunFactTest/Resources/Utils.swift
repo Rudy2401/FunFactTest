@@ -31,21 +31,6 @@ class Utils {
         UIGraphicsEndImageContext()
         return newImage!
     }
-    static func addressToCoordinatesConverter(address: String) -> CLLocationCoordinate2D {
-        print (address)
-        let geoCoder = CLGeocoder()
-        var coordinates = CLLocationCoordinate2D()
-        geoCoder.geocodeAddressString(address, completionHandler: {(placemarks, error) -> Void in
-            if error != nil {
-                print("Error", error!)
-            }
-            if let placemark = placemarks?[0] {
-                coordinates = placemark.location!.coordinate
-            }
-            print (coordinates.latitude)
-        })
-        return coordinates
-    }
     static func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: Any, type: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel,handler: {_ in

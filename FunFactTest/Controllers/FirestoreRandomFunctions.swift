@@ -326,4 +326,69 @@ extension MainViewController {
             }
         }
     }
+    func addFunFactTitle() {
+        let db = Firestore.firestore()
+        db.collection("funFacts").getDocuments { (snap, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for doc in (snap?.documents)! {
+                    let funFactID = doc.documentID as String
+                    db.collection("funFacts").document(funFactID).setData(["funFactTitle": ""], merge: true)
+                }
+            }
+        }
+    }
+    func checkIntegrity() {
+        let db = Firestore.firestore()
+        var count = 0
+        db.collection("landmarks").getDocuments { (snap, error) in
+            for _ in snap!.documents {
+                count += 1
+            }
+            print ("Number of landmarks = \(count)")
+        }
+        db.collection("funFacts").getDocuments { (snapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for doc in snapshot!.documents {
+                    let landmarkID = doc.data()["landmarkId"] as? String
+                    db.collection("landmarks").document(landmarkID!).getDocument(completion: { (snap, error) in
+                        if let error = error {
+                            print ("Document: \(landmarkID!) not found. Error: \(error.localizedDescription)")
+                        } else {
+                            print ("All Good!")
+                        }
+                    })
+                }
+            }
+        }
+        
+        db.collection("users").getDocuments { (snapshot, error) in
+            if let error = error {
+                print("Error getting documents: \(error)")
+            } else {
+                for doc in snapshot!.documents {
+                    let userID = doc.data()["uid"] as? String
+                    db.collection("users").document(userID!).collection("funFactsRejected").getDocuments(completion: { (snap, error) in
+                        if let error = error {
+                            print ("Error getting sub collections: \(error.localizedDescription)")
+                        } else {
+                            for doc in snap!.documents {
+                                let ref = doc.data()["funFactID"] as! DocumentReference
+                                ref.getDocument(completion: { (snap, error) in
+                                    if let error = error {
+                                        print ("Error getting reference: \(error.localizedDescription)")
+                                    } else {
+                                        print ("All Good!!")
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            }
+        }
+    }
 }

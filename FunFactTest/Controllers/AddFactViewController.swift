@@ -13,8 +13,9 @@ import MapKit
 import FirebaseAuth
 import IQKeyboardManagerSwift
 import Geofirestore
+import CropViewController
 
-class AddNewFactViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AlgoliaSearchManagerDelegate, FirestoreManagerDelegate, GeoFirestoreManagerDelegate {
+class AddNewFactViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, AlgoliaSearchManagerDelegate, FirestoreManagerDelegate, GeoFirestoreManagerDelegate, CropViewControllerDelegate {
     
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var landmarkImage: UIImageView!
@@ -32,6 +33,10 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
     @IBOutlet weak var autocompleteTableView: UITableView!
     @IBOutlet weak var staticImage: UIImageView!
     @IBOutlet weak var chooseImageLabel: UILabel!
+    @IBOutlet weak var funFactTitleTextField: UITextField!
+    @IBOutlet weak var funFactTitleBtn: UIButton!
+    @IBOutlet weak var tagsTextField: UITextField!
+    @IBOutlet weak var tagsBtn: UIButton!
     
     var algoliaManager = AlgoliaSearchManager()
     var firestore = FirestoreManager()
@@ -53,7 +58,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
     var funFactID = ""
     var landmarkTypeText = ""
     var imageCaptionText = ""
-    var image = ""
+    var funFactTitleText = ""
     var funFactDesc = ""
     var source = ""
     var typedSubstring = ""
@@ -82,13 +87,35 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                             numOfFunFacts: 0,
                             likes: 0,
                             dislikes: 0)
+    let imageCaptionPlaceholder = "Enter image caption here. Credits for images go here. (Optional)"
+    let funFactDescPlaceholder = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise."
+    
+    var croppingStyle = CropViewCroppingStyle.default
+    var image: UIImage?
+    var croppedRect = CGRect.zero
+    var croppedAngle = 0
+    var documentsUrl: URL {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+    }
+    
+    enum Tags: Int {
+        case address
+        case name
+        case type
+        case caption
+        case image
+        case title
+        case description
+        case tags
+        case source
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         switch mode {
         case .edit:
             navigationItem.title = "Edit Fun Fact"
-        case .add:
+        case .add, .addNew:
             navigationItem.title = "Add New Fun Fact"
             staticImage.image = UIImage.fontAwesomeIcon(name: .images,
                                                           style: .solidp,
@@ -101,7 +128,9 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         }
         algoliaManager.delegate = self
         funFactDescription.keyboardDistanceFromTextField = 200
-        funFactDescription.keyboardType = .twitter
+        tagsTextField.keyboardDistanceFromTextField = 200
+        tagsTextField.keyboardType = .twitter
+        funFactDescription.keyboardType = .default
         sourceTextField.keyboardType = .URL
         
         autocompleteTableView.translatesAutoresizingMaskIntoConstraints = false
@@ -109,6 +138,9 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         autocompleteTableView.dataSource = self
         autocompleteTableView.isScrollEnabled = true
         autocompleteTableView.isHidden = true
+        autocompleteTableView.layer.borderWidth = 0.5
+        autocompleteTableView.layer.borderColor = UIColor.lightGray.cgColor
+        autocompleteTableView.layer.cornerRadius = 5
         contentView.bringSubviewToFront(autocompleteTableView)
 
         scrollView.scrollIndicatorInsets = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 2)
@@ -125,15 +157,33 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
 
         sourceBtn.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         sourceBtn.setTitle(String.fontAwesomeIcon(name: .book), for: .normal)
-
-        imageCaption.tag = 0
-        funFactDescription.tag = 1
+        
+        funFactTitleBtn.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+        funFactTitleBtn.setTitle(String.fontAwesomeIcon(name: .sign), for: .normal)
+        
+        tagsBtn.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+        tagsBtn.setTitle(String.fontAwesomeIcon(name: .tags), for: .normal)
+        
+        tagsTextField.tag = Tags.tags.rawValue
+        imageCaption.tag = Tags.caption.rawValue
+        funFactDescription.tag = Tags.description.rawValue
+        addressTextField?.tag = Tags.address.rawValue
+        landmarkNameTextField?.tag = Tags.name.rawValue
+        landmarkType.tag = Tags.type.rawValue
+        funFactTitleTextField.tag = Tags.title.rawValue
+        sourceTextField.tag = Tags.source.rawValue
+        landmarkImage.tag = Tags.image.rawValue
+        
         pickerData = Constants.landmarkTypes
-        self.landmarkType.delegate = self
-        self.landmarkType.dataSource = self
-        self.funFactDescription.delegate = self
-        self.imageCaption.delegate  = self
-        self.sourceTextField.delegate  = self
+        landmarkType.delegate = self
+        landmarkType.dataSource = self
+        funFactDescription.delegate = self
+        imageCaption.delegate  = self
+        tagsTextField.delegate = self
+        addressTextField?.delegate = self
+        landmarkNameTextField?.delegate = self
+        funFactTitleTextField.delegate = self
+        sourceTextField.delegate = self
 
         let cancelItem = UIBarButtonItem(
             title: "Cancel",
@@ -170,10 +220,10 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         imageCaption.layer.borderColor = UIColor.darkGray.cgColor
         imageCaption.layer.cornerRadius = 5
 
-        imageCaption.text = "Enter image caption here. Please make sure to add Credits to pictures taken off the internet."
+        imageCaption.text = imageCaptionPlaceholder
         imageCaption.textColor = UIColor.lightGray
 
-        funFactDescription.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable."
+        funFactDescription.text = funFactDescPlaceholder
         funFactDescription.textColor = UIColor.lightGray
 
         funFactDescription.layer.borderWidth = 0
@@ -187,6 +237,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         submitButton.backgroundColor = Colors.seagreenColor
         submitButton.accessibilityIdentifier = "submit"
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -219,7 +270,10 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                 }
             }
         }
-        if mode == .edit {
+        switch mode {
+        case .edit:
+            staticImage.isHidden = true
+            chooseImageLabel.isHidden = true
             firestore.getLandmark(for: landmarkID ?? "") { (landmark, error) in
                 if let error = error {
                     print ("Error getting landmark object \(error)")
@@ -229,15 +283,45 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                     self.landmarkType.selectRow(self.pickerData.firstIndex(of: self.landmark.type)!,
                                                 inComponent: 0,
                                                 animated: true)
-                    self.addressTextField?.text = self.landmark.address.replacingOccurrences(of: " ", with: "") == "" ? self.landmarkName : self.landmark.address
-                    self.funFactDescription.text = self.funFactDesc
-                    self.imageCaption.text = self.imageCaptionText
-                    self.sourceTextField.text = self.source
-                    self.funFactDescription.textColor = UIColor.black
-                    self.imageCaption.textColor = UIColor.black
-                    self.setupImage()
+                    self.addressTextField?.text = self.landmark.address.replacingOccurrences(of: " ", with: "") == "" ? self.landmark.name : self.landmark.address
+                    self.landmarkNameTextField?.text = self.landmark.name
+                    self.firestore.downloadFunFact(for: self.funFactID, completionHandler: { (funFact, error) in
+                        if let error = error {
+                            print ("Error getting fun fact \(error)")
+                        } else {
+                            var hashtags = ""
+                            if !(funFact?.tags.isEmpty)! {
+                                hashtags = "#" + (funFact?.tags.joined(separator: " #"))!
+                            }
+                            self.funFactDescription.text = funFact?.description
+                            self.imageCaption.text = funFact?.imageCaption
+                            self.sourceTextField.text = funFact?.source
+                            self.funFactTitleTextField.text = funFact?.funFactTitle
+                            self.tagsTextField.text = hashtags
+                            self.funFactDescription.textColor = UIColor.black
+                            self.imageCaption.textColor = UIColor.black
+                            self.setupImage()
+                        }
+                    })
                 }
             }
+        case .addNew:
+            firestore.getLandmark(for: landmarkID ?? "") { (landmark, error) in
+                if let error = error {
+                    print ("Error getting landmark object \(error)")
+                }
+                else {
+                    self.landmark = landmark!
+                    self.landmarkType.selectRow(self.pickerData.firstIndex(of: self.landmark.type)!,
+                                                inComponent: 0,
+                                                animated: true)
+                    self.addressTextField?.text = self.landmark.address.replacingOccurrences(of: " ", with: "") == "" ? self.landmark.name : self.landmark.address
+                    self.landmarkNameTextField?.text = self.landmark.name
+                }
+            }
+        case .add:
+            loadSavedFields()
+            return
         }
     }
     func documentsDidUpdate() {
@@ -262,7 +346,14 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             self.state = addDet.state
             self.zipcode = addDet.zipcode
             self.coordinate = addDet.coordinate!
-            self.landmarkNameTextField?.isEnabled = false
+            UserDefaults.standard.set(self.address, forKey: "address")
+            UserDefaults.standard.set(self.landmarkName, forKey: "name")
+            UserDefaults.standard.set(self.country, forKey: "country")
+            UserDefaults.standard.set(self.city, forKey: "city")
+            UserDefaults.standard.set(self.state, forKey: "state")
+            UserDefaults.standard.set(self.zipcode, forKey: "zipcode")
+            UserDefaults.standard.set(self.coordinate.latitude, forKey: "latitude")
+            UserDefaults.standard.set(self.coordinate.longitude, forKey: "longitude")
         }
     }
     func documentsDidDownload() {
@@ -281,7 +372,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             let imag = UIImagePickerController()
             imag.delegate = self
             imag.sourceType = UIImagePickerController.SourceType.photoLibrary
-            imag.allowsEditing = true
+            imag.allowsEditing = false
             self.present(imag, animated: true, completion: nil)
         }
     }
@@ -290,17 +381,72 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         // Local variable inserted by Swift 4.2 migrator.
         let info = convertFromUIImagePickerControllerInfoKeyDictionary(info)
-
-        guard let selectedImage = info[convertFromUIImagePickerControllerInfoKey(
-            UIImagePickerController.InfoKey.editedImage)]
-            as? UIImage else { return }
-        landmarkImage.image = selectedImage
+        
+        guard let image = (info[convertFromUIImagePickerControllerInfoKey(UIImagePickerController.InfoKey.originalImage)] as? UIImage) else { return }
+        let cropController = CropViewController(croppingStyle: croppingStyle, image: image)
+        cropController.delegate = self
+        
+        self.image = image
+        landmarkImage.contentMode = .scaleAspectFill
+        
         staticImage.isHidden = true
         chooseImageLabel.isHidden = true
-        self.dismiss(animated: true, completion: nil)
+        
+        picker.dismiss(animated: true, completion: {
+            self.present(cropController, animated: true, completion: nil)
+        })
     }
+
+    func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+        self.croppedRect = cropRect
+        self.croppedAngle = angle
+        updateImageViewWithImage(image, fromCropViewController: cropViewController)
+    }
+    
+    func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+        self.croppedRect = cropRect
+        self.croppedAngle = angle
+        updateImageViewWithImage(image, fromCropViewController: cropViewController)
+    }
+    
+    func updateImageViewWithImage(_ image: UIImage, fromCropViewController cropViewController: CropViewController) {
+        if mode == .edit {
+            landmarkImage.image = UIImage()
+        }
+        landmarkImage.image = image
+        if let file = save(image: image) {
+            print ("Saved \(file)")
+        }
+        
+        self.navigationItem.rightBarButtonItem?.isEnabled = true
+        
+        if cropViewController.croppingStyle != .circular {
+            landmarkImage.isHidden = true
+            
+            cropViewController.dismissAnimatedFrom(self, withCroppedImage: image,
+                                                   toView: landmarkImage,
+                                                   toFrame: CGRect.zero,
+                                                   setup: { },
+                                                   completion: { self.landmarkImage.isHidden = false })
+        }
+        else {
+            self.landmarkImage.isHidden = false
+            cropViewController.dismiss(animated: true, completion: nil)
+        }
+    }
+    
     @objc func cancelAction(_ sender: Any) {
-        navigationController?.popViewController(animated: true)
+        let alertController = UIAlertController(title: "Cancel",
+                                                message: "Are you sure you want to cancel? All information will be lost.",
+                                                preferredStyle: .alert)
+        let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
+            self.removeSavedFields()
+            self.navigationController?.popViewController(animated: true)
+        })
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(okayAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
     }
     @IBAction func addFunFact(_ sender: Any) {
         if self.validatePage() {
@@ -322,6 +468,11 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                 db.collection("landmarks").document().documentID : self.landmarkID ?? ""
             self.city = (self.city == "" || self.city == nil) ? self.landmark.city : self.city
             self.address = (self.address == "" || self.address == nil) ? self.landmark.address : self.address
+            self.landmarkName = (self.landmarkName == "" || self.landmarkName == nil) ? self.landmark.name : self.landmarkName
+            if self.mode == .edit {
+                self.landmarkName = self.landmarkNameTextField?.text
+            }
+            self.type = (self.type == "" || self.type == nil) ? self.landmark.type : self.type
             self.state = (self.state == "" || self.state == nil) ? self.landmark.state : self.state
             self.zipcode = (self.zipcode == "" || self.zipcode == nil) ? self.landmark.zipcode : self.zipcode
             self.country = (self.country == "" || self.country == nil) ? self.landmark.country : self.country
@@ -376,20 +527,27 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                                         }
                                 })
                             //Upload fun fact details
+                            var imageCaptionText = ""
+                            if self.imageCaption.text != self.imageCaptionPlaceholder {
+                                imageCaptionText = self.imageCaption.text
+                            }
+                            var hashtags = self.tagsTextField.text?.replacingOccurrences(of: " ", with: "").components(separatedBy: "#") ?? []
+                            hashtags.remove(at: 0)
                             let funFact = FunFact(landmarkId: tempLandmarkID,
                                                   landmarkName: self.landmarkName ?? "",
                                                   id: ffID,
                                                   description: self.funFactDescription.text,
+                                                  funFactTitle: self.funFactTitleTextField.text ?? "",
                                                   likes: self.likes,
                                                   dislikes: self.dislikes,
                                                   verificationFlag: self.verificationFlag,
                                                   image: ffID,
-                                                  imageCaption: self.imageCaption.text,
+                                                  imageCaption: imageCaptionText,
                                                   disputeFlag: self.disputeFlag,
                                                   submittedBy: Auth.auth().currentUser?.uid ?? "",
                                                   dateSubmitted: Timestamp(date: Date()),
                                                   source: self.sourceTextField.text ?? "",
-                                                  tags: self.funFactDescription.text.hashtags(),
+                                                  tags: hashtags,
                                                   approvalCount: self.approvalCount,
                                                   rejectionCount: self.rejectionCount,
                                                   approvalUsers: self.approvalUsers,
@@ -407,7 +565,8 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                     }
                                 } else {
                                     print("Document successfully written!")
-                                    self.firestore.addHashtags(funFactID: ffID, hashtags: self.funFactDescription.text.hashtags())
+                                    
+                                    self.firestore.addHashtags(funFactID: ffID, hashtags: hashtags)
                                     self.firestore.addUserSubmitted(funFactID: ffID, userID: Auth.auth().currentUser?.uid ?? "")
                                     self.firestore.uploadImage(imageName: ffID + ".jpeg",
                                                                image: self.landmarkImage.image ?? UIImage(),
@@ -422,6 +581,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                                                     }
                                                                 }
                                     })
+                                    self.removeSavedFields()
                                     let alert = Utils.showAlert(status: .success, message: ErrorMessages.funFactUploadSuccess)
                                     self.present(alert, animated: true) {
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
@@ -465,7 +625,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  toFocus: self.landmarkNameTextField!,
                                  type: "textfield")
         }
-        if funFactDescription?.text == "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable." {
+        if funFactDescription?.text == funFactDescPlaceholder {
             errors = true
             message += "Please enter a fun fact description"
             Utils.alertWithTitle(title: title,
@@ -550,6 +710,9 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         navigationController?.popViewController(animated: true)
     }
     func setupImage() {
+        if self.image != nil {
+            return
+        }
         let imageId = funFactID
         let imageName = "\(imageId).jpeg"
         let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
@@ -564,6 +727,79 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             let gsReference = storageRef.child("images/\(imageName)")
             self.landmarkImage.sd_setImage(with: gsReference, placeholderImage: UIImage())
             self.landmarkImage.layer.cornerRadius = 5
+        }
+    }
+    
+    func removeSavedFields() {
+        delete(fileName: "tempImage")
+        UserDefaults.standard.removeObject(forKey: "address")
+        UserDefaults.standard.removeObject(forKey: "name")
+        UserDefaults.standard.removeObject(forKey: "type")
+        UserDefaults.standard.removeObject(forKey: "caption")
+        UserDefaults.standard.removeObject(forKey: "description")
+        UserDefaults.standard.removeObject(forKey: "title")
+        UserDefaults.standard.removeObject(forKey: "source")
+        UserDefaults.standard.removeObject(forKey: "tags")
+        UserDefaults.standard.removeObject(forKey: "country")
+        UserDefaults.standard.removeObject(forKey: "city")
+        UserDefaults.standard.removeObject(forKey: "state")
+        UserDefaults.standard.removeObject(forKey: "zipcode")
+        UserDefaults.standard.removeObject(forKey: "latitude")
+        UserDefaults.standard.removeObject(forKey: "longitude")
+    }
+    func loadSavedFields() {
+        if UserDefaults.standard.object(forKey: "address") != nil {
+            address = UserDefaults.standard.string(forKey: "address")
+            addressTextField?.text = UserDefaults.standard.string(forKey: "address")
+        }
+        if UserDefaults.standard.object(forKey: "country") != nil {
+            country = UserDefaults.standard.string(forKey: "country")
+        }
+        if UserDefaults.standard.object(forKey: "city") != nil {
+            city = UserDefaults.standard.string(forKey: "city")
+        }
+        if UserDefaults.standard.object(forKey: "state") != nil {
+            state = UserDefaults.standard.string(forKey: "state")
+        }
+        if UserDefaults.standard.object(forKey: "zipcode") != nil {
+            zipcode = UserDefaults.standard.string(forKey: "zipcode")
+        }
+        if UserDefaults.standard.object(forKey: "latitude") != nil &&  UserDefaults.standard.object(forKey: "longitude") != nil {
+            coordinate = CLLocationCoordinate2D(latitude: UserDefaults.standard.object(forKey: "latitude") as! CLLocationDegrees,
+                                                longitude: UserDefaults.standard.object(forKey: "longitude") as! CLLocationDegrees)
+        }
+        if UserDefaults.standard.object(forKey: "name") != nil {
+            landmarkNameTextField?.text = UserDefaults.standard.string(forKey: "name")
+            landmarkName = UserDefaults.standard.string(forKey: "name")
+        }
+        if UserDefaults.standard.object(forKey: "caption") != nil {
+            imageCaption?.textColor = .black
+            imageCaption?.text = UserDefaults.standard.string(forKey: "caption")
+        }
+        if UserDefaults.standard.object(forKey: "description") != nil {
+            funFactDescription?.textColor = .black
+            funFactDescription?.text = UserDefaults.standard.string(forKey: "description")
+        }
+        if UserDefaults.standard.object(forKey: "title") != nil {
+            funFactTitleTextField?.text = UserDefaults.standard.string(forKey: "title")
+        }
+        if UserDefaults.standard.object(forKey: "tags") != nil {
+            tagsTextField?.text = UserDefaults.standard.string(forKey: "tags")
+        }
+        if UserDefaults.standard.object(forKey: "source") != nil {
+            sourceTextField?.text = UserDefaults.standard.string(forKey: "source")
+        }
+        if let image = load(fileName: "tempImage") {
+            landmarkImage.image = image
+            landmarkImage.layer.cornerRadius = 5
+            staticImage.isHidden = true
+            chooseImageLabel.isHidden = true
+        }
+        if UserDefaults.standard.object(forKey: "type") != nil {
+            landmarkType.selectRow(self.pickerData.firstIndex(of: UserDefaults.standard.string(forKey: "type")!)!,
+                                   inComponent: 0,
+                                   animated: true)
+            type = UserDefaults.standard.string(forKey: "type")
         }
     }
     
@@ -583,6 +819,30 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         shapeLayer.path = UIBezierPath(roundedRect: shapeRect, cornerRadius: 5).cgPath
         
         landmarkImage.layer.addSublayer(shapeLayer)
+    }
+    func save(image: UIImage) -> String? {
+        let fileName = "tempImage"
+        let fileURL = documentsUrl.appendingPathComponent(fileName)
+        if let imageData = image.jpegData(compressionQuality: 1.0) {
+            try? imageData.write(to: fileURL, options: .atomic)
+            return fileName // ----> Save fileName
+        }
+        print("Error saving image")
+        return nil
+    }
+    func load(fileName: String) -> UIImage? {
+        let fileURL = documentsUrl.appendingPathComponent(fileName)
+        do {
+            let imageData = try Data(contentsOf: fileURL)
+            return UIImage(data: imageData)
+        } catch {
+            print("Error loading image : \(error)")
+        }
+        return nil
+    }
+    func delete(fileName: String) {
+        let fileURL = documentsUrl.appendingPathComponent(fileName)
+        try? FileManager.default.removeItem(at: fileURL)
     }
 }
 
@@ -625,29 +885,18 @@ extension AddNewFactViewController: UITableViewDelegate, UITableViewDataSource {
         return cell!
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedCell = tableView.cellForRow(at: indexPath)! as! HashtagCell // swiftlint:disable:this force_cast
-        let tempStr = self.funFactDescription.text.components(separatedBy: "#").dropLast().joined(separator: "#")
-
-        self.funFactDescription.text = tempStr + selectedCell.hashtag.text!
+        let selectedCell = tableView.cellForRow(at: indexPath)! as! HashtagCell
+        let tempStr = tagsTextField.text?
+            .components(separatedBy: " ")
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+            .components(separatedBy: " ")
+            .dropLast()
+            .joined(separator: " ")
+        
+        tagsTextField.text = tempStr! + selectedCell.hashtag.text!
         autocompleteTableView.isHidden = true
-        self.funFactDescription.text += " "
-        if funFactDescription.text.count > 300 {
-            let selectedRange = funFactDescription.selectedRange
-            let str1 = funFactDescription.text.substring(toIndex: 300)
-            let str2 = funFactDescription.text.substring(fromIndex: 300)
-            
-            let strAttr1 = NSMutableAttributedString(string: str1, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black,
-                                                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
-            let strAttr2 = NSMutableAttributedString(string: str2, attributes: [NSAttributedString.Key.foregroundColor: UIColor.red,
-                                                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
-            let str = NSMutableAttributedString()
-            str.append(strAttr1)
-            str.append(strAttr2)
-            funFactDescription.attributedText = str
-            funFactDescription.selectedRange = selectedRange
-        } else {
-            funFactDescription.textColor = .black
-        }
+        tagsTextField.text = tagsTextField.text! + " "
     }
     func searchAutocompleteEntriesWithSubstring(substring: String) {
         autocompleteHashtags.removeAll(keepingCapacity: true)

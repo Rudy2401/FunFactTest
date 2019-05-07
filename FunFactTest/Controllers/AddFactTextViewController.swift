@@ -42,11 +42,19 @@ extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
+        switch textView.tag {
+        case Tags.caption.rawValue:
+            UserDefaults.standard.set(textView.text, forKey: "caption")
+        case Tags.description.rawValue:
+            UserDefaults.standard.set(textView.text, forKey: "description")
+        default:
+            print ("Not textview")
+        }
         if textView.text.isEmpty {
-            if textView.tag == 0 {
-                textView.text = "Click on the icon to select image. Enter image caption here."
-            } else if textView.tag == 1 {
-                textView.text = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise. Make sure to enter #hashtags to make your facts searchable."
+            if textView.tag == Tags.caption.rawValue {
+                textView.text = imageCaptionPlaceholder
+            } else if textView.tag == Tags.description.rawValue {
+                textView.text = funFactDescPlaceholder
             }
             textView.textColor = UIColor.lightGray
         }
@@ -59,22 +67,76 @@ extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
     
     // Finish Editing The Text Field
     func textFieldDidEndEditing(_ textField: UITextField) {
+        switch textField.tag {
+        case Tags.title.rawValue:
+            UserDefaults.standard.set(textField.text, forKey: "title")
+        case Tags.tags.rawValue:
+            UserDefaults.standard.set(textField.text, forKey: "tags")
+        case Tags.source.rawValue:
+            UserDefaults.standard.set(textField.text, forKey: "source")
+        default:
+            print ("Not textfield")
+        }
+        
         navigationController?.navigationBar.isHidden = false
+        if textField.tag == Tags.tags.rawValue {
+            let changedText = textField.text?
+                .components(separatedBy: " ")
+                .filter { !$0.isEmpty }
+                .joined(separator: " ")
+            let textComponents = changedText?.components(separatedBy: " ") ?? []
+            var newText = [String]()
+            for text in textComponents {
+                if text.first != "#" {
+                    newText.append("#\(text)")
+                } else {
+                    newText.append(text)
+                }
+            }
+            let newText2 = newText.joined(separator: " ")
+                .components(separatedBy: "#")
+                .filter { !$0.isEmpty }
+                .joined(separator: "#")
+            
+            let textComponents2 = newText2.replacingOccurrences(of: " ", with: "").components(separatedBy: "#")
+            let newText3 = (textComponents2.count == 1 && textComponents2[0].isEmpty) ? "" : "#" + textComponents2.joined(separator: " #")
+            textField.text = newText3
+        }
     }
     // Hide the keyboard when the return key pressed
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        autocompleteTableView.isHidden = true
-        let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
-        let tags = newText.components(separatedBy: "#")
-        var tagSubstring = ""
-        if tags.count > 1 && !((tags.last?.contains(" "))! || (tags.last?.contains("."))!) {
-            tagSubstring = tags.last!
-            autocompleteTableView.isHidden = false	
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let newText = (textField.text! as NSString)
+            .replacingCharacters(in: range, with: string)
+        
+        if textField.tag == Tags.tags.rawValue {
+            autocompleteTableView.isHidden = true
+            do {
+                let regex = try NSRegularExpression(pattern: ".*[^#A-Za-z ].*", options: [])
+                if regex.firstMatch(in: newText, options: [], range: NSMakeRange(0, newText.count)) != nil {
+                    let alert = Utils.showAlert(status: .failure, message: "Only alphabets and # allowed")
+                    self.present(alert, animated: true) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+                            guard self?.presentedViewController == alert else { return }
+                            self?.dismiss(animated: true, completion: nil)
+                        }
+                    }
+                }
+            }
+            catch {
+                print ("Caught regex error")
+            }
+            
+            let tags = newText.components(separatedBy: " ")
+            let tagSubstring = tags.last!
+            autocompleteTableView.isHidden = false
             searchAutocompleteEntriesWithSubstring(substring: tagSubstring)
+            if tagSubstring.last == " " || tagSubstring.count == 0 {
+                autocompleteTableView.isHidden = true
+            }
         }
         return true
     }

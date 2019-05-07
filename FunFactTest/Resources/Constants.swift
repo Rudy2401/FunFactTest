@@ -96,23 +96,26 @@ enum Fonts {
     static let demiBoldFont = "AvenirNext-DemiBold"
     static let italicsFont = "Avenir-BookOblique"
     static let mainTextFont = "Charter"
+    static let mainTextBoldFont = "Charter-Bold"
 }
 
 enum ErrorMessages {
-    static let funFactUploadError = "Error while uploading fun fact"
+    static let funFactUploadError = "Error while uploading fun fact. Please try again later."
     static let funFactUploadSuccess = "Fun fact uploaded succesfully!"
-    static let verificationError = "Error while verifying."
-    static let disputeError = "Error uploading dispute."
+    static let verificationError = "Error while verifying. Please try again later."
+    static let disputeError = "Error uploading dispute. Please try again later."
     static let disputeSuccess = "Dispute uploaded successfully!"
-    static let updateUserError = "Error while updating user profile."
+    static let updateUserError = "Error while updating user profile. Please try again later."
     static let updateUserSuccess = "User profile updated successfully!"
     static let noRecordsFound = "No records found, zoom out to view more"
-    static let userCreateError = "Error while creating user."
+    static let userCreateError = "Error while creating user. Please try again later."
     static let userCreateSuccess = "User created successfully!"
     static let rejectionSuccess = "Uploaded successfully!"
-    static let rejectionError = "Error while uploading."
+    static let rejectionError = "Error while uploading. Please try again later."
     static let interestsSuccess = "User interests updated successfully!"
     static let settingsSuccess = "Settings updated successfully!"
+    static let deleteSuccess = "Fun Fact deleted successfully!"
+    static let deleteError = "Error while deleting Fun Fact. Please try again later."
 }
 
 enum SettingsUserDefaults {
@@ -130,6 +133,7 @@ enum DirectionSetting {
 enum Mode {
     case edit
     case add
+    case addNew
 }
 enum Flex {
     static let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
@@ -163,8 +167,10 @@ enum Attributes {
                                    NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
     static let attribute12Gray = [ NSAttributedString.Key.foregroundColor: UIColor.gray,
                                    NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 12.0)!]
-    static let attribute16DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
+    static let attribute16RegularBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
                                         NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!]
+    static let attribute16DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
+                                        NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
     static let attribute16DemiBlackAve = [ NSAttributedString.Key.foregroundColor: UIColor.black,
                                         NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
     static let attribute14DemiBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,

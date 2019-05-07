@@ -37,5 +37,6 @@ extension AddNewFactViewController: UIPickerViewDataSource, UIPickerViewDelegate
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         type = pickerData[row]
+        UserDefaults.standard.set(type, forKey: "type")
     }
 }

@@ -305,7 +305,9 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
     
     @objc func menuAction(sender: UIButton) {
         let currentVC = viewControllerAtIndex(currentIndex)!
-        let actionSheetController: UIAlertController = UIAlertController(title: "Options", message: "Please select one of the following", preferredStyle: .actionSheet)
+        let actionSheetController: UIAlertController = UIAlertController(title: "Options",
+                                                                         message: "Please select one of the following",
+                                                                         preferredStyle: .actionSheet)
 
         let cancelActionButton = UIAlertAction(title: "Cancel", style: .cancel) { _ in
             print("Cancel")
@@ -314,7 +316,10 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
 
         let addActionButton = UIAlertAction(title: "Add Fun Fact", style: .default)
         { _ in
-            print("Save")
+            guard let addFactVC  = self.storyboard?.instantiateViewController(withIdentifier: "addFactVC") as? AddNewFactViewController? else { return }
+            addFactVC?.mode = .addNew
+            addFactVC?.landmarkID = currentVC.landmarkID
+            self.navigationController?.pushViewController(addFactVC!, animated: true)
         }
         actionSheetController.addAction(addActionButton)
 
@@ -322,7 +327,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
             let editActionButton = UIAlertAction(title: "Edit Fun Fact", style: .default)
             { _ in
                 guard let addFactVC  = self.storyboard?.instantiateViewController(withIdentifier: "addFactVC") as? AddNewFactViewController? else { return }
-                addFactVC?.mode = Mode.edit
+                addFactVC?.mode = .edit
                 addFactVC?.funFactID = currentVC.funFact.id
                 addFactVC?.landmarkID = currentVC.landmarkID
                 addFactVC?.approvalCount = currentVC.funFact.approvalCount
@@ -331,13 +336,44 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
                 addFactVC?.rejectionUsers = currentVC.funFact.rejectionUsers
                 addFactVC?.rejectionReason = currentVC.funFact.rejectionReason
                 self.navigationController?.pushViewController(addFactVC!, animated: true)
-                
             }
             actionSheetController.addAction(editActionButton)
             
             let deleteActionButton = UIAlertAction(title: "Delete Fun Fact", style: .default)
             { _ in
-                print("Delete")
+                let alertController = UIAlertController(title: "Deletion",
+                                                        message: "Are you sure you want to delete this fact? This action cannot be undone.",
+                                                        preferredStyle: .alert)
+                
+                let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
+                    self.firestore.deleteFunFact(funFactID: currentVC.funFact.id,
+                                                 landmarkID: self.landmarkID,
+                                                 numOfFunFacts: self.totalPages,
+                                                 completion: { (error) in
+                                                    if let error = error {
+                                                        print ("Error deleting fun fact \(error)")
+                                                        let alert = Utils.showAlert(status: .failure, message: ErrorMessages.deleteError)
+                                                        self.present(alert, animated: true) {
+                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                                                guard self?.presentedViewController == alert else { return }
+                                                                self?.dismiss(animated: true, completion: nil)
+                                                            }
+                                                        }
+                                                    } else {
+                                                        let alert = Utils.showAlert(status: .success, message: ErrorMessages.deleteSuccess)
+                                                        self.present(alert, animated: true) {
+                                                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                                                guard self?.presentedViewController == alert else { return }
+                                                                self?.dismiss(animated: true, completion: nil)
+                                                            }
+                                                        }
+                                                    }
+                    })
+                })
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                alertController.addAction(okayAction)
+                alertController.addAction(cancelAction)
+                self.present(alertController, animated: true, completion: nil)
             }
             actionSheetController.addAction(deleteActionButton)
         }
@@ -365,10 +401,8 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
                 
                 linkBuilder.socialMetaTagParameters = DynamicLinkSocialMetaTagParameters()
                 linkBuilder.socialMetaTagParameters?.title = self.headingContent
-                linkBuilder.socialMetaTagParameters?.descriptionText = currentVC.funFact.description
+                linkBuilder.socialMetaTagParameters?.descriptionText = currentVC.funFact.funFactTitle + "\n" + currentVC.funFact.description
                 linkBuilder.socialMetaTagParameters?.imageURL = imageUrl!
-                
-                print ("image URL = \(imageUrl!)")
                 
                 guard let longDynamicLink = linkBuilder.url else { return }
                 print("The long URL is: \(longDynamicLink)")

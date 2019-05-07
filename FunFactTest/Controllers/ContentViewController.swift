@@ -30,6 +30,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                           landmarkName: "",
                           id: "",
                           description: "",
+                          funFactTitle: "",
                           likes: 0,
                           dislikes: 0,
                           verificationFlag: "",
@@ -335,34 +336,33 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         })
     }
     func populatefunFactDesc() {
+        // Fun Fact title
+        let funFactTitleAttrString = NSAttributedString(string: funFact.funFactTitle,
+                                                        attributes: Attributes.attribute16DemiBlack)
+        
         // Fun Fact description Text View
         let funFactDescAttr = NSMutableAttributedString(string: funFact.description)
         let attributedfunFactDesc = NSMutableAttributedString()
         
-        let regularSearchPattern = "\\w+"
-        var regularRanges: [NSRange] = [NSRange]()
-        let regularRegex = try! NSRegularExpression(pattern: regularSearchPattern, options: [])
-        regularRanges = regularRegex.matches(in: funFactDescAttr.string,
-                                             options: [],
-                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
-        
-        for range in regularRanges {
-            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlack,
-                                          range: NSRange(location: range.location,
-                                                         length: range.length))
+        funFactDescAttr.addAttributes(Attributes.attribute16RegularBlack,
+                                      range: NSMakeRange(0, funFactDescAttr.length))
+        if !funFact.tags.isEmpty {
+            let staticTags = NSMutableAttributedString(string: "\nTags: ")
+            staticTags.addAttributes(Attributes.attribute16RegularBlack,
+                                     range: NSMakeRange(0, staticTags.length))
+            
+            let hashtags = "#" + funFact.tags.joined(separator: " #")
+            let hashtagAttrString = NSMutableAttributedString(string: hashtags)
+            hashtagAttrString.addAttributes(Attributes.attribute16DemiBlue,
+                                            range: NSMakeRange(0, hashtagAttrString.length))
+            
+            funFactDescAttr.append(staticTags)
+            funFactDescAttr.append(hashtagAttrString)
         }
         
-        let hashtagSearchPattern = "#\\w+"
-        var hashtagRanges: [NSRange] = [NSRange]()
-        let hashtagRegex = try! NSRegularExpression(pattern: hashtagSearchPattern, options: [])
-        hashtagRanges = hashtagRegex.matches(in: funFactDescAttr.string,
-                                             options: [],
-                                             range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
-        
-        for range in hashtagRanges {
-            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlue,
-                                          range: NSRange(location: range.location,
-                                                         length: range.length))
+        if funFact.funFactTitle.count > 1 {
+            attributedfunFactDesc.append(funFactTitleAttrString)
+            attributedfunFactDesc.append(NSAttributedString(string: "\n"))
         }
         attributedfunFactDesc.append(funFactDescAttr)
         funFactDescriptionTextView.attributedText = attributedfunFactDesc
@@ -769,7 +769,7 @@ extension UITextView {
                                              range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
         
         for range in regularRanges {
-            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlack,
+            funFactDescAttr.addAttributes(Attributes.attribute16RegularBlack,
                                           range: NSRange(location: range.location,
                                                          length: range.length))
         }

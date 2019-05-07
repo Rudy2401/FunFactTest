@@ -85,6 +85,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
         //Enabling IQKeyboard manager
         IQKeyboardManager.shared.enable = true
         IQKeyboardManager.shared.disabledDistanceHandlingClasses = [SignUpViewController.self, SignInViewController.self]
+        
+        if UserDefaults.standard.object(forKey: SettingsUserDefaults.notificationDate) == nil {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "yyyy-MM-dd"
+            let now = Date()
+            let dateString = formatter.string(from:now)
+            UserDefaults.standard.set(dateString, forKey: SettingsUserDefaults.notificationDate)
+        }
         return true
     }
 
@@ -223,9 +231,14 @@ extension AppDelegate: CLLocationManagerDelegate {
         }
     }
     func handleEvent(forRegion region: CLRegion!) {
-        print ("NotificationCount = \(UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount))")
-        print ("NotificationFrequency = \(UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationFrequency))")
-        if UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount) >= UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationFrequency) {
+        let notificationDate = UserDefaults.standard.string(forKey: SettingsUserDefaults.notificationDate)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        let now = Date()
+        let todayDate = formatter.string(from: now)
+        
+        if UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount)
+            >= UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationFrequency) && todayDate == notificationDate {
             return
         }
         if !region.identifier.contains("|") {
@@ -248,86 +261,110 @@ extension AppDelegate: CLLocationManagerDelegate {
                     print ("Error getting document \(error)")
                 } else {
                     if let document = snapshot?.documents.randomElement(), document.exists {
-                        content.body = document.data()["description"] as! String
+                        let notificationContent = (document.data()["funFactTitle"] as! String).replacingOccurrences(of: " ", with: "") == ""
+                            ? (document.data()["description"] as! String)
+                            : (document.data()["funFactTitle"] as! String) + "\n" + (document.data()["description"] as! String)
+                        
+                        content.body = notificationContent
                         imageId = document.data()["imageName"] as! String
+                        
+                        // Add image to notification
+                        let imageName = "\(imageId).jpeg"
+                        let imageFromCache = CacheManager.shared.getFromCache(key: imageId) as? UIImage
+                        if imageFromCache != nil {
+                            let imageData = imageFromCache!.jpegData(compressionQuality: 1.0)
+                            guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: imageName, data: imageData! as NSData, options: nil) else { return  }
+                            content.attachments = [attachment]
+                        } else {
+                            let storage = Storage.storage()
+                            let storageRef = storage.reference()
+                            let gsReference = storageRef.child("images/\(imageName)")
+                            gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
+                                if let error = error {
+                                    print("error = \(error)")
+                                } else {
+                                    self.createDynamicLink(landmarkID: landmarkID ?? "", funFactID: document.data()["id"] as! String, completion: { (identifier, error) in
+                                        if let error = error {
+                                            print ("Error creating dynamic link \(error)")
+                                        } else {
+                                            guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: imageName, data: data! as NSData, options: nil) else { return  }
+                                            content.attachments = [attachment]
+                                            content.sound = UNNotificationSound.default
+                                            self.notificationCount += 1
+                                            
+                                            // when the notification will be triggered
+                                            let timeInSeconds: TimeInterval = 2
+                                            // the actual trigger object
+                                            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInSeconds,
+                                                                                            repeats: false)
+                                            // notification unique identifier, dynamic link will be the identifier
+                                            let identifier = identifier!
+                                            
+                                            // the notification request object
+                                            let request = UNNotificationRequest(identifier: identifier,
+                                                                                content: content,
+                                                                                trigger: trigger)
+                                            // trying to add the notification request to notification center
+                                            self.notificationCenter.getDeliveredNotifications(completionHandler: { (notifications) in
+                                                // MARK: This portion is commented to receive multiple notifications for one landmark
+                                                /*for notification in notifications {
+                                                 if notification.request.identifier == identifier {
+                                                 print (notification.request.identifier)
+                                                 return
+                                                 }
+                                                 }*/
+                                                self.notificationCenter?.add(request, withCompletionHandler: { (error) in
+                                                    if error != nil {
+                                                        print("Error adding notification with identifier: \(identifier) \(error?.localizedDescription ?? "")")
+                                                    } else {
+                                                        if notificationDate == todayDate {
+                                                            var count = UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount)
+                                                            count += 1
+                                                            UserDefaults.standard.set(count, forKey: SettingsUserDefaults.notificationCount)
+                                                        } else {
+                                                            UserDefaults.standard.set(todayDate, forKey: SettingsUserDefaults.notificationDate)
+                                                            UserDefaults.standard.set(0, forKey: SettingsUserDefaults.notificationCount)
+                                                        }
+                                                    }
+                                                })
+                                            })
+                                        }
+                                    })
+                                }
+                            }
+                        }
                     } else {
                         return
                     }
                 }
-                // Add image to notification
-                let imageName = "\(imageId).jpeg"
-                let imageFromCache = CacheManager.shared.getFromCache(key: imageId) as? UIImage
-                if imageFromCache != nil {
-                    let imageData = imageFromCache!.jpegData(compressionQuality: 1.0)
-                    guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: imageName, data: imageData! as NSData, options: nil) else { return  }
-                    content.attachments = [attachment]
-                } else {
-                    let storage = Storage.storage()
-                    let storageRef = storage.reference()
-                    let gsReference = storageRef.child("images/\(imageName)")
-                    gsReference.getData(maxSize: 1 * 1024 * 1024) { data, error in
-                        if let error = error {
-                            print("error = \(error)")
-                        } else {
-                            guard let attachment = UNNotificationAttachment.create(imageFileIdentifier: imageName, data: data! as NSData, options: nil) else { return  }
-                            content.attachments = [attachment]
-                            content.sound = UNNotificationSound.default
-                            self.notificationCount += 1
-                            
-                            // when the notification will be triggered
-                            let timeInSeconds: TimeInterval = 3
-                            // the actual trigger object
-                            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeInSeconds,
-                                                                            repeats: false)
-                            // notification unique identifier, for this example, same as the region to avoid duplicate notifications
-                            let identifier = region.identifier
-                            
-                            // the notification request object
-                            let request = UNNotificationRequest(identifier: identifier,
-                                                                content: content,
-                                                                trigger: trigger)
-                            // trying to add the notification request to notification center
-                            self.notificationCenter.getDeliveredNotifications(completionHandler: { (notifications) in
-                                // MARK: This portion is commented to receive multiple notifications for one landmark
-                                /*for notification in notifications {
-                                    if notification.request.identifier == identifier {
-                                        print (notification.request.identifier)
-                                        return
-                                    }
-                                }*/
-                                self.notificationCenter?.add(request, withCompletionHandler: { (error) in
-                                    if error != nil {
-                                        print("Error adding notification with identifier: \(identifier) \(error?.localizedDescription ?? "")")
-                                    } else {
-                                        if UserDefaults.standard.string(forKey: SettingsUserDefaults.notificationDate) == nil {
-                                            let formatter = DateFormatter()
-                                            formatter.dateFormat = "yyyy-MM-dd"
-                                            let now = Date()
-                                            let dateString = formatter.string(from:now)
-                                            UserDefaults.standard.set(dateString, forKey: SettingsUserDefaults.notificationDate)
-                                        } else {
-                                            let notificationDate = UserDefaults.standard.string(forKey: SettingsUserDefaults.notificationDate)
-                                            let formatter = DateFormatter()
-                                            formatter.dateFormat = "yyyy-MM-dd"
-                                            let now = Date()
-                                            let todayDate = formatter.string(from:now)
-                                            
-                                            if notificationDate == todayDate {
-                                                var count = UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount)
-                                                count += 1
-                                                UserDefaults.standard.set(count, forKey: SettingsUserDefaults.notificationCount)
-                                            } else {
-                                                UserDefaults.standard.set(todayDate, forKey: SettingsUserDefaults.notificationDate)
-                                            }
-                                        }
-                                    }
-                                })
-                            })
-                        }
-                    }
-                }
         }
+    }
+    func createDynamicLink(landmarkID: String, funFactID: String, completion: @escaping (String?, String?) -> ()) {
+        guard let link = URL(string: "https://funfactsproject/?landmarkID=\(landmarkID)&funFactID=\(landmarkID)&apn=com.rushi.FunFact&d=1") else { return }
+        let dynamicLinksDomainURIPrefix = "funfactsproject.page.link"
         
+        let linkBuilder = DynamicLinkComponents(link: link, domain: dynamicLinksDomainURIPrefix)
+        linkBuilder.iOSParameters = DynamicLinkIOSParameters(bundleID: "com.rushi.FunFact")
+        linkBuilder.iOSParameters?.appStoreID = "962194608"
+        linkBuilder.iOSParameters?.minimumAppVersion = "1.0"
+        
+        guard let longDynamicLink = linkBuilder.url else { return }
+        print("The long URL is: \(longDynamicLink)")
+        DynamicLinks.performDiagnostics(completion: nil)
+        
+        let options = DynamicLinkComponentsOptions()
+        options.pathLength = .short
+        linkBuilder.options = options
+        
+        linkBuilder.shorten { url, warnings, error in
+            if let error = error {
+                completion(nil, error.localizedDescription)
+            } else {
+                let shortUrl = url!
+                print("The short URL is: \(shortUrl.absoluteString)")
+                completion(shortUrl.absoluteString, nil)
+            }
+        }
     }
 }
 extension AppDelegate: UNUserNotificationCenterDelegate {
@@ -342,6 +379,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         // get the notification identifier to respond accordingly
         let identifier = response.notification.request.identifier
-        print ("identifier = \(identifier)")
+        
+        let url = UIApplication.shared.canOpenURL(URL(string: identifier)!)
+        print ("Can open? \(url)")
+        UIApplication.shared.open(URL(string: identifier)!,
+                                  options: [:],
+                                  completionHandler: nil)
     }
 }

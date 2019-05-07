@@ -18,6 +18,7 @@ struct FunFact: Hashable  {
     var landmarkName: String
     var id: String
     var description: String
+    var funFactTitle: String
     var likes: Int
     var dislikes: Int
     var verificationFlag: String

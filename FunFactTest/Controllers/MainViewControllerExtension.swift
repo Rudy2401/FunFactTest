@@ -113,7 +113,30 @@ extension MainViewController {
                         }
                     }
                 case ErrorCode.noNetwork:
-                    print ("Current location = \(self.currentLocationCoordinate)")
+                    let location = GeoPoint(latitude: self.currentLocationCoordinate.latitude, longitude: self.currentLocationCoordinate.longitude)
+                    self.firestore.downloadLandmarksFromCache(coordinates: location, completion: { (landmark, error) in
+                        if let error = error {
+                            print ("Error getting landmarks \(error)")
+                            spinner.dismissLoader()
+                        } else {
+                            let landmark = landmark!
+                            
+                            count += 1
+                            // Add anotations
+                            var annotation: FunFactAnnotation
+                            annotation = FunFactAnnotation(
+                                landmarkID: landmark.id,
+                                title: "\(count)) \(landmark.name)",
+                                address: "\(landmark.address), \(landmark.city), \(landmark.state), \(landmark.country)",
+                                type: landmark.type,
+                                coordinate: CLLocationCoordinate2D(latitude: landmark.coordinates.latitude,
+                                                                   longitude: landmark.coordinates.longitude))
+                            self.mapView.addAnnotation(annotation)
+                            AppDataSingleton.appDataSharedInstance.listOfLandmarkIDs.append(landmark.id)
+                            spinner.dismissLoader()
+                        }
+                    })
+                    
                 default:
                     print ("Default")
                     
@@ -165,8 +188,5 @@ extension MainViewController {
                 spinner.dismissLoader()
             }
         }
-    }
-    func downloadLandmarksFromCache() {
-        
     }
 }

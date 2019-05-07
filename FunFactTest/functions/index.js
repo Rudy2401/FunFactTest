@@ -1,10 +1,12 @@
 const functions = require('firebase-functions');
+const googleCloudStorage = require('@google-cloud/storage');
 var admin = require("firebase-admin");
 var serviceAccount = require("./serviceAccountKey.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://funfacts-5b1a9.firebaseio.com"
+    databaseURL: "https://funfacts-5b1a9.firebaseio.com",
+    storageBucket: "funfacts-5b1a9.appspot.com"
 });
 
 const db = admin.firestore()
@@ -408,6 +410,7 @@ exports.udpateNumOfFunFactsForDelete = functions.firestore.document('/funFacts/{
     // Document Deleted : subtract one from count
     const landmarkID = snap.data().landmarkId;
     const docRef = admin.firestore().collection('landmarks').doc(landmarkID)
+    const userSubRef = admin.firestore().collection('users')
 
     return docRef.get().then(snap => {
         // get the total funFact count and subtract one
@@ -484,4 +487,69 @@ exports.updateRejectedCountForDelete = functions.firestore.document('/users/{use
         // run update
         return docRef.set(data, { merge: true });
     })
+});
+
+exports.updateUserFactsSubmittedForDelete = functions.firestore.document('/funFacts/{funFactID}').onDelete((change, context) => {
+    const userID = change.data().submittedBy
+    const funFactID = change.data().id
+    const docRef = admin.firestore().collection('users').doc(userID).collection('funFactsSubmitted').doc(funFactID)
+
+    return docRef.delete().then(() => {
+        return console.log('Deleted funFactID ', funFactID);
+      }).catch((error) => {
+        return console.error('Deletion failed:', error);
+      });
+});
+exports.updateUserFactsRejectedForDelete = functions.firestore.document('/funFacts/{funFactID}').onDelete((change, context) => {
+    const userID = change.data().submittedBy
+    const funFactID = change.data().id
+    const docRef = admin.firestore().collection('users').doc(userID).collection('funFactsRejected').doc(funFactID)
+
+    return docRef.delete().then(() => {
+        return console.log('Deleted funFactID ', funFactID);
+      }).catch((error) => {
+        return console.error('Deletion failed:', error);
+      });
+});
+exports.updateUserFactsLikedForDelete = functions.firestore.document('/funFacts/{funFactID}').onDelete((change, context) => {
+    const userID = change.data().submittedBy
+    const funFactID = change.data().id
+    const docRef = admin.firestore().collection('users').doc(userID).collection('funFactsLiked').doc(funFactID)
+
+    return docRef.delete();
+});
+exports.updateUserFactsVerifiedForDelete = functions.firestore.document('/funFacts/{funFactID}').onDelete((change, context) => {
+    const userID = change.data().submittedBy
+    const funFactID = change.data().id
+    const docRef = admin.firestore().collection('users').doc(userID).collection('funFactsVerified').doc(funFactID)
+
+    return docRef.delete().then(() => {
+        return console.log('Deleted funFactID ', funFactID);
+      }).catch((error) => {
+        return console.error('Deletion failed:', error);
+      });
+});
+exports.updateUserFactsDisputedForDelete = functions.firestore.document('/funFacts/{funFactID}').onDelete((change, context) => {
+    const userID = change.data().submittedBy
+    const funFactID = change.data().id
+    const docRef = admin.firestore().collection('users').doc(userID).collection('funFactsDisputed').doc(funFactID)
+
+    return docRef.delete().then(() => {
+        return console.log('Deleted funFactID ', funFactID);
+      }).catch((error) => {
+        return console.error('Deletion failed:', error);
+      });
+});
+exports.deleteImage = functions.firestore.document('/funFacts/{funFactID}').onDelete((change, context) => {
+    const funFactID = change.data().id
+    const filePath = 'images/' + funFactID + '.jpeg'
+    // const bucket = googleCloudStorage.bucket('funfacts-5b1a9.appspot.com')
+    const bucket = admin.storage().bucket()
+    const file = bucket.file(filePath)
+
+    file.delete().then(() => {
+        return console.log('Successfully deleted photo with UID', funFactID)
+    }).catch((err) => {
+        return console.error('Failed to remove photo, error', err)
+    });
 });

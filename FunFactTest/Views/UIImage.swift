@@ -14,7 +14,7 @@ extension UIImage {
         case sizeImpossibleToReach
     }
     func compressImage(_ expectedSizeKb: Int, completion: (UIImage, CGFloat) -> Void ) throws {
-        let minimalCompressRate: CGFloat = 0.4 // min compressRate to be checked later
+        let minimalCompressRate: CGFloat = 0.9 // min compressRate to be checked later
         if expectedSizeKb == 0 {
             throw CompressImageErrors.invalidExSize // if the size is equal to zero throws
         }

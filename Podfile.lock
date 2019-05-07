@@ -12,6 +12,7 @@ PODS:
   - BoringSSL/Implementation (10.0.6):
     - BoringSSL/Interface (= 10.0.6)
   - BoringSSL/Interface (10.0.6)
+  - CropViewController (2.3.8)
   - FacebookCore (0.4.0):
     - Bolts (~> 1.9)
     - FBSDKCoreKit (~> 4.36)
@@ -240,6 +241,7 @@ PODS:
 
 DEPENDENCIES:
   - Bolts-Swift (from `https://github.com/BoltsFramework/Bolts-Swift.git`)
+  - CropViewController
   - FacebookCore
   - FacebookLogin
   - FacebookShare
@@ -259,6 +261,7 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Bolts
     - BoringSSL
+    - CropViewController
     - FacebookCore
     - FacebookLogin
     - FacebookShare
@@ -315,6 +318,7 @@ SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Bolts-Swift: d7b06d9261c2215eb20f483f3178763626f305a7
   BoringSSL: e10f92a27043805c01071fe815a5cd98ae8212e7
+  CropViewController: 7be882b7d3fb3faef48a41924e80f689e9df2514
   FacebookCore: 770e57cfe250a4de4458b682191c0ff062dee247
   FacebookLogin: eb0f2251aca835a94d70a5f7e580edc46d1e1603
   FacebookShare: ec48492ba748f971c6a13661963f7aae38140111
@@ -358,6 +362,6 @@ SPEC CHECKSUMS:
   TwitterCore: 8cbc9ad34d91c63a0035ea05bfbfc0d7ca72a28c
   TwitterKit: bc7bd086b9b724a1d888745a054e1d0b1ecc4f3f
 
-PODFILE CHECKSUM: ce529a63758c7c45ab8355d2d4a56044075ff81d
+PODFILE CHECKSUM: 3dbc8e94bb7a9816a623c04bfe6bf8ba5da88380
 
 COCOAPODS: 1.5.3
