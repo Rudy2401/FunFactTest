@@ -57,6 +57,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         addButtonsToView()
         setupSettingsDefault()
         setupLocationManager()
+        tabBarController?.delegate = (UIApplication.shared.delegate as! AppDelegate) as? UITabBarControllerDelegate
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showFunFact),
@@ -385,12 +386,25 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+        showFunFact()
     }
     @objc func showFunFact() {
+        print ("in Main showFunFact")
         if AppDataSingleton.appDataSharedInstance.url != nil {
-            guard let landmarkID = AppDataSingleton.appDataSharedInstance.url?.valueOf("landmarkID") else { return }
-            downloadFunFactsAndSegue(for: landmarkID)
+//            guard let landmarkID = AppDataSingleton.appDataSharedInstance.url?.valueOf("landmarkID") else { return }
+//            downloadFunFactsAndSegue(for: landmarkID)
+            
+            DynamicLinks.dynamicLinks().handleUniversalLink(AppDataSingleton.appDataSharedInstance.url!) { (dynamicLink, error) in
+                guard error == nil else {
+                    print ("Found an error \(error!.localizedDescription)")
+                    return
+                }
+                if let dynamicLink = dynamicLink {
+                    guard let landmarkID = dynamicLink.url?.valueOf("landmarkID") else { return }
+                    self.downloadFunFactsAndSegue(for: landmarkID)
+                    AppDataSingleton.appDataSharedInstance.url = nil
+                }
+            }
         }
     }
     @objc func viewAddFact(recognizer: UITapGestureRecognizer) {
@@ -437,7 +451,10 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         let completeleaderLabelClicked = NSMutableAttributedString()
         completeleaderLabelClicked.append(leaderAttrClicked1)
         
-        let leader = UIButton(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width / 10, height: self.view.frame.size.height))
+        let leader = UIButton(frame: CGRect(x: 0,
+                                            y: 0,
+                                            width: self.view.frame.size.width / 10,
+                                            height: self.view.frame.size.height))
         leader.isUserInteractionEnabled = true
         leader.titleLabel?.lineBreakMode = NSLineBreakMode.byWordWrapping
         leader.setAttributedTitle(completeleaderLabel, for: .normal)
@@ -483,8 +500,17 @@ extension MainViewController: MKMapViewDelegate {
             return
         } else if view.annotation is MKClusterAnnotation {
             let center = CLLocationCoordinate2D(latitude: (view.annotation?.coordinate.latitude)!, longitude: (view.annotation?.coordinate.longitude)!)
-            let region = MKCoordinateRegion(center: center, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
-            self.mapView.setRegion(region, animated: true)
+            print (mapView.region.span)
+            if mapView.region.span.latitudeDelta > 0.011 && mapView.region.span.longitudeDelta > 0.011 {
+                let region = MKCoordinateRegion(center: center,
+                                                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+                self.mapView.setRegion(region, animated: true)
+            } else {
+                let region = MKCoordinateRegion(center: center,
+                                                span: MKCoordinateSpan(latitudeDelta: mapView.region.span.latitudeDelta/2,
+                                                                       longitudeDelta: mapView.region.span.longitudeDelta/2))
+                self.mapView.setRegion(region, animated: true)
+            }
         }
         
         if let annotation = view.annotation as? FunFactAnnotation {

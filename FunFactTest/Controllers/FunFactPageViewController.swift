@@ -80,12 +80,19 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         
         setupToolbarAndNavigationbar()
         if AppDataSingleton.appDataSharedInstance.url != nil {
-            guard let funFactID = AppDataSingleton.appDataSharedInstance.url?.valueOf("funFactID") else { return }
-            setViewControllers([viewControllerAtIndex(getIndexOfVC(for: funFactID))] as? [UIViewController], direction: .forward, animated: true, completion: nil)
-            pageControl.currentPage = getIndexOfVC(for: funFactID)
-            currentIndex = getIndexOfVC(for: funFactID)
-            pageNumLabel.text = "[\(currentIndex + 1)/\(totalPages)]"
-            AppDataSingleton.appDataSharedInstance.url = nil
+            DynamicLinks.dynamicLinks().handleUniversalLink(AppDataSingleton.appDataSharedInstance.url!) { (dynamicLink, error) in
+                guard error == nil else {
+                    print ("Found an error \(error!.localizedDescription)")
+                    return
+                }
+                if let dynamicLink = dynamicLink {
+                    guard let funFactID = dynamicLink.url?.valueOf("funFactID") else { return }
+                    self.setViewControllers([self.viewControllerAtIndex(self.getIndexOfVC(for: funFactID))] as? [UIViewController], direction: .forward, animated: true, completion: nil)
+                    self.pageControl.currentPage = self.getIndexOfVC(for: funFactID)
+                    self.currentIndex = self.getIndexOfVC(for: funFactID)
+                    self.pageNumLabel.text = "[\(self.currentIndex + 1)/\(self.totalPages)]"
+                }
+            }
         } else {
             self.setViewControllers([viewControllerAtIndex(0)] as? [UIViewController], direction: .forward, animated: true, completion: nil)
         }
@@ -114,7 +121,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         
         let dataViewController = self.storyboard?.instantiateViewController(withIdentifier: "contentView") as! ContentViewController
         navigationItem.title = headingContent
-        if headingContent == "" {
+        if headingContent == "" || AppDataSingleton.appDataSharedInstance.url != nil {
             firestore.getLandmarkName(for: landmarkID) { (landmarkName, error) in
                 if let error = error {
                     print ("Error getting landmark Name \(error)")

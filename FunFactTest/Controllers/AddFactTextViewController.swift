@@ -11,11 +11,11 @@ import IQKeyboardManagerSwift
 
 extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
     func textViewDidChange(_ textView: UITextView) {
-        funFactDescription.toolbarPlaceholder = "\(300 - textView.text.count) chars remaining"
-        if textView.text.count > 300 {
+        funFactDescription.toolbarPlaceholder = "\(400 - textView.text.count) chars remaining"
+        if textView.text.count > 400 {
             let selectedRange = textView.selectedRange
-            let str1 = textView.text.substring(toIndex: 300)
-            let str2 = textView.text.substring(fromIndex: 300)
+            let str1 = textView.text.substring(toIndex: 400)
+            let str2 = textView.text.substring(fromIndex: 400)
             
             let strAttr1 = NSMutableAttributedString(string: str1, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black,
                                                                                 NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
@@ -35,7 +35,7 @@ extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
         tag = textView.tag
         if textView.textColor == UIColor.lightGray {
             textView.text = nil
-            funFactDescription.toolbarPlaceholder = "\(300 - textView.text.count) chars remaining"
+            funFactDescription.toolbarPlaceholder = "\(400 - textView.text.count) chars remaining"
             textView.textColor = UIColor.black
         }
         navigationController?.navigationBar.isHidden = true

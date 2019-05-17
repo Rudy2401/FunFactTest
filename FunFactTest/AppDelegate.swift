@@ -123,10 +123,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         var handled = false
         print ("Received url through custom URL scheme \(url.absoluteString)")
-        if let dynamicLink = DynamicLinks.dynamicLinks().dynamicLink(fromCustomSchemeURL: url) {
-            self.handleDynamicLink(dynamicLink)
-            return true
-        } else if url.absoluteString.contains("fb") {
+        handled =  handleURL(url)
+        if url.absoluteString.contains("fb") {
             handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
             
         } else if url.absoluteString.contains("google") {
@@ -137,30 +135,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         
         if let incomingURL = userActivity.webpageURL {
-            print ("Incoming URL = \(incomingURL)")
-            let linkHandled = DynamicLinks.dynamicLinks().handleUniversalLink(incomingURL) { (dynamicLink, error) in
-                guard error == nil else {
-                    print ("Found an error \(error!.localizedDescription)")
-                    return
-                }
-                if let dynamicLink = dynamicLink {
-                    self.handleDynamicLink(dynamicLink)
-                }
-            }
-            if linkHandled {
-                return true
-            } else {
-                return false
-            }
+            return handleURL(incomingURL)
         }
         return false
     }
-    func handleDynamicLink(_ dynamicLink: DynamicLink) {
-        guard let url = dynamicLink.url else {
-            print ("No URL")
-            return
-        }
+    func handleURL(_ url: URL) -> Bool {
         AppDataSingleton.appDataSharedInstance.url = url
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let firstNav = storyboard.instantiateViewController(withIdentifier: "firstNav") as! UINavigationController
+        let nav1 = storyboard.instantiateViewController(withIdentifier: "nav1") as! UINavigationController
+        let nav2 = storyboard.instantiateViewController(withIdentifier: "nav2") as! UINavigationController
+        let nav3 = storyboard.instantiateViewController(withIdentifier: "nav3") as! UINavigationController
+        let nav4 = storyboard.instantiateViewController(withIdentifier: "nav4") as! UINavigationController
+        let mainVC = storyboard.instantiateViewController(withIdentifier: "mainView") as! MainViewController
+        let tabBarController = storyboard.instantiateViewController(withIdentifier: "tabBar") as! TabBarController
+        nav1.viewControllers = [mainVC]
+        tabBarController.viewControllers = [nav1, nav2, nav3, nav4]
+        self.window?.rootViewController = firstNav
+        firstNav.show(tabBarController, sender: nil)
+        return true
     }
     
     @objc func calendarDayDidChange(_ notification : NSNotification) {
@@ -340,13 +333,11 @@ extension AppDelegate: CLLocationManagerDelegate {
         }
     }
     func createDynamicLink(landmarkID: String, funFactID: String, completion: @escaping (String?, String?) -> ()) {
-        guard let link = URL(string: "https://funfactsproject/?landmarkID=\(landmarkID)&funFactID=\(landmarkID)&apn=com.rushi.FunFact&d=1") else { return }
+        guard let link = URL(string: "https://funfactsproject/?efr=1&landmarkID=\(landmarkID)&funFactID=\(landmarkID)&apn=com.rushi.FunFact") else { return }
         let dynamicLinksDomainURIPrefix = "funfactsproject.page.link"
         
         let linkBuilder = DynamicLinkComponents(link: link, domain: dynamicLinksDomainURIPrefix)
         linkBuilder.iOSParameters = DynamicLinkIOSParameters(bundleID: "com.rushi.FunFact")
-        linkBuilder.iOSParameters?.appStoreID = "962194608"
-        linkBuilder.iOSParameters?.minimumAppVersion = "1.0"
         
         guard let longDynamicLink = linkBuilder.url else { return }
         print("The long URL is: \(longDynamicLink)")
@@ -379,11 +370,25 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         // get the notification identifier to respond accordingly
         let identifier = response.notification.request.identifier
-        
-        let url = UIApplication.shared.canOpenURL(URL(string: identifier)!)
-        print ("Can open? \(url)")
-        UIApplication.shared.open(URL(string: identifier)!,
-                                  options: [:],
-                                  completionHandler: nil)
+        print ("Ciicked on notification! Link: \(identifier)")
+        let _ = handleURL(URL(string: identifier)!)
+    }
+}
+extension UIApplication {
+    var visibleViewController : UIViewController? {
+        return keyWindow?.rootViewController?.topViewController
+    }
+}
+
+extension UIViewController {
+    fileprivate var topViewController: UIViewController {
+        switch self {
+        case is UINavigationController:
+            return (self as! UINavigationController).visibleViewController?.topViewController ?? self
+        case is UITabBarController:
+            return (self as! UITabBarController).selectedViewController?.topViewController ?? self
+        default:
+            return presentedViewController?.topViewController ?? self
+        }
     }
 }

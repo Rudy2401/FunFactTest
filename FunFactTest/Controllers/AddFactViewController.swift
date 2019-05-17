@@ -88,7 +88,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                             likes: 0,
                             dislikes: 0)
     let imageCaptionPlaceholder = "Enter image caption here. Credits for images go here. (Optional)"
-    let funFactDescPlaceholder = "Enter the fun fact details. Maximum 300 characters. Please keep the facts relevant and precise."
+    let funFactDescPlaceholder = "Enter the fun fact details. Maximum 400 characters. Please keep the facts relevant and precise."
     
     var croppingStyle = CropViewCroppingStyle.default
     var image: UIImage?
@@ -469,7 +469,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             self.city = (self.city == "" || self.city == nil) ? self.landmark.city : self.city
             self.address = (self.address == "" || self.address == nil) ? self.landmark.address : self.address
             self.landmarkName = (self.landmarkName == "" || self.landmarkName == nil) ? self.landmark.name : self.landmarkName
-            if self.mode == .edit {
+            if self.mode == .edit || self.mode == .add {
                 self.landmarkName = self.landmarkNameTextField?.text
             }
             self.type = (self.type == "" || self.type == nil) ? self.landmark.type : self.type
@@ -671,9 +671,9 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  type: "pickerview")
         }
 
-        if funFactDescription.text.count > 300 {
+        if funFactDescription.text.count > 400 {
             errors = true
-            message += "Please make sure that the fun fact description is limited to 300 characters"
+            message += "Please make sure that the fun fact description is limited to 400 characters"
             Utils.alertWithTitle(title: title,
                                  message: message,
                                  viewController: self,

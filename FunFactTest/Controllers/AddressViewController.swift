@@ -38,6 +38,7 @@ class AddressViewController: UIViewController {
         
         let searchBar = resultSearchController!.searchBar
         let textFieldInsideUISearchBar = searchBar.value(forKey: "searchField") as? UITextField
+        searchBar.becomeFirstResponder()
         textFieldInsideUISearchBar?.font = UIFont(name: Fonts.regularFont, size: 14.0)
         searchBar.sizeToFit()
         searchBar.placeholder = "Search for places"

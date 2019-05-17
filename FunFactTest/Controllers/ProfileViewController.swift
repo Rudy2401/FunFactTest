@@ -55,6 +55,11 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         rejectedNum.accessibilityIdentifier = "rejectedNum"
         submittedNum.textColor = Colors.blueColor
         
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(showFunFact),
+                                               name: UIApplication.willEnterForegroundNotification,
+                                               object: nil)
+        
         scrollView.alwaysBounceVertical = true
         scrollView.bounces  = true
         refreshControl = UIRefreshControl()
@@ -125,6 +130,11 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
             userImageView.layer.borderWidth = 0.5
             userImageView.layer.borderColor = UIColor.gray.cgColor
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        }
+    }
+    @objc func showFunFact() {
+        if AppDataSingleton.appDataSharedInstance.url != nil {
+            self.tabBarController?.selectedIndex = 0
         }
     }
     @objc func didPullToRefresh() {
