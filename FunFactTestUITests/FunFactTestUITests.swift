@@ -107,8 +107,7 @@ class FunFactTestUITests: XCTestCase {
     }
     
     func testAnnotationAndContent() {
-        
-        
+        XCUIApplication()/*@START_MENU_TOKEN@*/.staticTexts["115 Broadway, New York, NY, 10006"]/*[[".otherElements[\"mapView\"].staticTexts[\"115 Broadway, New York, NY, 10006\"]",".staticTexts[\"115 Broadway, New York, NY, 10006\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
         
     }
     

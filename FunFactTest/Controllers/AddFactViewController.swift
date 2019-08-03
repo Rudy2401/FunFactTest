@@ -725,8 +725,14 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             let storage = Storage.storage()
             let storageRef = storage.reference()
             let gsReference = storageRef.child("images/\(imageName)")
-            self.landmarkImage.sd_setImage(with: gsReference, placeholderImage: UIImage())
-            self.landmarkImage.layer.cornerRadius = 5
+            gsReference.downloadURL { (url, error) in
+                if let error = error {
+                    print ("Error getting URL \(error)")
+                } else {
+                    self.landmarkImage.layer.cornerRadius = 5
+                    self.landmarkImage.sd_setImage(with: url, placeholderImage: UIImage())
+                }
+            }
         }
     }
     

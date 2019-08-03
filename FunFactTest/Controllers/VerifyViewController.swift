@@ -8,7 +8,7 @@
 
 import UIKit
 import FirebaseFirestore
-import FirebaseAuth
+import Firebase
 
 class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreManagerDelegate {
     

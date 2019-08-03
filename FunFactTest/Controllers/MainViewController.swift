@@ -13,7 +13,6 @@ import Firebase
 import FirebaseStorage
 import UserNotifications
 import MapKitGoogleStyler
-import FirebaseUI
 import InstantSearch
 import Geofirestore
 
@@ -53,6 +52,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         typeColor.layer.cornerRadius = 2.5
         firestore.delegate = self
         annotationBottomView.alpha = 0.0
+        
         addNavButtons()
         addButtonsToView()
         setupSettingsDefault()
@@ -63,8 +63,8 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
                                                selector: #selector(showFunFact),
                                                name: UIApplication.willEnterForegroundNotification,
                                                object: nil)
-        
-        firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "") { (user, error) in
+        let currentUserUID = Auth.auth().currentUser!.isAnonymous ? "" : Auth.auth().currentUser?.uid
+        firestore.downloadUserProfile(currentUserUID ?? "") { (user, error) in
             if let error = error {
                 print ("Error getting user profile \(error)")
             } else {
@@ -179,7 +179,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     @IBAction func viewAddFact(_ sender: Any) {
-        if Auth.auth().currentUser == nil {
+        if Auth.auth().currentUser!.isAnonymous {
             let alert = UIAlertController(title: "Error",
                                           message: "Please sign in to submit a fact.",
                                           preferredStyle: .alert)
@@ -199,6 +199,9 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     func setupBottomView (annotationClicked: FunFactAnnotation, landmark: Landmark) {
+        if annotationBottomView.isHidden == true {
+            annotationBottomView.isHidden = false
+        }
         for overlay in mapView.overlays {
             mapView.removeOverlay(overlay)
         }
@@ -346,7 +349,13 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
             let storage = Storage.storage()
             let storageRef = storage.reference()
             let gsReference = storageRef.child("images/\(imageName)")
-            self.landmarkImageView.sd_setImage(with: gsReference, placeholderImage: UIImage())
+            gsReference.downloadURL { url, error in
+                if let error = error {
+                    print ("Error setting url \(error)")
+                } else {
+                    self.landmarkImageView.sd_setImage(with: url, placeholderImage: UIImage())
+                }
+            }
             self.landmarkImageView.layer.cornerRadius = 5
         }
     }
@@ -379,6 +388,14 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setupNavigationbar()
+        if currentAnnotation != nil {
+            firestore.isLandmarkDeleted(landmarkID: currentAnnotation!.landmarkID) { (deleted) in
+                if deleted == .yes {
+                    self.mapView.removeAnnotation(self.currentAnnotation!)
+                    self.annotationBottomView.isHidden = true
+                }
+            }
+        }
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -389,11 +406,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         showFunFact()
     }
     @objc func showFunFact() {
-        print ("in Main showFunFact")
         if AppDataSingleton.appDataSharedInstance.url != nil {
-//            guard let landmarkID = AppDataSingleton.appDataSharedInstance.url?.valueOf("landmarkID") else { return }
-//            downloadFunFactsAndSegue(for: landmarkID)
-            
             DynamicLinks.dynamicLinks().handleUniversalLink(AppDataSingleton.appDataSharedInstance.url!) { (dynamicLink, error) in
                 guard error == nil else {
                     print ("Found an error \(error!.localizedDescription)")

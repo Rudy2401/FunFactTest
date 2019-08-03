@@ -372,6 +372,7 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
                                                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
                                                                 guard self?.presentedViewController == alert else { return }
                                                                 self?.dismiss(animated: true, completion: nil)
+                                                                self?.navigationController?.popViewController(animated: true)
                                                             }
                                                         }
                                                     }

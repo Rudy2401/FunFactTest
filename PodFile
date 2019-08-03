@@ -4,7 +4,8 @@ use_frameworks!
 target 'FunFactTest' do
 	pod 'Firebase/Core'
 	pod 'Firebase/Firestore'
-	pod 'FirebaseUI'
+    pod 'Firebase/Auth'
+    pod 'Firebase/Storage'
     pod 'FBSDKLoginKit'
     pod 'Bolts-Swift', :git => 'https://github.com/BoltsFramework/Bolts-Swift.git'
     pod 'FBSDKCoreKit'
@@ -20,5 +21,7 @@ target 'FunFactTest' do
     #pod 'BitlySDK'
     pod 'Firebase/DynamicLinks'
     pod 'CropViewController'
+    pod 'GoogleSignIn'
     #pod 'WSTagsField'
+    pod 'SDWebImage', '~> 5.0'
 end

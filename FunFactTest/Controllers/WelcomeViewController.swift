@@ -12,7 +12,7 @@ import Firebase
 import FirebaseAuth
 import GoogleSignIn
 
-class WelcomeViewController: UIViewController {
+class WelcomeViewController: UIViewController, FirestoreManagerDelegate {
     @IBOutlet weak var fbSignInButton: ButtonWithShadow!
     @IBOutlet weak var googleSignInButton: ButtonWithShadow!
     @IBOutlet weak var emailSignInButton: ButtonWithShadow!
@@ -22,6 +22,8 @@ class WelcomeViewController: UIViewController {
     @IBOutlet weak var welcomeTitle: UILabel!
     
     var signedInView: UIView?
+    var firestore = FirestoreManager()
+    var currentUser: User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,15 +32,24 @@ class WelcomeViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         if let currentUser = Auth.auth().currentUser {
-            currentUser.getIDTokenForcingRefresh(true) { (con, error) in
+//            currentUser.getIDTokenForcingRefresh(true) { (con, error) in
+//                if let error = error {
+//                    Auth.auth().signInAnonymously(completion: { (res, error) in
+//                        if let error = error {
+//                            print ("Error signing in anon \(error.localizedDescription)")
+//                        }
+//                    })
+//                    return
+//                }
+//            }
+            currentUser.getIDToken { (tok, error) in
                 if let error = error {
-                    do {
-                        try Auth.auth().signOut()
-                        print ("token error = \(error)")
-                    }
-                    catch let error as NSError {
-                        print (error.localizedDescription)
-                    }
+                    print ("Error getting token \(error.localizedDescription)")
+                    Auth.auth().signInAnonymously(completion: { (res, error) in
+                        if let error = error {
+                            print ("Error signing in anon \(error.localizedDescription)")
+                        }
+                    })
                     return
                 }
             }
@@ -59,12 +70,6 @@ class WelcomeViewController: UIViewController {
             self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
         } else {
             // No user is signed in.
-            do {
-                try Auth.auth().signOut()
-            }
-            catch let error as NSError {
-                print (error.localizedDescription)
-            }
             insideView.isHidden = false
             signedInView?.isHidden = true
             GIDSignIn.sharedInstance().delegate = self
@@ -79,6 +84,10 @@ class WelcomeViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    func documentsDidUpdate() {
+        
+    }
+    
     
     func anotherAnimateLabel() {
         if welcomeTitle.center != CGPoint(x:50, y:10) {
@@ -209,53 +218,72 @@ class WelcomeViewController: UIViewController {
     }
     
     @IBAction func facebookLogin(_ sender: UIButton) {
-        let fbLoginManager = FBSDKLoginManager()
-        FBSDKLoginManager().logOut()
-        fbLoginManager.logIn(withReadPermissions: ["public_profile", "email"], from: self) { (result, error) in
+        let currentUser = Auth.auth().currentUser
+        let fbLoginManager = LoginManager()
+        LoginManager().logOut()
+        fbLoginManager.logIn(permissions: ["public_profile", "email"], from: self) { (result, error) in
             if let error = error {
                 print("Failed to login: \(error.localizedDescription)")
                 return
             }
-            guard let accessToken = FBSDKAccessToken.current() else {
+            guard let accessToken = AccessToken.current else {
                 print("Failed to get access token")
                 return
             }
             let credential = FacebookAuthProvider.credential(withAccessToken: accessToken.tokenString)
             
             // Perform login by calling Firebase APIs
-            Auth.auth().signInAndRetrieveData(with: credential, completion: { (user, error) in
+            Auth.auth().signInAndRetrieveData(with: credential, completion: { (authResult, error) in
                 if let error = error {
                     print("Login error: \(error.localizedDescription)")
                     let alertController = UIAlertController(title: "Login Error", message: error.localizedDescription, preferredStyle: .alert)
                     let okayAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
                     alertController.addAction(okayAction)
                     self.present(alertController, animated: true, completion: nil)
-                    
-                    return
+                } else {
+                    print ("######## Auth successful")
+                    if currentUser!.isAnonymous {
+                        currentUser?.delete(completion: { (error) in
+                            if let error = error {
+                                print ("Error removing user \(error.localizedDescription)")
+                            }
+                        })
+                    }
+                    if (authResult?.additionalUserInfo!.isNewUser)! {
+                        self.firestore.updateUserAdditionalFields(for: authResult!.user, completion: { (error) in
+                            if let error = error {
+                                print ("Error updating user \(error)")
+                            }
+                        })
+                    }
+                    // Present the main view
+                    self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
                 }
-                print ("######## Auth successful")
-                // Present the main view
-                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
             })
         }
     }
     @IBAction func googleLogin(sender: UIButton) {
+        currentUser = Auth.auth().currentUser
         GIDSignIn.sharedInstance().signIn()
     }
     
     @IBAction func guestAction(_ sender: Any) {
-        self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
+        Auth.auth().signInAnonymously() { (authResult, error) in
+            if let error = error {
+                print ("Error signing in anonymously \(error.localizedDescription)")
+            } else {
+                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
+            }
+        }
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let backItem = UIBarButtonItem()
         backItem.title = ""
         navigationItem.backBarButtonItem = backItem // This will show in the next view controller being pushed
     }
-    
 }
 extension WelcomeViewController: GIDSignInDelegate, GIDSignInUIDelegate {
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error!) {
-        
         if error != nil {
             return
         }
@@ -266,20 +294,32 @@ extension WelcomeViewController: GIDSignInDelegate, GIDSignInUIDelegate {
         
         let credential = GoogleAuthProvider.credential(withIDToken: authentication.idToken, accessToken: authentication.accessToken)
         
-        Auth.auth().signInAndRetrieveData(with: credential, completion: { (user, error) in
+        Auth.auth().signInAndRetrieveData(with: credential, completion: { (authResult, error) in
             if let error = error {
                 print("Login error: \(error.localizedDescription)")
                 let alertController = UIAlertController(title: "Login Error", message: error.localizedDescription, preferredStyle: .alert)
                 let okayAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
                 alertController.addAction(okayAction)
                 self.present(alertController, animated: true, completion: nil)
-                
-                return
+            } else {
+                if self.currentUser != nil && self.currentUser!.isAnonymous {
+                    self.currentUser?.delete(completion: { (error) in
+                        if let error = error {
+                            print ("Error removing user \(error.localizedDescription)")
+                        }
+                    })
+                }
+                if (authResult?.additionalUserInfo!.isNewUser)! {
+                    self.firestore.updateUserAdditionalFields(for: authResult!.user, completion: { (error) in
+                        if let error = error {
+                            print ("Error updating user \(error)")
+                        }
+                    })
+                }
+                print ("######## Auth successful")
+                // Present the main view
+                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
             }
-
-            print ("######## Auth successful")
-            // Present the main view
-            self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
         })
     }
     

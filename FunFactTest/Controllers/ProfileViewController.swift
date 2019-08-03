@@ -99,7 +99,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         } else {
             signOutButton.isHidden = true
         }
-        if Auth.auth().currentUser != nil {
+        if !Auth.auth().currentUser!.isAnonymous {
             let subGesture = UITapGestureRecognizer(target: self,
                                                     action: #selector(subTapAction))
             subGesture.numberOfTapsRequired = 1
@@ -126,11 +126,12 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
             
             userImageView.layer.cornerRadius = userImageView.frame.height/2
             signOutButton.layer.backgroundColor = Colors.seagreenColor.cgColor
-            signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+            
             userImageView.layer.borderWidth = 0.5
             userImageView.layer.borderColor = UIColor.gray.cgColor
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         }
+        signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
     }
     @objc func showFunFact() {
         if AppDataSingleton.appDataSharedInstance.url != nil {
@@ -138,6 +139,9 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         }
     }
     @objc func didPullToRefresh() {
+        if Auth.auth().currentUser!.isAnonymous {
+            return
+        }
         self.firestore.downloadUserProfile(Auth.auth().currentUser?.uid ?? "", completionHandler: { (userProfile, error) in
             if let error = error {
                 print ("Error getting user profile \(error)")
@@ -164,13 +168,12 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
                                                 preferredStyle: .alert)
         
         let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
-            do {
-                try Auth.auth().signOut()
-                self.tabBarController?.selectedIndex = 0
-            }
-            catch let error as NSError {
-                print (error.localizedDescription)
-            }
+            Auth.auth().signInAnonymously(completion: { (res, error) in
+                if let error = error {
+                    print ("Error signing in anonymously \(error.localizedDescription)")
+                }
+            })
+            self.tabBarController?.selectedIndex = 0
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alertController.addAction(okayAction)
@@ -180,7 +183,16 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        if Auth.auth().currentUser == nil {
+        if !Auth.auth().currentUser!.isAnonymous  {
+            for view in scrollView.subviews {
+                view.isHidden = false
+            }
+            signInButton.isHidden = true
+        } else {
+            for view in scrollView.subviews {
+                view.isHidden = true
+            }
+            signInButton.isHidden = false
             return
         }
         let spinner = Utils.showLoader(view: self.view)
@@ -206,17 +218,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         navigationController?.isNavigationBarHidden = true
         navigationController?.isNavigationBarHidden = false
         navigationController?.navigationBar.prefersLargeTitles = true
-        if Auth.auth().currentUser != nil  {
-            for view in scrollView.subviews {
-                view.isHidden = false
-            }
-            signInButton.isHidden = true
-        } else {
-            for view in scrollView.subviews {
-                view.isHidden = true
-            }
-            signInButton.isHidden = false
-        }
     }
     func loadAllData() {
         switch mode {
@@ -242,7 +243,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         }
         // Hide the navigation bar on the this view controller
         self.navigationController?.toolbar.isHidden = true
-        if Auth.auth().currentUser != nil {
+        if !Auth.auth().currentUser!.isAnonymous {
             self.submittedNum.text = String(submittedCount)
             self.disputesNum.text = String(disputeCount)
             self.verifiedNum.text = String(verifiedCount)

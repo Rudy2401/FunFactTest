@@ -8,7 +8,7 @@
 
 import UIKit
 import Firebase
-import FirebaseAuth
+//import FirebaseAuth
 import FirebaseFirestore
 import IQKeyboardManagerSwift
 
@@ -73,7 +73,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         // Dispose of any resources that can be recreated.
     }
     @IBAction func login(sender: UIButton) {
-        
+        let currentUser = Auth.auth().currentUser
         // Validate the input
         guard let emailAddress = emailTextField.text, emailAddress != "",
             let password = passwordTextField.text, password != "" else {
@@ -114,6 +114,13 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
                     self.present(alertController, animated: true, completion: nil)
                     
                     return
+            }
+            if currentUser!.isAnonymous {
+                currentUser?.delete(completion: { (error) in
+                    if let error = error {
+                        print ("Error removing user \(error.localizedDescription)")
+                    }
+                })
             }
             let db = Firestore.firestore()
             db.collection("users")

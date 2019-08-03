@@ -256,13 +256,17 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
                 secondaryText = searchLandmarks[indexPath.row].addressHighlighted!
                 image = searchLandmarks[indexPath.row].image!
                 cell.landmarkID = searchLandmarks[indexPath.row].landmarkID!
-                cell.searchImageView.image = setupImage(image: image)
+                setupImage(image: image, completion: { (resultImage) in
+                    cell.searchImageView.image = resultImage
+                })
             }
             if hashtagButton.isSelected {
                 searchText = "#\(searchHashtags[indexPath.row].nameHighlighted!)"
                 secondaryText = "\(searchHashtags[indexPath.row].count ?? 0) facts"
                 image = searchHashtags[indexPath.row].image!
-                cell.searchImageView.image = setupImage(image: image)
+                setupImage(image: image, completion: { (resultImage) in
+                    cell.searchImageView.image = resultImage
+                })
             }
             if userButton.isSelected {
                 searchText = searchUsers[indexPath.row].userNameHighlighted!
@@ -270,16 +274,15 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
                 photoURL = searchUsers[indexPath.row].photoURL!
                 let url = URL(string: photoURL) ?? URL(string: "")
                 cell.userID = searchUsers[indexPath.row].userID!
-                cell.searchImageView?.sd_setImage(with: url!,
+                cell.searchImageView?.sd_setImage(with: url,
                                                placeholderImage: UIImage(),
                                                options: SDWebImageOptions(rawValue: 0),
                                                completed: { (image, error, cacheType, imageURL) in
                                                 if error != nil {
-                                                    cell.searchImageView.image = UIImage
-                                                        .fontAwesomeIcon(name: .user,
-                                                                         style: .solid,
-                                                                         textColor: .darkGray,
-                                                                         size: CGSize(width: 100, height: 100))
+                                                    cell.searchImageView.image = UIImage.fontAwesomeIcon(name: .user,
+                                                                                                         style: .solid,
+                                                                                                         textColor: .darkGray,
+                                                                                                         size: CGSize(width: 100, height: 100))
                                                 }
                 })
             }
@@ -297,13 +300,13 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
         if self.hashtagButton.isSelected {
             let cell = tableView.cellForRow(at: indexPath) as! SearchCellTableViewCell
             let hashtag = "\(cell.primaryText.text?.components(separatedBy: "#").last ?? "")"
-            firestore.getFunFacts(for: hashtag) { (refs, error) in
+            firestore.getFunFacts(for: hashtag) { (funFacts, error) in
                 if let error = error {
                     print ("Error getting hashtag funfacts \(error)")
                 } else {
                     let funFactsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                     funFactsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
-                    funFactsVC.refs = refs
+                    funFactsVC.funFacts = funFacts ?? []
                     funFactsVC.sender = .hashtags
                     funFactsVC.hashtagName = cell.primaryText.text!
                     self.navigationController?.pushViewController(funFactsVC, animated: true)
@@ -368,23 +371,22 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
         tableView.reloadData()
     }
     
-    func setupImage(image: String) -> UIImage {
+    func setupImage(image: String, completion: @escaping (UIImage) -> ()) {
         let landmarkImage = UIImageView()
         
         let imageName = image + ".jpeg"
-        let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
-        if imageFromCache != nil {
-            print("******In cache")
-            landmarkImage.image = imageFromCache
-            landmarkImage.layer.cornerRadius = 5
-        } else {
-            let storage = Storage.storage()
-            let storageRef = storage.reference()
-            let gsReference = storageRef.child("images/\(imageName)")
-            landmarkImage.sd_setImage(with: gsReference, placeholderImage: UIImage())
-            landmarkImage.layer.cornerRadius = 5
+        let storage = Storage.storage()
+        let storageRef = storage.reference()
+        let gsReference = storageRef.child("images/\(imageName)")
+        gsReference.downloadURL { url, error in
+            if let error = error {
+                print ("Error setting url \(error)")
+            } else {
+                landmarkImage.sd_setImage(with: url, placeholderImage: UIImage())
+                landmarkImage.layer.cornerRadius = 5
+                completion(landmarkImage.image!)
+            }
         }
-        return landmarkImage.image!
     }
 }
 extension SearchViewController: UISearchResultsUpdating {

@@ -71,8 +71,6 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         back.setAttributedTitle(completebackLabelClicked, for: .highlighted)
         back.setAttributedTitle(completebackLabelClicked, for: .selected)
         back.titleLabel?.textAlignment = .center
-        let backBtn = UIBarButtonItem(customView: back)
-//        navigationItem.leftBarButtonItem = backBtn
         navigationItem.backBarButtonItem?.title = ""
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -95,39 +93,49 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         if validatePage() {
             return
         }
-        let db = Firestore.firestore()
+        let alertController = UIAlertController(title: "Dispute",
+                                                message: "Are you sure you want to dispute this fact?",
+                                                preferredStyle: .alert)
         
-        let date = Timestamp(date: Date())
-        let did = db.collection("disputes").document().documentID
-        firestore.addDispute(for: did,
-                             funFactID: funFactID,
-                             reason: reason,
-                             description: notesText.text,
-                             user: Auth.auth().currentUser?.uid ?? "",
-                             date: date,
-                             completion: { (error) in
-                                if let error = error {
-                                    print ("Error adding dispute \(error)")
-                                    let alert = Utils.showAlert(status: .failure, message: ErrorMessages.disputeError)
-                                    self.present(alert, animated: true) {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-                                            guard self?.presentedViewController == alert else { return }
-                                            self?.dismiss(animated: true, completion: nil)
+        let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
+            let db = Firestore.firestore()
+            let date = Timestamp(date: Date())
+            let did = db.collection("disputes").document().documentID
+            self.firestore.addDispute(for: did,
+                                      funFactID: self.funFactID,
+                                      reason: self.reason,
+                                      description: self.notesText.text,
+                                      user: Auth.auth().currentUser?.uid ?? "",
+                                      date: date,
+                                      completion: { (error) in
+                                        if let error = error {
+                                            print ("Error adding dispute \(error)")
+                                            let alert = Utils.showAlert(status: .failure, message: ErrorMessages.disputeError)
+                                            self.present(alert, animated: true) {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                                    guard self?.presentedViewController == alert else { return }
+                                                    self?.dismiss(animated: true, completion: nil)
+                                                }
+                                            }
+                                        } else {
+                                            let alert = Utils.showAlert(status: .success, message: ErrorMessages.disputeSuccess)
+                                            self.present(alert, animated: true) {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+                                                    guard self?.presentedViewController == alert else { return }
+                                                    self?.dismiss(animated: true, completion: nil)
+                                                    self?.navigationController?.popToRootViewController(animated: true)
+                                                }
+                                            }
                                         }
-                                    }
-                                } else {
-                                    let alert = Utils.showAlert(status: .success, message: ErrorMessages.disputeSuccess)
-                                    self.present(alert, animated: true) {
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-                                            guard self?.presentedViewController == alert else { return }
-                                            self?.dismiss(animated: true, completion: nil)
-                                        }
-                                    }
-                                }
-                            })
-        
-        firestore.updateDisputeFlag(funFactID: funFactID)
-        firestore.addUserDisputes(disputeID: did, userID: Auth.auth().currentUser?.uid ?? "")
+            })
+            
+            self.firestore.updateDisputeFlag(funFactID: self.funFactID)
+            self.firestore.addUserDisputes(funFactID: self.funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+        })
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(okayAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
     }
     
     @objc func dismissAlert() {

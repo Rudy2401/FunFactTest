@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -34,8 +34,10 @@
 		D86BA16A22468E0A00026454 /* InterestTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86BA16922468E0A00026454 /* InterestTableViewCell.swift */; };
 		D86DA75D21741BA6001F7B5C /* FunFactsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */; };
 		D86DA75F217424A8001F7B5C /* UserSubsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86DA75E217424A8001F7B5C /* UserSubsCell.swift */; };
+		D87E316922B823BF00FD7639 /* GoogleUtilities.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D87E316822B823BF00FD7639 /* GoogleUtilities.framework */; };
 		D87ED7BA2151BF3D00B14B5F /* firebase.json in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7B92151BF3C00B14B5F /* firebase.json */; };
 		D87ED7BC2151BF5400B14B5F /* functions in Resources */ = {isa = PBXBuildFile; fileRef = D87ED7BB2151BF5400B14B5F /* functions */; };
+		D8859BF722C05C2A00B2A238 /* FunFactTestUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8859BF622C05C2A00B2A238 /* FunFactTestUnitTests.swift */; };
 		D88DBE7F212EFC48009A2CC2 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE7E212EFC48009A2CC2 /* Constants.swift */; };
 		D88DBE81212F3727009A2CC2 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE80212F3727009A2CC2 /* CacheManager.swift */; };
 		D88DBE84212F68F9009A2CC2 /* FancyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88DBE83212F68F9009A2CC2 /* FancyButton.swift */; };
@@ -115,6 +117,13 @@
 			remoteGlobalIDString = D8FE7F7E20DB2712007B4550;
 			remoteInfo = FunFactTest;
 		};
+		D8859BF922C05C2A00B2A238 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D8FE7F7720DB2712007B4550 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D8FE7F7E20DB2712007B4550;
+			remoteInfo = FunFactTest;
+		};
 		D8B3104321E58B2E00E85148 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */;
@@ -139,7 +148,7 @@
 		D80B8C54225EA809003ACCA0 /* LeaderboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewController.swift; sourceTree = "<group>"; };
 		D80B8C56225EAADD003ACCA0 /* LeaderboardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardTableViewCell.swift; sourceTree = "<group>"; };
 		D80B8C602264D005003ACCA0 /* FunFactTestUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunFactTestUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D80B8C622264D006003ACCA0 /* FunFactTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactTestUITests.swift; sourceTree = "<group>"; };
+		D80B8C622264D006003ACCA0 /* FunFactTestUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactTestUITests.swift; sourceTree = "<group>"; wrapsLines = 1; };
 		D80B8C642264D006003ACCA0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D80F6C9F2163140A00AF2E8D /* FontAwesome_swift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = FontAwesome_swift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = BoltsSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -165,8 +174,12 @@
 		D86BA16922468E0A00026454 /* InterestTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterestTableViewCell.swift; sourceTree = "<group>"; };
 		D86DA75C21741BA6001F7B5C /* FunFactsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactsTableViewController.swift; sourceTree = "<group>"; };
 		D86DA75E217424A8001F7B5C /* UserSubsCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSubsCell.swift; sourceTree = "<group>"; };
+		D87E316822B823BF00FD7639 /* GoogleUtilities.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = GoogleUtilities.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D87ED7B92151BF3C00B14B5F /* firebase.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = firebase.json; sourceTree = "<group>"; };
 		D87ED7BB2151BF5400B14B5F /* functions */ = {isa = PBXFileReference; lastKnownFileType = folder; path = functions; sourceTree = "<group>"; };
+		D8859BF422C05C2A00B2A238 /* FunFactTestUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FunFactTestUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D8859BF622C05C2A00B2A238 /* FunFactTestUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunFactTestUnitTests.swift; sourceTree = "<group>"; };
+		D8859BF822C05C2A00B2A238 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D88DBE7E212EFC48009A2CC2 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		D88DBE80212F3727009A2CC2 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		D88DBE82212F594F009A2CC2 /* FunFactTest.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FunFactTest.entitlements; sourceTree = "<group>"; };
@@ -250,10 +263,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D8859BF122C05C2A00B2A238 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D8FE7F7C20DB2712007B4550 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D87E316922B823BF00FD7639 /* GoogleUtilities.framework in Frameworks */,
 				D8650461216BED5F00B65AAB /* IQKeyboardManagerSwift.framework in Frameworks */,
 				D8E78FF5214310E5006F03B9 /* MapKitGoogleStyler.framework in Frameworks */,
 				D8F76AF72112812400A039D2 /* FirebaseCore.framework in Frameworks */,
@@ -277,6 +298,7 @@
 		D569FB58055CD1C61272A23D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				D87E316822B823BF00FD7639 /* GoogleUtilities.framework */,
 				D8B3103D21E58B2E00E85148 /* GeoFire.xcodeproj */,
 				D8650460216BED5F00B65AAB /* IQKeyboardManagerSwift.framework */,
 				D80F6CA321631ABA00AF2E8D /* BoltsSwift.framework */,
@@ -308,6 +330,15 @@
 				D8948538222EFDC000C215D5 /* GeoFirestoreManager.swift */,
 			);
 			path = Managers;
+			sourceTree = "<group>";
+		};
+		D8859BF522C05C2A00B2A238 /* FunFactTestUnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				D8859BF622C05C2A00B2A238 /* FunFactTestUnitTests.swift */,
+				D8859BF822C05C2A00B2A238 /* Info.plist */,
+			);
+			path = FunFactTestUnitTests;
 			sourceTree = "<group>";
 		};
 		D88DBE7D212EFC0B009A2CC2 /* Resources */ = {
@@ -439,6 +470,7 @@
 				D8A2AE4D21960132003C4EB1 /* FontAwesome */,
 				D8FE7F8120DB2712007B4550 /* FunFactTest */,
 				D80B8C612264D005003ACCA0 /* FunFactTestUITests */,
+				D8859BF522C05C2A00B2A238 /* FunFactTestUnitTests */,
 				D8FE7F8020DB2712007B4550 /* Products */,
 				270B60A5492612E273CC8201 /* Pods */,
 				D569FB58055CD1C61272A23D /* Frameworks */,
@@ -450,6 +482,7 @@
 			children = (
 				D8FE7F7F20DB2712007B4550 /* FunFactTest.app */,
 				D80B8C602264D005003ACCA0 /* FunFactTestUITests.xctest */,
+				D8859BF422C05C2A00B2A238 /* FunFactTestUnitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -497,6 +530,24 @@
 			productReference = D80B8C602264D005003ACCA0 /* FunFactTestUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		D8859BF322C05C2A00B2A238 /* FunFactTestUnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D8859BFD22C05C2A00B2A238 /* Build configuration list for PBXNativeTarget "FunFactTestUnitTests" */;
+			buildPhases = (
+				D8859BF022C05C2A00B2A238 /* Sources */,
+				D8859BF122C05C2A00B2A238 /* Frameworks */,
+				D8859BF222C05C2A00B2A238 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D8859BFA22C05C2A00B2A238 /* PBXTargetDependency */,
+			);
+			name = FunFactTestUnitTests;
+			productName = FunFactTestUnitTests;
+			productReference = D8859BF422C05C2A00B2A238 /* FunFactTestUnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		D8FE7F7E20DB2712007B4550 /* FunFactTest */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D8FE7F9120DB2716007B4550 /* Build configuration list for PBXNativeTarget "FunFactTest" */;
@@ -535,6 +586,10 @@
 						CreatedOnToolsVersion = 10.2;
 						TestTargetID = D8FE7F7E20DB2712007B4550;
 					};
+					D8859BF322C05C2A00B2A238 = {
+						CreatedOnToolsVersion = 10.2.1;
+						TestTargetID = D8FE7F7E20DB2712007B4550;
+					};
 					D8FE7F7E20DB2712007B4550 = {
 						CreatedOnToolsVersion = 9.4.1;
 						LastSwiftMigration = 1020;
@@ -570,6 +625,7 @@
 			targets = (
 				D8FE7F7E20DB2712007B4550 /* FunFactTest */,
 				D80B8C5F2264D005003ACCA0 /* FunFactTestUITests */,
+				D8859BF322C05C2A00B2A238 /* FunFactTestUnitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -593,6 +649,13 @@
 
 /* Begin PBXResourcesBuildPhase section */
 		D80B8C5E2264D005003ACCA0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D8859BF222C05C2A00B2A238 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -636,31 +699,16 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseAnonymousAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseFacebookAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseGoogleAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebasePhoneAuthUI.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/FirebaseUI/FirebaseTwitterAuthUI.bundle",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-				"${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework/TwitterKitResources.bundle",
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseAnonymousAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseFacebookAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseGoogleAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebasePhoneAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FirebaseTwitterAuthUI.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/TwitterKitResources.bundle",
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		49249414AD3E55BE8BFD2B91 /* [CP] Check Pods Manifest.lock */ = {
@@ -686,75 +734,16 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
-				"${BUILT_PRODUCTS_DIR}/Bolts-Swift/BoltsSwift.framework",
-				"${BUILT_PRODUCTS_DIR}/BoringSSL/openssl.framework",
-				"${BUILT_PRODUCTS_DIR}/CropViewController/CropViewController.framework",
-				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
-				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
-				"${BUILT_PRODUCTS_DIR}/FBSDKShareKit/FBSDKShareKit.framework",
-				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
-				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
-				"${BUILT_PRODUCTS_DIR}/FacebookShare/FacebookShare.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMOAuth2/GTMOAuth2.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleUtilities/GoogleUtilities.framework",
-				"${BUILT_PRODUCTS_DIR}/IQKeyboardManagerSwift/IQKeyboardManagerSwift.framework",
-				"${BUILT_PRODUCTS_DIR}/InstantSearch/InstantSearch.framework",
-				"${BUILT_PRODUCTS_DIR}/InstantSearchClient/InstantSearchClient.framework",
-				"${BUILT_PRODUCTS_DIR}/InstantSearchCore/InstantSearchCore.framework",
-				"${BUILT_PRODUCTS_DIR}/MapKitGoogleStyler/MapKitGoogleStyler.framework",
-				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
-				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
-				"${PODS_ROOT}/TwitterCore/iOS/TwitterCore.framework",
-				"${PODS_ROOT}/TwitterKit/iOS/TwitterKit.framework",
-				"${BUILT_PRODUCTS_DIR}/gRPC/GRPCClient.framework",
-				"${BUILT_PRODUCTS_DIR}/gRPC-C++/grpcpp.framework",
-				"${BUILT_PRODUCTS_DIR}/gRPC-Core/grpc.framework",
-				"${BUILT_PRODUCTS_DIR}/gRPC-ProtoRPC/ProtoRPC.framework",
-				"${BUILT_PRODUCTS_DIR}/gRPC-RxLibrary/RxLibrary.framework",
-				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
-				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BoltsSwift.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/openssl.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CropViewController.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKShareKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookShare.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMOAuth2.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IQKeyboardManagerSwift.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/InstantSearch.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/InstantSearchClient.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/InstantSearchCore.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MapKitGoogleStyler.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TwitterCore.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TwitterKit.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GRPCClient.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpcpp.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/grpc.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ProtoRPC.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxLibrary.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		D800724A2208DBF300A20084 /* ShellScript */ = {
@@ -778,6 +767,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				D80B8C632264D006003ACCA0 /* FunFactTestUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D8859BF022C05C2A00B2A238 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D8859BF722C05C2A00B2A238 /* FunFactTestUnitTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -866,6 +863,11 @@
 			target = D8FE7F7E20DB2712007B4550 /* FunFactTest */;
 			targetProxy = D80B8C652264D006003ACCA0 /* PBXContainerItemProxy */;
 		};
+		D8859BFA22C05C2A00B2A238 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D8FE7F7E20DB2712007B4550 /* FunFactTest */;
+			targetProxy = D8859BF922C05C2A00B2A238 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -928,6 +930,51 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = FunFactTest;
+			};
+			name = Release;
+		};
+		D8859BFB22C05C2A00B2A238 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XQECAX5M82;
+				INFOPLIST_FILE = FunFactTestUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "-.FunFactTestUnitTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FunFactTest.app/FunFactTest";
+			};
+			name = Debug;
+		};
+		D8859BFC22C05C2A00B2A238 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = XQECAX5M82;
+				INFOPLIST_FILE = FunFactTestUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "-.FunFactTestUnitTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FunFactTest.app/FunFactTest";
 			};
 			name = Release;
 		};
@@ -1099,6 +1146,15 @@
 			buildConfigurations = (
 				D80B8C682264D006003ACCA0 /* Debug */,
 				D80B8C692264D006003ACCA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D8859BFD22C05C2A00B2A238 /* Build configuration list for PBXNativeTarget "FunFactTestUnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D8859BFB22C05C2A00B2A238 /* Debug */,
+				D8859BFC22C05C2A00B2A238 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -83,6 +83,11 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         
         if funFact.verificationFlag == "N" {
             setupVerificationPage()
+        } else if funFact.verificationFlag == "R" {
+            setupDisputeRejectedPage()
+        }
+        if funFact.disputeFlag == "Y" {
+            setupDisputeRejectedPage()
         }
         if (self.navigationController?.presentingViewController as? FunFactPageViewController) != nil {
             let addFactGesture = UITapGestureRecognizer(target: self, action: #selector(viewAddFactForLandmark))
@@ -95,7 +100,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     
     @IBAction func likeIt(_ sender: Any) {
-        if Auth.auth().currentUser == nil {
+        if Auth.auth().currentUser!.isAnonymous {
             let alert = UIAlertController(title: "Error",
                                           message: "Please sign in to like/dislike a fact.",
                                           preferredStyle: .alert)
@@ -133,7 +138,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     
     @IBAction func dislikeIt(_ sender: Any) {
-        if Auth.auth().currentUser == nil {
+        if Auth.auth().currentUser!.isAnonymous {
             let alert = UIAlertController(title: "Error",
                                           message: "Please sign in to like/dislike a fact.",
                                           preferredStyle: .alert)
@@ -296,14 +301,14 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
         dislikeCount.text = "\(funFact.dislikes)" + " dislikes"
         for id in (AppDataSingleton.appDataSharedInstance.userProfile.funFactsLiked) {
-            if id.documentID == funFact.id {
+            if id.id == funFact.id {
                 likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
                 likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
                 likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
             }
         }
         for id in (AppDataSingleton.appDataSharedInstance.userProfile.funFactsDisliked) {
-            if id.documentID == funFact.id {
+            if id.id == funFact.id {
                 dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
                 dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
                 dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
@@ -387,8 +392,43 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             let storage = Storage.storage()
             let storageRef = storage.reference()
             let gsReference = storageRef.child("images/\(imageName)")
-            self.landmarkImage.sd_setImage(with: gsReference, placeholderImage: UIImage())
+            gsReference.downloadURL { (url, error) in
+                if let error = error {
+                    print ("Error getting URL \(error)")
+                } else {
+                    self.landmarkImage.sd_setImage(with: url, placeholderImage: UIImage())
+                }
+            }
         }
+    }
+    
+    func setupDisputeRejectedPage() {
+        let rejView = UIView(frame: UIScreen.main.bounds)
+        var displayString = ""
+        rejView.tag = 101
+        rejView.backgroundColor = UIColor(white: 0.9, alpha: 0.95)
+        
+        if funFact.verificationFlag == "R" {
+            displayString = "This fact has been rejected by the community, it will be deleted after final review."
+        }
+        if funFact.disputeFlag == "Y" {
+            displayString = "This fact is under dispute, awaiting final review by our team."
+        }
+        
+        let rejTextLabel = UILabel()
+        rejTextLabel.numberOfLines = 0
+        rejTextLabel.textAlignment = NSTextAlignment.center
+        let rejText = NSAttributedString(string: displayString, attributes: Attributes.attribute16DemiBlackAve)
+        rejTextLabel.attributedText = rejText
+        
+        rejView.addSubview(rejTextLabel)
+        self.view.addSubview(rejView)
+        UIApplication.shared.keyWindow!.bringSubviewToFront(rejView)
+        
+        rejTextLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([rejTextLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
+                                     rejTextLabel.leftAnchor.constraint(equalTo: rejView.leftAnchor, constant: 10.0),
+                                     rejTextLabel.rightAnchor.constraint(equalTo: rejView.rightAnchor, constant: -10.0)])
     }
     
     func setupVerificationPage() {
@@ -454,7 +494,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         stack.translatesAutoresizingMaskIntoConstraints = false
         rejectButton.translatesAutoresizingMaskIntoConstraints = false
         approveButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([verifTextLabel.centerYAnchor.constraint(equalTo: verifView.centerYAnchor),
+        NSLayoutConstraint.activate([verifTextLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
                                      verifTextLabel.leftAnchor.constraint(equalTo: verifView.leftAnchor, constant: 10.0),
                                      verifTextLabel.rightAnchor.constraint(equalTo: verifView.rightAnchor, constant: -10.0),
                                      verifButton.heightAnchor.constraint(equalToConstant: 50.0),
@@ -475,7 +515,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     /// Verify Action - Updates the approval count and user
     @objc func approveAction(_ sender: UIButton) {
-        if Auth.auth().currentUser == nil {
+        if Auth.auth().currentUser!.isAnonymous {
             let alert = UIAlertController(title: "Error",
                                           message: "Please sign in to verify a fact.",
                                           preferredStyle: .alert)
@@ -526,6 +566,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                             message = "Verification successful! We need \(3 - apprCount) more approvers to publish this fact on the app."
                         case 3:
                             message = "Great news! This fact has been verified."
+                            self.navigationController?.popViewController(animated: true)
                         default:
                             message = "Verification successful! We need \(3 - apprCount) more approvers to publish this fact on the app."
                         }
@@ -566,7 +607,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     /// Reject Action - Updates the rejection count and user
     @objc func rejectAction(_ sender: UIButton) {
-        if Auth.auth().currentUser == nil {
+        if Auth.auth().currentUser!.isAnonymous {
             let alert = UIAlertController(title: "Error",
                                           message: "Please sign in to reject a fact.",
                                           preferredStyle: .alert)
@@ -599,7 +640,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         popup.dismiss(animated: true)
     }
     @objc func disputeTapAction(sender : UITapGestureRecognizer) {
-        if Auth.auth().currentUser == nil {
+        if Auth.auth().currentUser!.isAnonymous {
             let alert = UIAlertController(title: "Error",
                                           message: "Please sign in to dispute a fact.",
                                           preferredStyle: .alert)
@@ -630,13 +671,13 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                 funFactDescriptionTextView.halfTextColorChange(fullText: funFactDescriptionTextView.text, changeText: tappedWord!)
                 for tag in funFact.tags {
                     if tappedWord == tag {
-                        firestore.getFunFacts(for: tappedWord!) { (refs, error) in
+                        firestore.getFunFacts(for: tappedWord!) { (funFacts, error) in
                             if let error = error {
                                 print ("Error getting hashtag funfacts \(error)")
                             } else {
                                 let funFactsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                                 funFactsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
-                                funFactsVC.refs = refs
+                                funFactsVC.funFacts = funFacts ?? []
                                 funFactsVC.sender = .hashtags
                                 funFactsVC.hashtagName = "#\(tappedWord!)"
                                 self.navigationController?.pushViewController(funFactsVC, animated: true)

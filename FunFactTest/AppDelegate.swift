@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         // Configure Facebook Sign in
-        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        ApplicationDelegate.shared.application(application, didFinishLaunchingWithOptions: launchOptions)
         // Configure Google Sign in
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         
@@ -123,9 +123,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         var handled = false
         print ("Received url through custom URL scheme \(url.absoluteString)")
-        handled =  handleURL(url)
-        if url.absoluteString.contains("fb") {
-            handled = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, options: options)
+        if url.absoluteString.contains("funfactsproject") {
+            handled =  handleURL(url)
+        }
+        else if url.absoluteString.contains("fb") {
+            handled = ApplicationDelegate.shared.application(app, open: url, options: options)
             
         } else if url.absoluteString.contains("google") {
             handled = GIDSignIn.sharedInstance().handle(url, sourceApplication: options[UIApplication.OpenURLOptionsKey.sourceApplication] as? String, annotation: [:])

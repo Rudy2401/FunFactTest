@@ -99,6 +99,11 @@ enum Fonts {
     static let mainTextBoldFont = "Charter-Bold"
 }
 
+enum Deleted {
+    case yes
+    case no
+}
+
 enum ErrorMessages {
     static let funFactUploadError = "Error while uploading fun fact. Please try again later."
     static let funFactUploadSuccess = "Fun fact uploaded succesfully!"
@@ -116,6 +121,7 @@ enum ErrorMessages {
     static let settingsSuccess = "Settings updated successfully!"
     static let deleteSuccess = "Fun Fact deleted successfully!"
     static let deleteError = "Error while deleting Fun Fact. Please try again later."
+    static let descriptionLengthError = "Description length > 400 chars. Length should be < 400."
 }
 
 enum SettingsUserDefaults {
@@ -263,6 +269,7 @@ struct Constants {
                                   "Inflammatory/Derogatory content",
                                   "Landmark Name does not match the fact",
                                   "Fact has too many grammatical errors/spelling mistakes",
+                                  "Copyright violation",
                                   "Other"]
     
     static let disputeReason = ["--- Select a reason ---",
@@ -270,6 +277,7 @@ struct Constants {
                                 "Fact belongs to another landmark",
                                 "Inflammatory/Derogatory content",
                                 "Source website content is inaccurate",
+                                "Copyright violation",
                                 "Other"]
     
     static func getMarkerDetails(type: String, width: Double, height: Double) -> AnnotationType {

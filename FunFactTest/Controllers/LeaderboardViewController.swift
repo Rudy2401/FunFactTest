@@ -55,7 +55,7 @@ class LeaderboardViewController: UIViewController, UITableViewDelegate, UITableV
         cell.countLabel.text = "\(leaders[indexPath.row].count)"
         let url = URL(string: leaders[indexPath.row].photoURL) ?? URL(string: "")
 
-        cell.userImageView.sd_setImage(with: url!,
+        cell.userImageView.sd_setImage(with: url,
                                        placeholderImage: UIImage(),
                                        options: SDWebImageOptions(rawValue: 0),
                                        completed: { (image, error, cacheType, imageURL) in
