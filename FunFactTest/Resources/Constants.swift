@@ -150,6 +150,11 @@ enum LeaderType {
     case worldwide
 }
 
+enum Sender {
+    case table
+    case regular
+}
+
 enum Attributes {
     static let attribute12RegDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
                                     NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!]

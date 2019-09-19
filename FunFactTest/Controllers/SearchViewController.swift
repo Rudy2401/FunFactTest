@@ -306,7 +306,6 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
                 } else {
                     let funFactsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                     funFactsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
-                    funFactsVC.funFacts = funFacts ?? []
                     funFactsVC.sender = .hashtags
                     funFactsVC.hashtagName = cell.primaryText.text!
                     self.navigationController?.pushViewController(funFactsVC, animated: true)
@@ -373,18 +372,23 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
     
     func setupImage(image: String, completion: @escaping (UIImage) -> ()) {
         let landmarkImage = UIImageView()
-        
         let imageName = image + ".jpeg"
-        let storage = Storage.storage()
-        let storageRef = storage.reference()
-        let gsReference = storageRef.child("images/\(imageName)")
-        gsReference.downloadURL { url, error in
-            if let error = error {
-                print ("Error setting url \(error)")
-            } else {
-                landmarkImage.sd_setImage(with: url, placeholderImage: UIImage())
-                landmarkImage.layer.cornerRadius = 5
-                completion(landmarkImage.image!)
+        let imageFromCache = CacheManager.shared.getFromCache(key: imageName) as? UIImage
+        if imageFromCache != nil {
+            print("******In cache")
+            landmarkImage.image = imageFromCache
+        } else {
+            let storage = Storage.storage()
+            let storageRef = storage.reference()
+            let gsReference = storageRef.child("images/\(imageName)")
+            gsReference.downloadURL { url, error in
+                if let error = error {
+                    print ("Error setting url \(error)")
+                } else {
+                    landmarkImage.sd_setImage(with: url, placeholderImage: UIImage())
+                    landmarkImage.layer.cornerRadius = 5
+                    completion(landmarkImage.image!)
+                }
             }
         }
     }

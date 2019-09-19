@@ -28,10 +28,10 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
     var mode = ProfileMode.currentUser
     var factsSubmitted = 0
     var disputesSubmitted = 0
-    var funFactsSubmitted = [FunFact]()
-    var funFactsDisputed = [FunFact]()
-    var funFactsVerified = [FunFact]()
-    var funFactsRejected = [FunFact]()
+    var funFactsSubmitted = [FunFactMini]()
+    var funFactsDisputed = [FunFactMini]()
+    var funFactsVerified = [FunFactMini]()
+    var funFactsRejected = [FunFactMini]()
     var submittedCount = 0
     var disputeCount = 0
     var verifiedCount = 0
@@ -188,6 +188,9 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
                 view.isHidden = false
             }
             signInButton.isHidden = true
+            if mode == .otherUser {
+                signOutButton.isHidden = true
+            }
         } else {
             for view in scrollView.subviews {
                 view.isHidden = true
@@ -320,7 +323,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
                 } else {
                     let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                     userSubsVC.userProfile = userProfile
-                    userSubsVC.funFacts = self.funFactsSubmitted
                     userSubsVC.sender = .submissions
                     self.navigationController?.pushViewController(userSubsVC, animated: true)
                 }
@@ -328,7 +330,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         } else {
             let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
             userSubsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
-            userSubsVC.funFacts = self.funFactsSubmitted
             userSubsVC.sender = .submissions
             self.navigationController?.pushViewController(userSubsVC, animated: true)
         }
@@ -341,7 +342,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
                 } else {
                     let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                     userSubsVC.userProfile = userProfile
-                    userSubsVC.funFacts = self.funFactsSubmitted
                     userSubsVC.sender = .disputes
                     self.navigationController?.pushViewController(userSubsVC, animated: true)
                 }
@@ -349,7 +349,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         } else {
             let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
             userSubsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
-            userSubsVC.funFacts = self.funFactsSubmitted
             userSubsVC.sender = .disputes
             self.navigationController?.pushViewController(userSubsVC, animated: true)
         }
@@ -362,7 +361,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
                 } else {
                     let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                     userSubsVC.userProfile = userProfile
-                    userSubsVC.funFacts = self.funFactsSubmitted
                     userSubsVC.sender = .verifications
                     self.navigationController?.pushViewController(userSubsVC, animated: true)
                 }
@@ -370,7 +368,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         } else {
             let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
             userSubsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
-            userSubsVC.funFacts = self.funFactsSubmitted
             userSubsVC.sender = .verifications
             self.navigationController?.pushViewController(userSubsVC, animated: true)
         }
@@ -383,7 +380,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
                 } else {
                     let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                     userSubsVC.userProfile = userProfile
-                    userSubsVC.funFacts = self.funFactsSubmitted
                     userSubsVC.sender = .rejections
                     self.navigationController?.pushViewController(userSubsVC, animated: true)
                 }
@@ -391,7 +387,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         } else {
             let userSubsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
             userSubsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
-            userSubsVC.funFacts = self.funFactsSubmitted
             userSubsVC.sender = .rejections
             self.navigationController?.pushViewController(userSubsVC, animated: true)
         }

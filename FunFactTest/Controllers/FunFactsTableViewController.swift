@@ -12,16 +12,55 @@ import FirebaseStorage
 
 class FunFactsTableViewController: UITableViewController, FirestoreManagerDelegate {
     var userProfile: UserProfile?
-    var funFacts = [FunFact]()
     var sender = ListOfFunFactsByType.submissions
     var firestore = FirestoreManager()
     var hashtagName = ""
     var landmarkName = ""
+    let collection = [ListOfFunFactsByType.submissions: "funFactsSubmitted",
+                      ListOfFunFactsByType.verifications: "funFactsVerified",
+                      ListOfFunFactsByType.disputes: "funFactsDisputed",
+                      ListOfFunFactsByType.rejections: "funFactsRejected",
+                      ListOfFunFactsByType.hashtags: "funFacts"]
+    
+    private lazy var baseQuery: Query = {
+        if self.sender == ListOfFunFactsByType.hashtags {
+            return Firestore.firestore()
+                .collection("hashtags")
+                .document(self.hashtagName.components(separatedBy: "#").last!)
+                .collection(collection[self.sender]!)
+                .order(by: "landmarkName")
+                .limit(to: 10)
+        } else {
+            return Firestore.firestore()
+                .collection("users")
+                .document(self.userProfile!.uid)
+                .collection(collection[self.sender]!)
+                .order(by: "landmarkName")
+                .limit(to: 10)
+        }
+    }()
+    lazy private var dataSource: FunFactsTableViewDataSource = {
+        return dataSourceForQuery(baseQuery)
+    }()
+    fileprivate var query: Query? {
+        didSet {
+            tableView.dataSource = nil
+            if let query = query {
+                dataSource = dataSourceForQuery(query)
+                tableView.dataSource = dataSource
+                dataSource.fetchNext() // Add this line
+            }
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        query = baseQuery
         tableView.delegate = self
-        tableView.dataSource = self
+        tableView.dataSource = dataSource
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.tableView.reloadData()
+        }
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -31,93 +70,30 @@ class FunFactsTableViewController: UITableViewController, FirestoreManagerDelega
         super.viewWillDisappear(animated)
         navigationController?.navigationBar.prefersLargeTitles = false
     }
+    private func dataSourceForQuery(_ query: Query) -> FunFactsTableViewDataSource {
+        return FunFactsTableViewDataSource(query: query) {
+            self.tableView.reloadData()
+        }
+    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         switch sender {
         case .submissions:
             navigationItem.title = "User Submissions"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsSubmitted") { (funFacts, error) in
-                if let error = error {
-                    print ("Error getting user data \(error)")
-                } else {
-                    self.funFacts = funFacts ?? []
-                    self.tableView.reloadData()
-                }
-            }
         case .verifications:
             navigationItem.title = "User Verifications"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsVerified") { (funFacts, error) in
-                if let error = error {
-                    print ("Error getting user data \(error)")
-                } else {
-                    self.funFacts = funFacts ?? []
-                    self.tableView.reloadData()
-                }
-            }
         case .disputes:
             navigationItem.title = "User Disputes"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsDisputed") { (funFacts, error) in
-                if let error = error {
-                    print ("Error getting user data \(error)")
-                } else {
-                    self.funFacts = funFacts ?? []
-                    self.tableView.reloadData()
-                }
-            }
         case .rejections:
             navigationItem.title = "User Rejections"
-            firestore.downloadOtherUserData(userProfile?.uid ?? "", collection: "funFactsRejected") { (funFacts, error) in
-                if let error = error {
-                    print ("Error getting user data \(error)")
-                } else {
-                    self.funFacts = funFacts ?? []
-                    self.tableView.reloadData()
-                }
-            }
         case .hashtags:
             navigationItem.title = hashtagName
-            self.tableView.reloadData()
         case .landmarks:
             navigationItem.title = landmarkName
-            tableView.reloadData()
         }
     }
     func documentsDidUpdate() {
         
-    }
-    
-    // MARK: - Table view data source
-
-    override func numberOfSections(in tableView: UITableView) -> Int {
-        var numOfSections: Int = 0
-        if funFacts.count > 0 {
-            tableView.separatorStyle = .singleLine
-            numOfSections = 1
-            tableView.backgroundView = nil
-        } else {
-            let noDataLabel = UILabel(frame: CGRect(x: 0, y: 0, width: tableView.bounds.size.width, height: tableView.bounds.size.height))
-            noDataLabel.text = "No data available"
-            noDataLabel.textColor = UIColor.black
-            noDataLabel.textAlignment = .center
-            tableView.backgroundView = noDataLabel
-            tableView.separatorStyle = .none
-        }
-        return numOfSections
-    }
-
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return funFacts.count
-    }
-    
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! UserSubsCell
-        let index = indexPath.row as Int
-        cell.funFactDescription.text = self.funFacts[index].description
-        cell.landmarkName.text = self.funFacts[index].landmarkName
-        setupImage(index: index, completion: { (image) in
-            cell.funFactImage.image = image
-        })
-        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -129,27 +105,18 @@ class FunFactsTableViewController: UITableViewController, FirestoreManagerDelega
             let index = (sender as! NSIndexPath).row
             let contentVC = segue.destination as? ContentViewController
             
-            contentVC!.funFact = self.funFacts[index]
-            contentVC?.landmarkID = self.funFacts[index].landmarkId
+            contentVC?.sender = .table
+            contentVC?.funFactMini = dataSource.funFactMinis[index]
         }
     }
-    func setupImage(index: Int, completion: @escaping (UIImage) -> ()) {
-        let funFactImage = UIImageView()
-        let imageId = self.funFacts[index].image
-        let imageName = "\(imageId).jpeg"
-        
-        let storage = Storage.storage()
-        let storageRef = storage.reference()
-        let gsReference = storageRef.child("images/\(imageName)")
-        
-        gsReference.downloadURL { (url, error) in
-            if let error = error {
-                print ("Error getting url \(error)")
-            } else {
-                funFactImage.sd_setImage(with: url, placeholderImage: UIImage())
-                funFactImage.layer.cornerRadius = 5
-                completion(funFactImage.image!)
-            }
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Load more rows if the user is 100 points away from scrolling to the bottom.
+        let height = scrollView.frame.size.height + 100
+        let contentYoffset = scrollView.contentOffset.y
+        let distanceFromBottom = scrollView.contentSize.height - contentYoffset
+        if distanceFromBottom < height && dataSource.isFetchingUpdates == false {
+            dataSource.fetchNext()
         }
     }
 }
+

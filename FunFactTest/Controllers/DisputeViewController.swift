@@ -17,7 +17,26 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     @IBOutlet weak var notesText: UITextView!
     @IBOutlet weak var submitButton: CustomButton!
     var pickerData: [String] = [String]()
-    var funFactID: String = ""
+    var funFact = FunFact(landmarkId: "",
+                          landmarkName: "",
+                          id: "",
+                          description: "",
+                          funFactTitle: "",
+                          likes: 0,
+                          dislikes: 0,
+                          verificationFlag: "",
+                          image: "",
+                          imageCaption: "",
+                          disputeFlag: "",
+                          submittedBy: "",
+                          dateSubmitted: Timestamp(date: Date()),
+                          source: "",
+                          tags: [],
+                          approvalCount: 0,
+                          rejectionCount: 0,
+                          approvalUsers: [],
+                          rejectionUsers: [],
+                          rejectionReason: [])
     var reason = ""
     var popup = UIAlertController()
     var firestore = FirestoreManager()
@@ -51,7 +70,6 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         notesText.layer.cornerRadius = 5
         
         submitButton.layer.backgroundColor = Colors.seagreenColor.cgColor
-        print(funFactID)
         
         let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: UIColor.white,
                                         NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
@@ -102,7 +120,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
             let date = Timestamp(date: Date())
             let did = db.collection("disputes").document().documentID
             self.firestore.addDispute(for: did,
-                                      funFactID: self.funFactID,
+                                      funFactID: self.funFact.id,
                                       reason: self.reason,
                                       description: self.notesText.text,
                                       user: Auth.auth().currentUser?.uid ?? "",
@@ -129,8 +147,8 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
                                         }
             })
             
-            self.firestore.updateDisputeFlag(funFactID: self.funFactID)
-            self.firestore.addUserDisputes(funFactID: self.funFactID, userID: Auth.auth().currentUser?.uid ?? "")
+            self.firestore.updateDisputeFlag(funFactID: self.funFact.id)
+            self.firestore.addUserDisputes(funFact: self.funFact, userID: Auth.auth().currentUser?.uid ?? "")
         })
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         alertController.addAction(okayAction)

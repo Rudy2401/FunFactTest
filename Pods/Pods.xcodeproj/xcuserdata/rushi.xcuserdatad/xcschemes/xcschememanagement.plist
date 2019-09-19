@@ -54,7 +54,12 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>Firebase.xcscheme</key>
+		<key>Firebase-Auth-Core-CoreOnly-Firestore-Storage.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Firebase-a1bf481d.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>
@@ -175,6 +180,11 @@
 			<false/>
 		</dict>
 		<key>Pods-FunFactTest.xcscheme</key>
+		<dict>
+			<key>isShown</key>
+			<false/>
+		</dict>
+		<key>Pods-FunFactUnitTests.xcscheme</key>
 		<dict>
 			<key>isShown</key>
 			<false/>

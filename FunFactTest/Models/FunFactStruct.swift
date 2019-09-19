@@ -35,3 +35,9 @@ struct FunFact: Hashable  {
     var rejectionUsers: [String]
     var rejectionReason: [String]
 }
+
+struct FunFactMini {
+    var landmarkName: String
+    var id: String
+    var description: String
+}

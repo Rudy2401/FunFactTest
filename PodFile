@@ -25,3 +25,9 @@ target 'FunFactTest' do
     #pod 'WSTagsField'
     pod 'SDWebImage', '~> 5.0'
 end
+target 'FunFactUnitTests' do
+    pod 'Firebase/Core'
+    pod 'Firebase/Firestore'
+    pod 'Firebase/Auth'
+    pod 'Firebase/Storage'
+end

@@ -29,36 +29,12 @@ struct UserProfile {
     var city: String
     var country: String
     var roles: [String]
-    var funFactsDisputed: [FunFact]
-    var funFactsLiked: [FunFact]
-    var funFactsDisliked: [FunFact]
-    var funFactsSubmitted: [FunFact]
-    var funFactsVerified: [FunFact]
-    var funFactsRejected: [FunFact]
-}
-
-struct FunFactsDisputed {
-    var disputeID: DocumentReference
-}
-
-struct FunFactsLiked {
-    var funFactID: DocumentReference
-}
-
-struct FunFactsDisliked {
-    var funFactID: DocumentReference
-}
-
-struct FunFactsSubmitted {
-    var funFactID: DocumentReference
-}
-
-struct FunFactsVerified {
-    var funFactID: DocumentReference
-}
-
-struct FunFactsRejected {
-    var funFactID: DocumentReference
+    var funFactsDisputed: [FunFactMini]
+    var funFactsLiked: [FunFactMini]
+    var funFactsDisliked: [FunFactMini]
+    var funFactsSubmitted: [FunFactMini]
+    var funFactsVerified: [FunFactMini]
+    var funFactsRejected: [FunFactMini]
 }
 
 struct Leader {

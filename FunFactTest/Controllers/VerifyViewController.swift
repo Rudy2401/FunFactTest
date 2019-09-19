@@ -14,7 +14,26 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
     
     @IBOutlet weak var rejectionView: RejectionView!
     var firestore = FirestoreManager()
-    var funFactID = ""
+    var funFact = FunFact(landmarkId: "",
+                          landmarkName: "",
+                          id: "",
+                          description: "",
+                          funFactTitle: "",
+                          likes: 0,
+                          dislikes: 0,
+                          verificationFlag: "",
+                          image: "",
+                          imageCaption: "",
+                          disputeFlag: "",
+                          submittedBy: "",
+                          dateSubmitted: Timestamp(date: Date()),
+                          source: "",
+                          tags: [],
+                          approvalCount: 0,
+                          rejectionCount: 0,
+                          approvalUsers: [],
+                          rejectionUsers: [],
+                          rejectionReason: [])
     var rejectionCount = 0
     var verFlag = ""
     var popup = UIAlertController()
@@ -36,12 +55,11 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
         
         let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
             let rejCount = self.rejectionCount + 1
-            let funFactRef = self.firestore.db.collection("funFacts").document(self.funFactID)
             if rejCount == 3 {
                 self.verFlag = "R"
             }
             self.firestore.updateRejectionFlag(
-                for: self.funFactID,
+                for: self.funFact.id,
                 verFlag: self.verFlag,
                 rejCount: rejCount,
                 reason: reason,
@@ -54,8 +72,7 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
                     }
                     let alert = Utils.showAlert(status: status, message: message)
                     self.firestore.addFunFactRejectedToUser(
-                        funFactRef: funFactRef,
-                        funFactID: self.funFactID,
+                        funFact: self.funFact,
                         user: Auth.auth().currentUser?.uid ?? "") { (error) in
                             if let error = error {
                                 print ("Error updating user \(error)")

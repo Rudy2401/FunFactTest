@@ -55,6 +55,8 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     var firestore = FirestoreManager()
     var stack = UIStackView()
     var refreshControl: UIRefreshControl!
+    var sender = Sender.regular
+    var funFactMini = FunFactMini(landmarkName: "", id: "", description: "")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -118,14 +120,14 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
             dislikeHeart.setTitleColor(.darkGray, for: .normal)
-            firestore.addLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            firestore.addLikes(funFact: funFact, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
             firestore.deleteDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray)
             &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
             likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
             likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
-            firestore.addLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            firestore.addLikes(funFact: funFact, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
             
         } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Colors.seagreenColor)
             && Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
@@ -156,14 +158,14 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
             dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
-            firestore.addDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            firestore.addDislikes(funFact: funFact, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
             firestore.deleteLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray)
             &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
             dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
             dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
-            firestore.addDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
+            firestore.addDislikes(funFact: funFact, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         } else if Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: Colors.redColor)
             && Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray) {
             dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
@@ -183,14 +185,33 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setupImage()
-        populatefunFactDesc()
-        setupVerifScreen()
-        setupImageCaption()
-        setupSubmittedBy()
-        setupSource()
-        setupDisputes()
-        setupLikesAndDislikes()
+        if sender == .table {
+            firestore.downloadFunFact(for: funFactMini.id) { (funFact, error) in
+                if let error = error {
+                    print ("Error getting fun fact \(error)")
+                } else {
+                    self.funFact = funFact!
+                    self.landmarkID = funFact?.landmarkId ?? ""
+                    self.setupImage()
+                    self.populatefunFactDesc()
+                    self.setupVerifScreen()
+                    self.setupImageCaption()
+                    self.setupSubmittedBy()
+                    self.setupSource()
+                    self.setupDisputes()
+                    self.setupLikesAndDislikes()
+                }
+            }
+        } else {
+            setupImage()
+            populatefunFactDesc()
+            setupVerifScreen()
+            setupImageCaption()
+            setupSubmittedBy()
+            setupSource()
+            setupDisputes()
+            setupLikesAndDislikes()
+        }
     }
     func setupImageCaption() {
         imageCaptionLabel.text = funFact.imageCaption
@@ -300,19 +321,26 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
         dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
         dislikeCount.text = "\(funFact.dislikes)" + " dislikes"
-        for id in (AppDataSingleton.appDataSharedInstance.userProfile.funFactsLiked) {
-            if id.id == funFact.id {
-                likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
-                likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-                likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
-            }
+        
+        firestore.hasUserLikedOrDisliked(uid: Auth.auth().currentUser?.uid ?? "",
+                                         funFactID: funFact.id,
+                                         collection: "funFactsLiked") { (hasLiked, error) in
+                                            if hasLiked! {
+                                                self.likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+                                                self.likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+                                                self.likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
+                                            }
+                                            
         }
-        for id in (AppDataSingleton.appDataSharedInstance.userProfile.funFactsDisliked) {
-            if id.id == funFact.id {
-                dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
-                dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-                dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
-            }
+        firestore.hasUserLikedOrDisliked(uid: Auth.auth().currentUser?.uid ?? "",
+                                         funFactID: funFact.id,
+                                         collection: "funFactsDisliked") { (hasDisliked, error) in
+                                            if hasDisliked! {
+                                                self.dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
+                                                self.dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+                                                self.dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
+                                            }
+                                            
         }
     }
     @objc func didPullToRefresh() {
@@ -546,8 +574,6 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                                                 preferredStyle: .alert)
         
         let okayAction = UIAlertAction(title: "Ok", style: .default, handler: { (_) in
-            let db = Firestore.firestore()
-            let funFactRef = db.collection("funFacts").document(self.funFact.id)
             let apprCount = self.funFact.approvalCount + 1
             var verFlag = "N"
             if apprCount == 3 {
@@ -572,8 +598,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                         }
                         
                         self.firestore.addFunFactVerifiedToUser(
-                            funFactRef: funFactRef,
-                            funFactID: self.funFact.id,
+                            funFact: self.funFact,
                             user: Auth.auth().currentUser?.uid ?? "") { (error) in
                                 if let error = error {
                                     print ("Error updating user \(error)")
@@ -677,7 +702,6 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                             } else {
                                 let funFactsVC = self.storyboard?.instantiateViewController(withIdentifier: "userSubs") as! FunFactsTableViewController
                                 funFactsVC.userProfile = AppDataSingleton.appDataSharedInstance.userProfile
-                                funFactsVC.funFacts = funFacts ?? []
                                 funFactsVC.sender = .hashtags
                                 funFactsVC.hashtagName = "#\(tappedWord!)"
                                 self.navigationController?.pushViewController(funFactsVC, animated: true)
@@ -722,7 +746,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as? DisputeViewController
         navigationController?.navigationBar.backItem?.title = ""
-        destinationVC?.funFactID = funFact.id
+        destinationVC?.funFact = funFact
         
         let imageViewVC = segue.destination as? ImageViewViewController
         imageViewVC?.image = landmarkImage.image
@@ -734,7 +758,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                 self.didPullToRefresh()
             }
         }
-        verifVC?.funFactID = funFact.id
+        verifVC?.funFact = funFact
         verifVC?.rejectionCount = funFact.rejectionCount
         verifVC?.verFlag = funFact.verificationFlag
     }

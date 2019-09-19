@@ -15,6 +15,7 @@ import UserNotifications
 import MapKitGoogleStyler
 import InstantSearch
 import Geofirestore
+import FirebaseDynamicLinks
 
 class MainViewController: UIViewController, FirestoreManagerDelegate {
     
@@ -38,7 +39,6 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     var currentLocationCoordinate = CLLocationCoordinate2D()
     var landmarkImage = UIImage()
     var landmarkType = ""
-    var userProfile = UserProfile(uid: "", dislikeCount: 0, disputeCount: 0, likeCount: 0, submittedCount: 0, verifiedCount: 0, rejectedCount: 0, email: "", name: "", userName: "", level: "", photoURL: "", provider: "",city: "", country: "", roles: [], funFactsDisputed: [], funFactsLiked: [], funFactsDisliked: [], funFactsSubmitted: [], funFactsVerified: [], funFactsRejected: [])
     var boundingBox: GeoRect?
     var firestore = FirestoreManager()
     var currentAnnotation: FunFactAnnotation?

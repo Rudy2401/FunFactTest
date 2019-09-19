@@ -567,7 +567,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                     print("Document successfully written!")
                                     
                                     self.firestore.addHashtags(funFactID: ffID, hashtags: hashtags)
-                                    self.firestore.addUserSubmitted(funFactID: ffID, userID: Auth.auth().currentUser?.uid ?? "")
+                                    self.firestore.addUserSubmitted(funFact: funFact, userID: Auth.auth().currentUser?.uid ?? "")
                                     self.firestore.uploadImage(imageName: ffID + ".jpeg",
                                                                image: self.landmarkImage.image ?? UIImage(),
                                                                type: ImageType.funFact,

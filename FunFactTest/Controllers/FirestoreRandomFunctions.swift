@@ -392,6 +392,7 @@ extension MainViewController {
         }
     }
     func replaceUserRefsWithFunFacts() {
+        let collections = ["funFactsDisliked", "funFactsLiked", "funFactsSubmitted", "funFactsDisputed", "funFactsVerified", "funFactsRejected"]
         let db = Firestore.firestore()
         db.collection("users").getDocuments { (snap, error) in
             if let error = error {
@@ -399,47 +400,32 @@ extension MainViewController {
             } else {
                 for doc in snap!.documents {
                     let userID = doc.documentID
-                    db.collection("users").document(userID).collection("funFactsDisliked").getDocuments(completion: { (nestedsnap, error) in
-                        if let error = error {
-                            print ("Error getting nested document \(error)")
-                        } else {
-                            for nesteddoc in nestedsnap!.documents {
-                                let funFactID = nesteddoc.documentID
-                                self.firestore.downloadFunFact(for: funFactID, completionHandler: { (funFact, error) in
-                                    if let error = error {
-                                        print ("Error getting nested funFact \(error)")
-                                    } else {
-                                        print (funFactID)
-                                        let funFact = funFact!
-                                        db.collection("users")
-                                            .document(userID)
-                                            .collection("funFactsDisliked")
-                                            .document(funFactID)
-                                            .setData(["landmarkId": funFact.landmarkId,
-                                                      "landmarkName": funFact.landmarkName,
-                                                      "id": funFact.id,
-                                                      "description": funFact.description,
-                                                      "funFactTitle": funFact.funFactTitle,
-                                                      "likes": funFact.likes,
-                                                      "dislikes": funFact.dislikes,
-                                                      "verificationFlag": funFact.verificationFlag,
-                                                      "imageName": funFact.id,
-                                                      "disputeFlag": funFact.disputeFlag,
-                                                      "submittedBy": funFact.submittedBy,
-                                                      "dateSubmitted": funFact.dateSubmitted,
-                                                      "imageCaption": funFact.imageCaption,
-                                                      "source": funFact.source,
-                                                      "tags": funFact.tags,
-                                                      "approvalCount": funFact.approvalCount,
-                                                      "approvalUsers": funFact.approvalUsers,
-                                                      "rejectionCount": funFact.rejectionCount,
-                                                      "rejectionUsers": funFact.rejectionUsers,
-                                                      "rejectionReason": funFact.rejectionReason])
-                                    }
-                                })
+                    for collection in collections {
+                        db.collection("users").document(userID).collection(collection).getDocuments(completion: { (nestedsnap, error) in
+                            if let error = error {
+                                print ("Error getting nested document \(error)")
+                            } else {
+                                for nesteddoc in nestedsnap!.documents {
+                                    let funFactID = nesteddoc.documentID
+                                    self.firestore.downloadFunFact(for: funFactID, completionHandler: { (funFact, error) in
+                                        if let error = error {
+                                            print ("Error getting nested funFact \(error)")
+                                        } else {
+                                            print (funFactID)
+                                            let funFact = funFact!
+                                            db.collection("users")
+                                                .document(userID)
+                                                .collection(collection)
+                                                .document(funFactID)
+                                                .setData(["landmarkName": funFact.landmarkName,
+                                                          "id": funFact.id,
+                                                          "description": funFact.description])
+                                        }
+                                    })
+                                }
                             }
-                        }
-                    })
+                        })
+                    }
                 }
             }
         }
@@ -468,26 +454,9 @@ extension MainViewController {
                                             .document(hashtagID)
                                             .collection("funFacts")
                                             .document(funFactID)
-                                            .setData(["landmarkId": funFact.landmarkId,
-                                                      "landmarkName": funFact.landmarkName,
+                                            .setData(["landmarkName": funFact.landmarkName,
                                                       "id": funFact.id,
-                                                      "description": funFact.description,
-                                                      "funFactTitle": funFact.funFactTitle,
-                                                      "likes": funFact.likes,
-                                                      "dislikes": funFact.dislikes,
-                                                      "verificationFlag": funFact.verificationFlag,
-                                                      "imageName": funFact.id,
-                                                      "disputeFlag": funFact.disputeFlag,
-                                                      "submittedBy": funFact.submittedBy,
-                                                      "dateSubmitted": funFact.dateSubmitted,
-                                                      "imageCaption": funFact.imageCaption,
-                                                      "source": funFact.source,
-                                                      "tags": funFact.tags,
-                                                      "approvalCount": funFact.approvalCount,
-                                                      "approvalUsers": funFact.approvalUsers,
-                                                      "rejectionCount": funFact.rejectionCount,
-                                                      "rejectionUsers": funFact.rejectionUsers,
-                                                      "rejectionReason": funFact.rejectionReason])
+                                                      "description": funFact.description])
                                     }
                                 })
                             }
