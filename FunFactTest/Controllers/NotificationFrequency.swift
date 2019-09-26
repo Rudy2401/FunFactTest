@@ -22,9 +22,38 @@ class NotificationFrequency: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        darkModeSupport()
         navigationItem.title = "More Settings"
         updateButton.cornerRadius = 25
-        updateButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        updateButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            view.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                view.backgroundColor = .secondarySystemBackground
+            } else {
+                view.backgroundColor = .black
+            }
+        }
     }
     override func viewDidAppear(_ animated: Bool) {
         loadNotificationFrequency()

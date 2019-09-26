@@ -39,6 +39,29 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        
+        if traitCollection.userInterfaceStyle == .light {
+            view.backgroundColor = .white
+            tableView.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                view.backgroundColor = .secondarySystemBackground
+                tableView.backgroundColor = .secondarySystemBackground
+            } else {
+                view.backgroundColor = .black
+                tableView.backgroundColor = .black
+            }
+        }
         setupButtons()
         tableView.delegate = self
         tableView.dataSource = self
@@ -96,25 +119,62 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = false
+        tableView.reloadData()
     }
     override func viewWillDisappear(_ animated: Bool) {
         
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        setupButtons()
     }
     func documentsDidDownload() {
         
     }
     func setupButtons() {
-        let landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttribute)
+        var landmarkString = NSAttributedString()
+        let searchField = searchController.searchBar.searchTextField
+        if traitCollection.userInterfaceStyle == .light {
+            landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttribute)
+            view.backgroundColor = .white
+            tableView.backgroundColor = .white
+            searchController.searchBar.barStyle = .default
+            searchField.backgroundColor = .white
+            searchField.textColor = .black
+        } else {
+            landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttributeDark)
+            searchController.searchBar.barStyle = .blackOpaque
+            searchField.textColor = .white
+            if #available(iOS 13.0, *) {
+                view.backgroundColor = .secondarySystemBackground
+                tableView.backgroundColor = .secondarySystemBackground
+                searchField.backgroundColor = .secondarySystemBackground
+            } else {
+                view.backgroundColor = .black
+                tableView.backgroundColor = .black
+                searchField.backgroundColor = .black
+            }
+        }
         let landmarkStringSelected = NSAttributedString(string: "Places", attributes: Attributes.searchButtonSelectedAttribute)
         landmarkButton.setAttributedTitle(landmarkString, for: .normal)
         landmarkButton.setAttributedTitle(landmarkStringSelected, for: .selected)
         
-        let hashtagString = NSAttributedString(string: "Tags", attributes: Attributes.searchButtonAttribute)
+        var hashtagString = NSAttributedString()
+        if traitCollection.userInterfaceStyle == .light {
+            hashtagString = NSAttributedString(string: "Tags", attributes: Attributes.searchButtonAttribute)
+        } else {
+            hashtagString = NSAttributedString(string: "Tags", attributes: Attributes.searchButtonAttributeDark)
+        }
         let hashtagStringSelected = NSAttributedString(string: "Tags", attributes: Attributes.searchButtonSelectedAttribute)
         hashtagButton.setAttributedTitle(hashtagString, for: .normal)
         hashtagButton.setAttributedTitle(hashtagStringSelected, for: .selected)
         
-        let userString = NSAttributedString(string: "People", attributes: Attributes.searchButtonAttribute)
+        var userString = NSAttributedString()
+        if traitCollection.userInterfaceStyle == .light {
+            userString = NSAttributedString(string: "People", attributes: Attributes.searchButtonAttribute)
+        } else {
+            userString = NSAttributedString(string: "People", attributes: Attributes.searchButtonAttributeDark)
+        }
         let userStringSelected = NSAttributedString(string: "People", attributes: Attributes.searchButtonSelectedAttribute)
         userButton.setAttributedTitle(userString, for: .normal)
         userButton.setAttributedTitle(userStringSelected, for: .selected)
@@ -245,6 +305,15 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
      
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SearchCellTableViewCell
+        if traitCollection.userInterfaceStyle == .light {
+            cell.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                cell.backgroundColor = .secondarySystemBackground
+            } else {
+                cell.backgroundColor = .black
+            }
+        }
         var searchText = ""
         var secondaryText = ""
         var image = ""
@@ -290,8 +359,8 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
             searchLandmarks = []
             tableView.reloadData()
         }
-        cell.primaryText.highlightedTextColor = Colors.seagreenColor
-        cell.secondaryText.highlightedTextColor = Colors.seagreenColor
+        cell.primaryText.highlightedTextColor = Colors.systemGreenColor
+        cell.secondaryText.highlightedTextColor = Colors.systemGreenColor
         cell.primaryText.highlightedText = searchText
         cell.secondaryText.highlightedText = secondaryText
         return cell

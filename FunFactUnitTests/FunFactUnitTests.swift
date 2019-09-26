@@ -17,6 +17,11 @@ class FunFactUnitTests: XCTestCase {
     var mainVC: MainViewController!
     var tabBarVC: TabBarController!
     var profileVC: ProfileViewController!
+    var funFactPageVC: FunFactPageViewController!
+    var contentVC: ContentViewController!
+
+    let funFactDesc = "A famous bar in the West Village, the White Horse Tavern was the preferred drinking location of esteemed poet and writer Dylan Thomas, who passed away in 1953 from unconfirmed causes. Because he spent time at the White Horse Tavern, Thomas became the first of many artists and writers to gain inspiration from its walls."
+    let imageCapText = "Credit: https://www.abqjew.net/2015/08/those-were-days.html"
 
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -32,6 +37,44 @@ class FunFactUnitTests: XCTestCase {
         
         profileVC = storyboard.instantiateViewController(withIdentifier: "profileView") as? ProfileViewController
         profileVC.loadViewIfNeeded()
+
+        funFactPageVC = storyboard.instantiateViewController(withIdentifier: "funFactPage") as? FunFactPageViewController
+        let funFact = FunFact(landmarkId: "NYpsvgl7hf4C7O0Ft7od",
+                landmarkName: "White Horse Tavern",
+                id: "2t4cWYo39iglxT0S858b",
+                description: funFactDesc,
+                funFactTitle: "",
+                likes: 1,
+                dislikes: 0,
+                verificationFlag: "Y",
+                image: "2t4cWYo39iglxT0S858b",
+                imageCaption: imageCapText,
+                disputeFlag: "N",
+                submittedBy: "aSh5Z3KlHPd7hnOwfWtWomT5NF22",
+                dateSubmitted: Timestamp(date: Date()),
+                source: "https://kwnyc.com/blog/10-fun-facts-about-nycs-west-village-neighborhood/",
+                tags: ["westvillage"],
+                approvalCount: 0,
+                rejectionCount: 0,
+                approvalUsers: [],
+                rejectionUsers: [],
+                rejectionReason: [])
+        let funFacts = [funFact]
+        let pageContent = ["2t4cWYo39iglxT0S858b"]
+        funFactPageVC.pageContent = pageContent as NSArray
+        funFactPageVC.funFacts = funFacts
+        funFactPageVC.headingContent = "58 Joralemon St"
+        funFactPageVC.landmarkID = "NYpsvgl7hf4C7O0Ft7od"
+        funFactPageVC.address = "58 Joralemon St"
+        funFactPageVC.loadViewIfNeeded()
+
+        contentVC = storyboard.instantiateViewController(withIdentifier: "contentView") as? ContentViewController
+        contentVC.funFact = funFacts[0]
+        contentVC.address = "58 Joralemon St"
+        contentVC.landmarkID = "NYpsvgl7hf4C7O0Ft7od"
+        contentVC.currPageNumberText = "1"
+        contentVC.totalPageNumberText = "1"
+        contentVC.loadViewIfNeeded()
     }
 
     override func tearDown() {
@@ -88,7 +131,6 @@ class FunFactUnitTests: XCTestCase {
                 XCTAssertNotNil(ann.coordinate)
                 XCTAssertNotNil(ann.landmarkID)
                 XCTAssertNotEqual("", ann.landmarkID)
-                mainVC.performSegue(withIdentifier: <#T##String#>, sender: <#T##Any?#>)
             }
         } else {
             XCTFail("Delay interrupted")
@@ -122,8 +164,17 @@ class FunFactUnitTests: XCTestCase {
         
         XCTAssertNotNil(profileVC.userImageView)
     }
-    
-    func testAnnotationClick() {
-        
+
+    func testFunFactPageView() {
+        XCTAssertNotNil(funFactPageVC)
+        XCTAssertEqual("58 Joralemon St", funFactPageVC.navigationItem.title)
+        XCTAssertEqual(1, funFactPageVC.totalPages)
+    }
+
+    func testContentView() {
+        XCTAssertNotNil(contentVC)
+        XCTAssertEqual("1", contentVC.currPageNumberText)
+        XCTAssertEqual(funFactDesc, contentVC.funFact.description)
+        XCTAssertEqual(imageCapText, contentVC.imageCaptionLabel.attributedText?.string)
     }
 }

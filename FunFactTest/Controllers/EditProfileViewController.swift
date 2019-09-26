@@ -48,6 +48,17 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        darkModeSupport()
         firestore.delegate = self
         navigationItem.title = "Edit Profile"
         
@@ -77,12 +88,35 @@ class EditProfileViewController: UIViewController, UIPickerViewDataSource, UIPic
         countryTextField.addGestureRecognizer(mytapGestureRecognizer)
         
         submitButton.cornerRadius = 25
-        submitButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        submitButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
         
         let imagePickerTapGesture = UITapGestureRecognizer(target: self, action: #selector(viewImagePicker))
         imagePickerTapGesture.numberOfTapsRequired = 1
         profileImageView.addGestureRecognizer(imagePickerTapGesture)
         profileImageView.isUserInteractionEnabled = true
+    }
+    func darkModeSupport () {
+        if traitCollection.userInterfaceStyle == .light {
+            view.backgroundColor = .white
+            fullNameButton.setTitleColor(.black, for: .normal)
+            userNameButton.setTitleColor(.black, for: .normal)
+            cityButton.setTitleColor(.black, for: .normal)
+            countryButton.setTitleColor(.black, for: .normal)
+        } else {
+            fullNameButton.setTitleColor(.white, for: .normal)
+            userNameButton.setTitleColor(.white, for: .normal)
+            cityButton.setTitleColor(.white, for: .normal)
+            countryButton.setTitleColor(.white, for: .normal)
+            if #available(iOS 13.0, *) {
+                view.backgroundColor = .secondarySystemBackground
+            } else {
+                view.backgroundColor = .black
+            }
+        }
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
     }
     
     override func viewWillAppear(_ animated: Bool) {

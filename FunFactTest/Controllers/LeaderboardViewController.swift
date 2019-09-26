@@ -26,6 +26,17 @@ class LeaderboardViewController: UIViewController, UITableViewDelegate, UITableV
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        
         navigationItem.title = "Leaderboard"
         tableView.delegate = self
         tableView.dataSource = self
@@ -33,22 +44,55 @@ class LeaderboardViewController: UIViewController, UITableViewDelegate, UITableV
         cityButton.isSelected = true
         setupButtons()
         setupTableHeader()
-        
+        darkModeSupport()
         refreshControl = UIRefreshControl()
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
         tableView.addSubview(refreshControl)
     }
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            tableView.backgroundColor = .white
+            view.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                tableView.backgroundColor = .secondarySystemBackground
+                view.backgroundColor = .secondarySystemBackground
+            } else {
+                tableView.backgroundColor = .black
+                view.backgroundColor = .black
+            }
+        }
+    }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return leaders.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "leaderboardCell", for: indexPath) as! LeaderboardTableViewCell
+        if traitCollection.userInterfaceStyle == .light {
+            cell.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                cell.backgroundColor = .secondarySystemBackground
+            } else {
+                cell.backgroundColor = .black
+            }
+        }
         
         if indexPath.row % 2 == 0 {
-            cell.backgroundColor = Colors.veryLightGray
+            if #available(iOS 13.0, *) {
+                cell.backgroundColor = .systemGray3
+            } else {
+                cell.backgroundColor = .gray
+            }
         }
         cell.rankLabel.text = "\(indexPath.row + 1)"
         cell.userNameLabel.text = leaders[indexPath.row].userID
@@ -114,7 +158,7 @@ class LeaderboardViewController: UIViewController, UITableViewDelegate, UITableV
     }
     func setupTableHeader() {
         let headerView = UIView(frame: CGRect(x: 0, y: 50, width: tableView.frame.width, height: 40))
-        headerView.backgroundColor = Colors.seagreenColor
+        headerView.backgroundColor = Colors.systemGreenColor
         
         let ranklabelView = UILabel(frame: CGRect(x: headerView.frame.size.width * 0.04,
                                                   y: headerView.frame.size.height * 0.22,

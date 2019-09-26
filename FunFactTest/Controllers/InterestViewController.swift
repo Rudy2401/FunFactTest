@@ -24,12 +24,44 @@ class InterestViewController: UIViewController, UITableViewDelegate, UITableView
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        darkModeSupport()
         tableView.delegate = self
         tableView.dataSource = self
         tableView.isScrollEnabled = false
         navigationItem.title = "Choose your interests"
         updateButton.cornerRadius = 25
-        updateButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        updateButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            tableView.backgroundColor = .white
+            view.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                tableView.backgroundColor = .secondarySystemBackground
+                view.backgroundColor = .secondarySystemBackground
+            } else {
+                tableView.backgroundColor = .black
+                view.backgroundColor = .black
+            }
+        }
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return landmarkTypes.count
@@ -37,6 +69,16 @@ class InterestViewController: UIViewController, UITableViewDelegate, UITableView
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! InterestTableViewCell
+        if traitCollection.userInterfaceStyle == .light {
+            cell.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                cell.backgroundColor = .secondarySystemBackground
+            } else {
+                cell.backgroundColor = .black
+            }
+        }
+        
         let index = indexPath.row as Int
         cell.landmarkTypeLabel.text = landmarkTypes[index]
         cell.landmarkTypeButton.setImage(Constants.getMarkerDetails(type: landmarkTypes[index],

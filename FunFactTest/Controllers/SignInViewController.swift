@@ -23,6 +23,16 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
         view.addBackground()
         emailTextField.delegate = self
         passwordTextField.delegate = self
@@ -34,14 +44,14 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         
         passwordImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         passwordImageButton.setTitle(String.fontAwesomeIcon(name: .lock), for: .normal)
-        
-        signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
-        signUpButton.layer.backgroundColor = UIColor.darkGray.cgColor
+
+        signInButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
         forgotButton.layer.backgroundColor = UIColor.clear.cgColor
-        forgotButton.layer.borderColor = Colors.seagreenColor.cgColor
+        forgotButton.layer.borderColor = Colors.systemGreenColor.cgColor
         forgotButton.layer.borderWidth = 1.0
-        forgotButton.tintColor = Colors.seagreenColor
-        
+        forgotButton.tintColor = Colors.systemGreenColor
+
+        darkModeSupport()
         let cancelItem = UIBarButtonItem(
             title: "Cancel",
             style: .plain,
@@ -52,6 +62,26 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         
         emailTextField.keyboardToolbar.doneBarButton.setTarget(self, action: #selector(doneButtonClicked))
     }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            signUpButton.layer.backgroundColor = UIColor.darkGray.cgColor
+            emailImageButton.setTitleColor(.darkGray, for: .normal)
+            passwordImageButton.setTitleColor(.darkGray, for: .normal)
+            emailTextField.placeHolderColor = .darkGray
+            passwordTextField.placeHolderColor = .darkGray
+        } else {
+            signUpButton.layer.backgroundColor = UIColor.systemGray.cgColor
+            emailImageButton.setTitleColor(.lightGray, for: .normal)
+            passwordImageButton.setTitleColor(.lightGray, for: .normal)
+            emailTextField.placeHolderColor = .lightGray
+            passwordTextField.placeHolderColor = .lightGray
+        }
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -68,6 +98,11 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
         self.title = ""
     }
 
+    @IBAction func showSignUpPage(_ sender: Any) {
+        let signUpVC = self.storyboard?.instantiateViewController(withIdentifier: "signUp")
+        signUpVC?.modalPresentationStyle = .fullScreen
+        self.navigationController?.pushViewController(signUpVC!, animated: true)
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -136,10 +171,6 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
             
         })
     }
-    @IBAction func signUpAction(_ sender: Any) {
-        performSegue(withIdentifier: "signUpSegue", sender: nil)
-    }
-    
     @IBAction func forgotAction(_ sender: Any) {
         let email = emailTextField.text
         if (email?.isEmpty)! {
@@ -148,7 +179,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
                                  message: message,
                                  viewController: self,
                                  toFocus: self.emailTextField!,
-                                 type: "textfield")
+                                 type: .textfield)
             return
         }
         Auth.auth().sendPasswordReset(withEmail: email!) { error in
@@ -159,7 +190,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
                                          message: message,
                                          viewController: self,
                                          toFocus: self.emailTextField!,
-                                         type: "textfield")
+                                         type: .textfield)
                     return
                 }
             }
@@ -168,7 +199,7 @@ class SignInViewController: UIViewController, UITextFieldDelegate {
                                  message: message,
                                  viewController: self,
                                  toFocus: self.emailTextField!,
-                                 type: "textfield")
+                                 type: .textfield)
         }
     }
     

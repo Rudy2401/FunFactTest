@@ -31,17 +31,17 @@ class Utils {
         UIGraphicsEndImageContext()
         return newImage!
     }
-    static func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: Any, type: String) {
+    static func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: Any, type: AlertType) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel,handler: {_ in
             switch(type) {
-            case "textfield":
+            case .textfield:
                 (toFocus as! UITextField).becomeFirstResponder()
-            case "textview":
+            case .textview:
                 (toFocus as! UITextView).becomeFirstResponder()
-            case "imageview":
+            case .imageview:
                 (toFocus as! UIImageView).becomeFirstResponder()
-            case "pickerview":
+            case .pickerview:
                 (toFocus as! UIPickerView).becomeFirstResponder()
             default:
                 print("default")

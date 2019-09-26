@@ -41,9 +41,31 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = UIColor.secondarySystemBackground
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        darkModeSupport()
         navigationItem.title = "Rejecting A Fact"
         rejectionView.delegate = self
         firestore.delegate = self
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
+    func darkModeSupport() {
+        if #available(iOS 13.0, *) {
+            self.view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .secondarySystemBackground
+        } else {
+            self.view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .darkGray
+        }
     }
     func cancelButtonPressed() {
         self.navigationController?.popViewController(animated: true)

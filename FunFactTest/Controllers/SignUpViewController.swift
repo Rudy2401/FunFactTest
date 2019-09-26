@@ -25,6 +25,16 @@ class SignUpViewController: UIViewController, FirestoreManagerDelegate, UITextFi
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
         firestore.delegate = self
         nameTextField.delegate = self
         emailTextField.delegate = self
@@ -39,7 +49,9 @@ class SignUpViewController: UIViewController, FirestoreManagerDelegate, UITextFi
         emailImageButton.setTitle(String.fontAwesomeIcon(name: .envelope), for: .normal)
         passwordImageButton.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
         passwordImageButton.setTitle(String.fontAwesomeIcon(name: .lock), for: .normal)
-        signUpButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        signUpButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
+
+        darkModeSupport()
         let cancelItem = UIBarButtonItem(
             title: "Cancel",
             style: .plain,
@@ -49,6 +61,27 @@ class SignUpViewController: UIViewController, FirestoreManagerDelegate, UITextFi
         navigationItem.rightBarButtonItem = cancelItem
         nameTextField.keyboardToolbar.doneBarButton.setTarget(self, action: #selector(doneButtonClicked))
         emailTextField.keyboardToolbar.doneBarButton.setTarget(self, action: #selector(doneButtonClicked))
+    }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            nameImageButton.setTitleColor(.darkGray, for: .normal)
+            emailImageButton.setTitleColor(.darkGray, for: .normal)
+            passwordImageButton.setTitleColor(.darkGray, for: .normal)
+            nameTextField.placeHolderColor = .darkGray
+            emailTextField.placeHolderColor = .darkGray
+            passwordTextField.placeHolderColor = .darkGray
+        } else {
+            nameImageButton.setTitleColor(.white, for: .normal)
+            emailImageButton.setTitleColor(.white, for: .normal)
+            passwordImageButton.setTitleColor(.white, for: .normal)
+            nameTextField.placeHolderColor = .lightGray
+            emailTextField.placeHolderColor = .lightGray
+            passwordTextField.placeHolderColor = .lightGray
+        }
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

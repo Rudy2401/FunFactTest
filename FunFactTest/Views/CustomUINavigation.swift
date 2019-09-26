@@ -13,7 +13,7 @@ extension UINavigationController {
     
     open override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationBar.barTintColor = Colors.seagreenColor
+        self.navigationBar.barTintColor = Colors.systemGreenColor
         self.navigationBar.tintColor = UIColor(white: 0.95, alpha: 1.0)
         self.navigationBar.isTranslucent = false
         if let customFont = UIFont(name: Fonts.boldFont, size: 25) {

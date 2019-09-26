@@ -48,6 +48,17 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            navigationController?.navigationBar.backgroundColor = Colors.seagreenColor
+        }
         view.accessibilityIdentifier = "mapView"
         typeColor.layer.cornerRadius = 2.5
         firestore.delegate = self
@@ -57,6 +68,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         addButtonsToView()
         setupSettingsDefault()
         setupLocationManager()
+        darkModeSupport()
         tabBarController?.delegate = (UIApplication.shared.delegate as! AppDelegate) as? UITabBarControllerDelegate
         
         NotificationCenter.default.addObserver(self,
@@ -83,6 +95,28 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         }
         
     }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            annotationBottomView.backgroundColor = .white
+            titleAnnotationLabel.textColor = .black
+            typeLabel.textColor = .black
+            addressLabel.textColor = .black
+        } else {
+            if #available(iOS 13.0, *) {
+                annotationBottomView.backgroundColor = .systemGray3
+            } else {
+                annotationBottomView.backgroundColor = .black
+            }
+            titleAnnotationLabel.textColor = .white
+            typeLabel.textColor = .white
+            addressLabel.textColor = .white
+        }
+    }
+    
     func documentsDidUpdate() {
         print ("uploaded to cache")
     }
@@ -128,7 +162,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         let addFactLabelAttrClicked = NSAttributedString(string: addFactLabel, attributes: Attributes.toolBarImageClickedAttribute)
         
         addFactButton.accessibilityIdentifier = "addFactButton"
-        addFactButton.backgroundColor = Colors.seagreenColor
+        addFactButton.backgroundColor = Colors.systemGreenColor
         addFactButton.clipsToBounds = true
         addFactButton.layer.cornerRadius = 25
         addFactButton.layer.shadowPath = UIBezierPath(roundedRect: addFactButton.bounds, cornerRadius: 25).cgPath
@@ -166,7 +200,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         }
         
         mapSearchButton.titleLabel?.font = UIFont(name: Fonts.regularFont, size: CGFloat(15))
-        mapSearchButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        mapSearchButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
         mapSearchButton.setTitle("Search this area", for: .normal)
         mapSearchButton.setTitle("Search this area", for: .highlighted)
         mapSearchButton.layer.cornerRadius = mapSearchButton.frame.height/2
@@ -199,6 +233,7 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
     }
     
     func setupBottomView (annotationClicked: FunFactAnnotation, landmark: Landmark) {
+        var bottomAttribute = Attributes.attribute12RegDG
         if annotationBottomView.isHidden == true {
             annotationBottomView.isHidden = false
         }
@@ -212,13 +247,22 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         annotationBottomView.layer.shadowRadius = 10.0
         annotationBottomView.layer.masksToBounds = false
         
-        annotationBottomView.backgroundColor = UIColor.white
+        if traitCollection.userInterfaceStyle == .light {
+            annotationBottomView.backgroundColor = .white
+        } else {
+            annotationBottomView.backgroundColor = .black
+            bottomAttribute = Attributes.attribute12RegDGDark
+            if #available(iOS 13.0, *) {
+                annotationBottomView.backgroundColor = .systemGray3
+            } else {
+                annotationBottomView.backgroundColor = .black
+            }
+        }
+        
         annotationBottomView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         annotationBottomView.layer.borderWidth = CGFloat.init(0.2)
         annotationBottomView.layer.borderColor = UIColor.lightGray.cgColor
         annotationBottomView.layer.cornerRadius = 5
-        let numOffAttr = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                           NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!]
         
         landmarkTitle = annotationClicked.title?.components(separatedBy: ") ").last ?? ""
         landmarkID = annotationClicked.landmarkID
@@ -236,9 +280,9 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         let distanceInMeters = CLLocation(latitude: currentLocationCoordinate.latitude, longitude: currentLocationCoordinate.longitude).distance(from: coordinate₁)
         
         distanceLabel.font = UIFont.fontAwesome(ofSize: 12, style: .solid)
-        distanceLabel.textColor = UIColor.blue
+        distanceLabel.textColor = UIColor.systemBlue
         let distance = " " + String(format: "%.2f", distanceInMeters/1600) + " mi"
-        let attrStringDist = NSAttributedString(string: distance, attributes: numOffAttr)
+        let attrStringDist = NSAttributedString(string: distance, attributes: bottomAttribute)
         let distanceComplete = NSMutableAttributedString()
         distanceComplete.append(NSAttributedString(string: String.fontAwesomeIcon(name: .mapMarkerAlt)))
         distanceComplete.append(attrStringDist)
@@ -262,19 +306,19 @@ class MainViewController: UIViewController, FirestoreManagerDelegate {
         }
         
         let attrStringLikePer = NSAttributedString(string: likePer,
-                                                   attributes: Attributes.attribute12RegDG)
+                                                   attributes: bottomAttribute)
         let likePerComplete = NSMutableAttributedString()
         likePerComplete.append(NSAttributedString(string: String.fontAwesomeIcon(name: .heart)))
         likePerComplete.append(attrStringLikePer)
         likeLabel.attributedText = likePerComplete
         
         noOfFunFactsLabel.font = UIFont.fontAwesome(ofSize: 12, style: .solid)
-        noOfFunFactsLabel.textColor = UIColor.brown
+        noOfFunFactsLabel.textColor = UIColor.systemOrange
         
         let numOfFF = " " + String (landmark.numOfFunFacts)
         
         let attrString = NSAttributedString(string: numOfFF,
-                                            attributes: Attributes.attribute12RegDG)
+                                            attributes: bottomAttribute)
         let numOfFFComplete = NSMutableAttributedString()
         numOfFFComplete.append(NSAttributedString(string: String.fontAwesomeIcon(name: .file)))
         numOfFFComplete.append(attrString)

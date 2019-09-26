@@ -70,14 +70,29 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         navigationController?.navigationBar.prefersLargeTitles = false
     }
     
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+//            overrideUserInterfaceStyle = .light
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
         self.dataSource = self
         self.delegate = self
         self.totalPages = pageContent.count
         self.view.backgroundColor = .white
         setupPageControl()
-        
+        darkModeSupport()
         setupToolbarAndNavigationbar()
         if AppDataSingleton.appDataSharedInstance.url != nil {
             DynamicLinks.dynamicLinks().handleUniversalLink(AppDataSingleton.appDataSharedInstance.url!) { (dynamicLink, error) in
@@ -255,9 +270,19 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
         quickHelpView = Utils.showQuickHelp()
         self.present(quickHelpView, animated: true, completion: nil)
     }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            self.pageControl.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                self.pageControl.backgroundColor = .secondarySystemBackground
+            } else {
+                self.pageControl.backgroundColor = .black
+            }
+        }
+    }
     private func setupPageControl() {
         self.pageControl.frame = CGRect(x: 0, y: self.view.frame.size.height - 50, width: self.view.frame.size.width, height: 50)
-        self.pageControl.backgroundColor = .white
         self.pageControl.currentPageIndicatorTintColor = UIColor(white: 0.4, alpha: 1.0)
         self.pageControl.pageIndicatorTintColor = UIColor(white: 0.8, alpha: 1.0)
         self.pageControl.hidesForSinglePage = true

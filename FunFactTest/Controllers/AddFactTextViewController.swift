@@ -16,9 +16,15 @@ extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
             let selectedRange = textView.selectedRange
             let str1 = textView.text.substring(toIndex: 400)
             let str2 = textView.text.substring(fromIndex: 400)
+            var strAttr1 = NSMutableAttributedString()
             
-            let strAttr1 = NSMutableAttributedString(string: str1, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black,
+            if traitCollection.userInterfaceStyle == .light {
+                strAttr1 = NSMutableAttributedString(string: str1, attributes: [NSAttributedString.Key.foregroundColor: UIColor.black,
                                                                                 NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
+            } else {
+                strAttr1 = NSMutableAttributedString(string: str1, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
+            }
             let strAttr2 = NSMutableAttributedString(string: str2, attributes: [NSAttributedString.Key.foregroundColor: UIColor.red,
                                                                                 NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)! ])
             
@@ -28,7 +34,7 @@ extension AddNewFactViewController: UITextViewDelegate, UITextFieldDelegate {
             textView.attributedText = str
             textView.selectedRange = selectedRange
         } else {
-            textView.textColor = .black
+            textView.textColor = traitCollection.userInterfaceStyle == .light ? .black : .white
         }
     }
     func textViewDidBeginEditing(_ textView: UITextView) {

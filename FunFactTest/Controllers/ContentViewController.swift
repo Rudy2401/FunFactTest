@@ -60,6 +60,17 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        
         sourceURL.isScrollEnabled = false
         scrollView.backgroundColor = .white
         scrollView.delegate = self
@@ -69,8 +80,6 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh")
         refreshControl.addTarget(self, action: #selector(didPullToRefresh), for: .valueChanged)
         self.scrollView.addSubview(refreshControl)
-        
-        view.backgroundColor = .white
         
         let imageGesture = UITapGestureRecognizer(target: self, action: #selector(viewImageViewer))
         imageGesture.numberOfTapsRequired = 1
@@ -99,8 +108,33 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         } else {
 //            navigationItem.title = funF
         }
+        darkModeSupport()
     }
-    
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            view.backgroundColor = .white
+            scrollView.backgroundColor = .white
+            imageCaptionLabel.backgroundColor = .white
+            sourceURL.backgroundColor = .white
+            funFactDescriptionTextView.backgroundColor = .white
+            imageCaptionLabel.textColor = .darkGray
+        } else {
+            if #available(iOS 13.0, *) {
+                view.backgroundColor = .secondarySystemBackground
+                scrollView.backgroundColor = .secondarySystemBackground
+                imageCaptionLabel.backgroundColor = .secondarySystemBackground
+                sourceURL.backgroundColor = .secondarySystemBackground
+                funFactDescriptionTextView.backgroundColor = .secondarySystemBackground
+            } else {
+                view.backgroundColor = .black
+                scrollView.backgroundColor = .black
+                imageCaptionLabel.backgroundColor = .black
+                sourceURL.backgroundColor = .black
+                funFactDescriptionTextView.backgroundColor = .black
+            }
+            imageCaptionLabel.textColor = .white
+        }
+    }
     @IBAction func likeIt(_ sender: Any) {
         if Auth.auth().currentUser!.isAnonymous {
             let alert = UIAlertController(title: "Error",
@@ -111,29 +145,30 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             self.present(alert, animated: true, completion: nil)
             return
         }
-        if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray)
+        let likeBtnColor: UIColor = traitCollection.userInterfaceStyle == .light ? .darkGray : .white
+        if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: likeBtnColor)
             &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: Colors.redColor) {
             likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-            likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
+            likeHeart.setTitleColor(Colors.systemGreenColor, for: .normal)
             
             dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-            dislikeHeart.setTitleColor(.darkGray, for: .normal)
+            dislikeHeart.setTitleColor(likeBtnColor, for: .normal)
             firestore.addLikes(funFact: funFact, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
             firestore.deleteDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
-        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray)
-            &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
+        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: likeBtnColor)
+            &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: likeBtnColor) {
             likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-            likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
+            likeHeart.setTitleColor(Colors.systemGreenColor, for: .normal)
             firestore.addLikes(funFact: funFact, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
             
-        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Colors.seagreenColor)
-            && Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
+        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Colors.systemGreenColor)
+            && Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: likeBtnColor) {
             likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-            likeHeart.setTitleColor(.darkGray, for: .normal)
+            likeHeart.setTitleColor(likeBtnColor, for: .normal)
             firestore.deleteLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         }
         didPullToRefresh()
@@ -149,28 +184,29 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             self.present(alert, animated: true, completion: nil)
             return
         }
-        if Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray)
-            &&  Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Colors.seagreenColor) {
+        let dislikeBtnColor: UIColor = traitCollection.userInterfaceStyle == .light ? .darkGray : .white
+        if Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: dislikeBtnColor)
+            &&  Utils.compareColors(c1: likeHeart.currentTitleColor, c2: Colors.systemGreenColor) {
             likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-            likeHeart.setTitleColor(.darkGray, for: .normal)
+            likeHeart.setTitleColor(dislikeBtnColor, for: .normal)
             
             dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
             dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
             firestore.addDislikes(funFact: funFact, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
             firestore.deleteLikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
-        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray)
-            &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: UIColor.darkGray) {
+        } else if Utils.compareColors(c1: likeHeart.currentTitleColor, c2: dislikeBtnColor)
+            &&  Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: dislikeBtnColor) {
             dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
             dislikeHeart.setTitleColor(Colors.redColor, for: .normal)
             firestore.addDislikes(funFact: funFact, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         } else if Utils.compareColors(c1: dislikeHeart.currentTitleColor, c2: Colors.redColor)
-            && Utils.compareColors(c1: likeHeart.currentTitleColor, c2: UIColor.darkGray) {
+            && Utils.compareColors(c1: likeHeart.currentTitleColor, c2: dislikeBtnColor) {
             dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
             dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
-            dislikeHeart.setTitleColor(.darkGray, for: .normal)
+            dislikeHeart.setTitleColor(dislikeBtnColor, for: .normal)
             firestore.deleteDislikes(funFactID: funFact.id, landmarkID: landmarkID, userID: Auth.auth().currentUser?.uid ?? "")
         }
         didPullToRefresh()
@@ -183,6 +219,10 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         super.viewDidAppear(animated)
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if sender == .table {
@@ -232,18 +272,27 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     func setupSubmittedBy() {
         let submittedBy1 = "Submitted By: "
-        let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
+        let myAttrString1 = traitCollection.userInterfaceStyle == .light ? NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG) :
+            NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDGDark)
         self.submittedBy.attributedText = myAttrString1
         firestore.downloadUserProfile(funFact.submittedBy) { (userProfile, error) in
             if let error = error {
                 print ("Error getting user profile \(error)")
             } else {
                 let submittedBy1 = "Submitted By: "
-                let myAttrString1 = NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG)
+                let myAttrString1 = self.traitCollection.userInterfaceStyle == .light ? NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDG) :
+                NSAttributedString(string: submittedBy1, attributes: Attributes.attribute12BoldDGDark)
                 let completeSubmittedBy = NSMutableAttributedString()
                 let userID = userProfile!.userName
                 let submittedBy2 = userID
-                let myAttrString2 = NSAttributedString(string: submittedBy2, attributes: Attributes.attribute12RegBlue)
+                var myAttrString2 = NSAttributedString()
+                if #available(iOS 13.0, *) {
+                    myAttrString2 = NSAttributedString(string: submittedBy2, attributes: Attributes.attribute12RegBlue)
+                } else {
+                    myAttrString2 = NSAttributedString(string: submittedBy2, attributes:
+                        [NSAttributedString.Key.foregroundColor: UIColor.blue,
+                         NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!])
+                }
                 let profileGesture = UITapGestureRecognizer(target: self, action: #selector(self.profileView))
                 profileGesture.numberOfTapsRequired = 1
                 
@@ -254,7 +303,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                 dateFormatter.dateFormat = "MMM dd, yyyy"
                 let date = self.funFact.dateSubmitted
                 let date1 = dateFormatter.string(from: date.dateValue())
-                let myAttrString3 = NSAttributedString(string: ", \(date1)", attributes: Attributes.attribute10RegDG)
+                let myAttrString3 = self.traitCollection.userInterfaceStyle == .light ? NSAttributedString(string: ", \(date1)", attributes: Attributes.attribute10RegDG) : NSAttributedString(string: ", \(date1)", attributes: Attributes.attribute10RegDGDark)
                 
                 completeSubmittedBy.append(myAttrString1)
                 completeSubmittedBy.append(myAttrString2)
@@ -265,9 +314,15 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         }
     }
     func setupSource() {
+        var sourceAttributeB = Attributes.attribute12BoldDG
+        var sourceAttributeR = Attributes.attribute12RegDG
+        if traitCollection.userInterfaceStyle == .dark {
+            sourceAttributeB = Attributes.attribute12BoldDGDark
+            sourceAttributeR = Attributes.attribute12RegDGDark
+        }
         let source1 = "Source: "
         let sourceAtt1 = NSMutableAttributedString(string: source1)
-        sourceAtt1.addAttributes(Attributes.attribute12BoldDG, range: (source1 as NSString).range(of: source1))
+        sourceAtt1.addAttributes(sourceAttributeB, range: (source1 as NSString).range(of: source1))
         let source2 = funFact.source
         var substring = ""
         if source2.count > 40 {
@@ -277,7 +332,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             substring = source2
         }
         let sourceAtt2 = NSMutableAttributedString(string: substring)
-        sourceAtt2.addAttributes(Attributes.attribute12RegDG, range: (substring as NSString).range(of: substring))
+        sourceAtt2.addAttributes(sourceAttributeR, range: (substring as NSString).range(of: substring))
         sourceAtt2.addAttribute(.link, value: source2, range: NSRange(location: 0, length: substring.count))
         let attributedString = NSMutableAttributedString()
         attributedString.append(sourceAtt1)
@@ -292,10 +347,16 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         sourceURL.textAlignment = .center
     }
     func setupDisputes() {
-        let disAttribute = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
+        var disAttribute = [NSAttributedString.Key: Any]()
+        if #available(iOS 13.0, *) {
+            disAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.link,
+                                 NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!] as [NSAttributedString.Key: Any]
+        } else {
+            disAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.blue,
                              NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!] as [NSAttributedString.Key: Any]
+        }
         let dispute1 = "See something wrong? Dispute this fact "
-        let disAttrString1 = NSAttributedString(string: dispute1, attributes: Attributes.attribute12RegDG)
+        let disAttrString1 = traitCollection.userInterfaceStyle == .light ? NSAttributedString(string: dispute1, attributes: Attributes.attribute12RegDG) : NSAttributedString(string: dispute1, attributes: Attributes.attribute12RegDGDark)
         
         let disputeArrow = String.fontAwesomeIcon(name: .arrowRight)
         let disputeArrowString = NSAttributedString(string: disputeArrow, attributes: Attributes.smallImageAttribute)
@@ -317,10 +378,14 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     func setupLikesAndDislikes() {
         likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
         likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
+        traitCollection.userInterfaceStyle == .light ? likeHeart.setTitleColor(.darkGray, for: .normal) : likeHeart.setTitleColor(.white, for: .normal)
         likeCount.text = "\(funFact.likes)" + " likes"
+        likeCount.textColor = traitCollection.userInterfaceStyle == .light ? .darkGray : .white
         dislikeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .light)
         dislikeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsDown), for: .normal)
+        traitCollection.userInterfaceStyle == .light ? dislikeHeart.setTitleColor(.darkGray, for: .normal) : dislikeHeart.setTitleColor(.white, for: .normal)
         dislikeCount.text = "\(funFact.dislikes)" + " dislikes"
+        dislikeCount.textColor = traitCollection.userInterfaceStyle == .light ? .darkGray : .white
         
         firestore.hasUserLikedOrDisliked(uid: Auth.auth().currentUser?.uid ?? "",
                                          funFactID: funFact.id,
@@ -328,7 +393,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                                             if hasLiked! {
                                                 self.likeHeart.titleLabel?.font = UIFont.fontAwesome(ofSize: 25, style: .solid)
                                                 self.likeHeart.setTitle(String.fontAwesomeIcon(name: .thumbsUp), for: .normal)
-                                                self.likeHeart.setTitleColor(Colors.seagreenColor, for: .normal)
+                                                self.likeHeart.setTitleColor(Colors.systemGreenColor, for: .normal)
                                             }
                                             
         }
@@ -370,24 +435,38 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     }
     func populatefunFactDesc() {
         // Fun Fact title
+        var funFactAttribute = Attributes.attribute16DemiBlack
+        var tagAttribute = Attributes.attribute16RegularBlack
+        
+        if traitCollection.userInterfaceStyle == .dark {
+            funFactAttribute = Attributes.attribute16DemiBlackDark
+            tagAttribute = Attributes.attribute16RegularBlackDark
+        }
+        
         let funFactTitleAttrString = NSAttributedString(string: funFact.funFactTitle,
-                                                        attributes: Attributes.attribute16DemiBlack)
+                                                        attributes: funFactAttribute)
         
         // Fun Fact description Text View
         let funFactDescAttr = NSMutableAttributedString(string: funFact.description)
         let attributedfunFactDesc = NSMutableAttributedString()
         
-        funFactDescAttr.addAttributes(Attributes.attribute16RegularBlack,
+        funFactDescAttr.addAttributes(tagAttribute,
                                       range: NSMakeRange(0, funFactDescAttr.length))
         if !funFact.tags.isEmpty {
             let staticTags = NSMutableAttributedString(string: "\nTags: ")
-            staticTags.addAttributes(Attributes.attribute16RegularBlack,
+            staticTags.addAttributes(tagAttribute,
                                      range: NSMakeRange(0, staticTags.length))
             
             let hashtags = "#" + funFact.tags.joined(separator: " #")
             let hashtagAttrString = NSMutableAttributedString(string: hashtags)
-            hashtagAttrString.addAttributes(Attributes.attribute16DemiBlue,
-                                            range: NSMakeRange(0, hashtagAttrString.length))
+            if #available(iOS 13.0, *) {
+                hashtagAttrString.addAttributes(Attributes.attribute16DemiBlue,
+                                                range: NSMakeRange(0, hashtagAttrString.length))
+            } else {
+                hashtagAttrString.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.blue,
+                NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!],
+                range: NSMakeRange(0, hashtagAttrString.length))
+            }
             
             funFactDescAttr.append(staticTags)
             funFactDescAttr.append(hashtagAttrString)
@@ -434,8 +513,16 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         let rejView = UIView(frame: UIScreen.main.bounds)
         var displayString = ""
         rejView.tag = 101
-        rejView.backgroundColor = UIColor(white: 0.9, alpha: 0.95)
-        
+        if traitCollection.userInterfaceStyle == .light {
+            rejView.backgroundColor =  UIColor(white: 0.9, alpha: 0.95)
+        } else {
+            if #available(iOS 13.0, *) {
+                rejView.backgroundColor = UIColor.secondarySystemBackground
+            } else {
+                rejView.backgroundColor = UIColor.darkGray
+            }
+        }
+
         if funFact.verificationFlag == "R" {
             displayString = "This fact has been rejected by the community, it will be deleted after final review."
         }
@@ -447,7 +534,9 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         rejTextLabel.numberOfLines = 0
         rejTextLabel.textAlignment = NSTextAlignment.center
         let rejText = NSAttributedString(string: displayString, attributes: Attributes.attribute16DemiBlackAve)
-        rejTextLabel.attributedText = rejText
+        let rejTextDark = NSAttributedString(string: displayString, attributes: Attributes.attribute16DemiBlackAveDark)
+
+        rejTextLabel.attributedText = traitCollection.userInterfaceStyle == .light ? rejText : rejTextDark
         
         rejView.addSubview(rejTextLabel)
         self.view.addSubview(rejView)
@@ -462,17 +551,19 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
     func setupVerificationPage() {
         let verifView = UIView(frame: UIScreen.main.bounds)
         verifView.tag = 100
-        verifView.backgroundColor = UIColor(white: 0.9, alpha: 0.95)
-        
+
         let verifTextLabel = UILabel()
         verifTextLabel.numberOfLines = 0
         verifTextLabel.textAlignment = NSTextAlignment.center
-        let verifText = NSAttributedString(string: "This fact hasn't been verified yet. It will show up on this app only when it's verified by 3 people. You can help verify this fact by clicking below.", attributes: Attributes.attribute16DemiBlackAve)
-        verifTextLabel.attributedText = verifText
+        let verifText = "This fact hasn't been verified yet. It will show up on this app only when it's verified by 3 people. You can help verify this fact by clicking below."
+        let verifTextAttr = NSAttributedString(string: verifText, attributes: Attributes.attribute16DemiBlackAve)
+        let verifTextAttrDark = NSAttributedString(string: verifText, attributes: Attributes.attribute16DemiBlackAveDark)
+
+        verifTextLabel.attributedText = traitCollection.userInterfaceStyle == .light ? verifTextAttr : verifTextAttrDark
         
         let verifButton = CustomButton()
         verifButton.frame = CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50)
-        verifButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        verifButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
         let verifButtonText = NSAttributedString(string: "Click To Verify", attributes: Attributes.loginButtonAttribute)
         verifButton.setAttributedTitle(verifButtonText, for: .normal)
         let verifButtonClickedText = NSAttributedString(string: "Click To Verify", attributes: Attributes.loginButtonClickedAttribute)
@@ -482,7 +573,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         
         let approveButton = CustomButton()
         approveButton.frame = CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50)
-        approveButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        approveButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
         let approveButtonText = NSAttributedString(string: "Approve", attributes: Attributes.loginButtonAttribute)
         approveButton.setAttributedTitle(approveButtonText, for: .normal)
         let approveButtonClickedText = NSAttributedString(string: "Approve", attributes: Attributes.loginButtonClickedAttribute)
@@ -492,10 +583,21 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
         
         let rejectButton = CustomButton()
         rejectButton.frame = CGRect(x: 0, y: 0, width: verifView.frame.width - 20, height: 50)
-        rejectButton.layer.backgroundColor = UIColor.white.cgColor
-        rejectButton.layer.borderColor = Colors.seagreenColor.cgColor
+        if traitCollection.userInterfaceStyle == .light {
+            rejectButton.layer.backgroundColor = UIColor.white.cgColor
+            verifView.backgroundColor = UIColor(white: 0.9, alpha: 0.95)
+        } else {
+            rejectButton.layer.backgroundColor = UIColor.clear.cgColor
+            if #available(iOS 13.0, *) {
+                verifView.backgroundColor = .secondarySystemBackground
+            } else {
+                verifView.backgroundColor = .darkGray
+            }
+        }
+
+        rejectButton.layer.borderColor = Colors.systemGreenColor.cgColor
         rejectButton.layer.borderWidth = 1.0
-        rejectButton.tintColor = Colors.seagreenColor
+        rejectButton.tintColor = Colors.systemGreenColor
         let rejectButtonText = NSAttributedString(string: "Reject", attributes: Attributes.cancelButtonAttribute)
         rejectButton.setAttributedTitle(rejectButtonText, for: .normal)
         let rejectButtonClickedText = NSAttributedString(string: "Reject", attributes: Attributes.cancelButtonClickedAttribute)
@@ -847,9 +949,16 @@ extension UITextView {
                                              range: NSMakeRange(0, funFactDescAttr.string.count)).map {$0.range}
         
         for range in hashtagRanges {
-            funFactDescAttr.addAttributes(Attributes.attribute16DemiBlue,
-                                          range: NSRange(location: range.location,
-                                                         length: range.length))
+            if #available(iOS 13.0, *) {
+                funFactDescAttr.addAttributes(Attributes.attribute16DemiBlue,
+                                              range: NSRange(location: range.location,
+                                                             length: range.length))
+            } else {
+                funFactDescAttr.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.blue,
+                NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!],
+                                            range: NSRange(location: range.location,
+                                                           length: range.length))
+            }
         }
         
         let tappedSearchPattern = "#\\b\(changeText)\\b"

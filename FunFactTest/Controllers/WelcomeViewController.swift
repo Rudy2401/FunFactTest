@@ -27,9 +27,24 @@ class WelcomeViewController: UIViewController, FirestoreManagerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
         navigationController?.isNavigationBarHidden = true
     }
     
+    @IBAction func showSignInPage(_ sender: Any) {
+        let signInVC = self.storyboard?.instantiateViewController(withIdentifier: "signIn")
+        signInVC?.modalPresentationStyle = .fullScreen
+        self.navigationController?.pushViewController(signInVC!, animated: true)
+    }
     override func viewDidAppear(_ animated: Bool) {
         if let currentUser = Auth.auth().currentUser {
 //            currentUser.getIDTokenForcingRefresh(true) { (con, error) in
@@ -257,7 +272,10 @@ class WelcomeViewController: UIViewController, FirestoreManagerDelegate {
                         })
                     }
                     // Present the main view
-                    self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
+                    let mainVC = self.storyboard?.instantiateViewController(withIdentifier: "tabBar")
+                    mainVC?.modalPresentationStyle = .fullScreen
+                    self.present(mainVC!, animated: true)
+//                    self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
                 }
             })
         }
@@ -272,7 +290,10 @@ class WelcomeViewController: UIViewController, FirestoreManagerDelegate {
             if let error = error {
                 print ("Error signing in anonymously \(error.localizedDescription)")
             } else {
-                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
+                let mainVC = self.storyboard?.instantiateViewController(withIdentifier: "tabBar")
+                mainVC?.modalPresentationStyle = .fullScreen
+                self.present(mainVC!, animated: true)
+//                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
             }
         }
     }
@@ -318,7 +339,10 @@ extension WelcomeViewController: GIDSignInDelegate, GIDSignInUIDelegate {
                 }
                 print ("######## Auth successful")
                 // Present the main view
-                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
+                let mainVC = self.storyboard?.instantiateViewController(withIdentifier: "tabBar")
+                mainVC?.modalPresentationStyle = .fullScreen
+                self.present(mainVC!, animated: true)
+//                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
             }
         })
     }

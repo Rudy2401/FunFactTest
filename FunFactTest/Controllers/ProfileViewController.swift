@@ -46,6 +46,18 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+            submittedNum.textColor = UIColor.link
+        } else {
+            submittedNum.textColor = UIColor.blue
+        }
+        darkModeSupport()
         firestore.delegate = self
         scrollView.delegate = self
         scrollView.accessibilityIdentifier = "profileScrollView"
@@ -53,7 +65,6 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
         disputesNum.accessibilityIdentifier = "disputesNum"
         verifiedNum.accessibilityIdentifier = "verifiedNum"
         rejectedNum.accessibilityIdentifier = "rejectedNum"
-        submittedNum.textColor = Colors.blueColor
         
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(showFunFact),
@@ -125,14 +136,30 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
             rejectedNum.addGestureRecognizer(rejGesture)
             
             userImageView.layer.cornerRadius = userImageView.frame.height/2
-            signOutButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+            signOutButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
             
             userImageView.layer.borderWidth = 0.5
             userImageView.layer.borderColor = UIColor.gray.cgColor
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
         }
-        signInButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        signInButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
     }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            scrollView.backgroundColor = .white
+            levelLabel.textColor = .darkGray
+            locationLabel.textColor = .darkGray
+        } else {
+            levelLabel.textColor = .white
+            locationLabel.textColor = .white
+            if #available(iOS 13.0, *) {
+                scrollView.backgroundColor = .secondarySystemBackground
+            } else {
+                scrollView.backgroundColor = .black
+            }
+        }
+    }
+    
     @objc func showFunFact() {
         if AppDataSingleton.appDataSharedInstance.url != nil {
             self.tabBarController?.selectedIndex = 0
@@ -215,6 +242,10 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
             spinner.dismissLoader()
         }
         
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -393,7 +424,9 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
     }
     
     @IBAction func navigateToWelcomeScreen(_ sender: Any) {
-        performSegue(withIdentifier: "welcomeScreenSegue", sender: nil)
+        let welcomeVC = self.storyboard?.instantiateViewController(withIdentifier: "firstNav")
+        welcomeVC?.modalPresentationStyle = .fullScreen
+        self.present(welcomeVC!, animated: true)
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)

@@ -23,7 +23,17 @@ class AddressViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        submitButton.backgroundColor = Colors.seagreenColor
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        submitButton.backgroundColor = Colors.systemGreenColor
         mapView.bringSubviewToFront(submitButton)
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
         

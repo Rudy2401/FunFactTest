@@ -10,17 +10,26 @@ import Foundation
 import UIKit
 
 enum Colors {
-    static let blueColor = UIColor(displayP3Red: 0, green: 122/255, blue: 1.0, alpha: 1.0)
-    static let seagreenColor = UIColor(displayP3Red: 46/255, green: 139/255, blue: 87/255, alpha: 1.0)
-    static let fbBlueColor = UIColor(displayP3Red: 59/255, green: 89/255, blue: 152/255, alpha: 1.0)
-    static let greenColor = UIColor(displayP3Red: 46/255, green: 204/255, blue: 113/255, alpha: 1.0)
-    static let redColor = UIColor(displayP3Red: 178/255, green: 34/255, blue: 34/255, alpha: 1.0)
-    static let maroonColor = UIColor(displayP3Red: 176/255, green: 48/255, blue: 96/255, alpha: 1.0)
-    static let airforceBlueColor = UIColor(displayP3Red: 93/255, green: 138/255, blue: 168/255, alpha: 1.0)
-    static let azureBlue = UIColor(displayP3Red: 0/255, green: 128/255, blue: 255/255, alpha: 1.0)
-    static let aliceBlue = UIColor(displayP3Red: 240/255, green: 248/255, blue: 255/255, alpha: 1.0)
-    static let veryLightGray = UIColor(red: 235/255.0, green: 235/255.0, blue: 235/255.0, alpha: 1.0)
-    static let orangeColor = UIColor(displayP3Red: 180/255, green: 70/255, blue: 25/255, alpha: 1.0)
+//    static let blueColor = UIColor(displayP3Red: 0, green: 122/255, blue: 1.0, alpha: 1.0)
+    static let blueColor = UIColor.blue
+    static let seagreenColor = UIColor(displayP3Red: 46 / 255, green: 139 / 255, blue: 87 / 255, alpha: 1.0)
+    static let systemGreenColor = UIColor(displayP3Red: 46 / 255, green: 160 / 255, blue: 87 / 255, alpha: 1.0)
+    static let fbBlueColor = UIColor(displayP3Red: 59 / 255, green: 89 / 255, blue: 152 / 255, alpha: 1.0)
+    static let greenColor = UIColor(displayP3Red: 46 / 255, green: 204 / 255, blue: 113 / 255, alpha: 1.0)
+    static let redColor = UIColor(displayP3Red: 178 / 255, green: 34 / 255, blue: 34 / 255, alpha: 1.0)
+    static let maroonColor = UIColor(displayP3Red: 176 / 255, green: 48 / 255, blue: 96 / 255, alpha: 1.0)
+    static let airforceBlueColor = UIColor(displayP3Red: 93 / 255, green: 138 / 255, blue: 168 / 255, alpha: 1.0)
+    static let azureBlue = UIColor(displayP3Red: 0 / 255, green: 128 / 255, blue: 255 / 255, alpha: 1.0)
+    static let aliceBlue = UIColor(displayP3Red: 240 / 255, green: 248 / 255, blue: 255 / 255, alpha: 1.0)
+    static let veryLightGray = UIColor(red: 235 / 255.0, green: 235 / 255.0, blue: 235 / 255.0, alpha: 1.0)
+    static let orangeColor = UIColor(displayP3Red: 180 / 255, green: 70 / 255, blue: 25 / 255, alpha: 1.0)
+}
+
+enum AlertType {
+    case textview
+    case textfield
+    case imageview
+    case pickerview
 }
 
 enum UserRole {
@@ -40,6 +49,7 @@ enum ImageType {
     static let profile = "profileImages"
     static let funFact = "images"
 }
+
 enum ProfileMode {
     case currentUser
     case otherUser
@@ -130,6 +140,7 @@ enum SettingsUserDefaults {
     static let notificationDate = "NotificationDate"
     static let directionsSetting = "DirectionsSetting"
 }
+
 enum DirectionSetting {
     static let auto = "auto"
     static let walk = "walk"
@@ -141,9 +152,11 @@ enum Mode {
     case add
     case addNew
 }
+
 enum Flex {
     static let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
 }
+
 enum LeaderType {
     case country
     case city
@@ -156,96 +169,117 @@ enum Sender {
 }
 
 enum Attributes {
-    static let attribute12RegDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                                    NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!]
-    static let attribute12BoldDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                                     NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 12.0)!]
-    static let attribute12BoldBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
-                                       NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 12.0)!]
-    static let attribute12RegBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
+    static let attribute12RegDG = [NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                                   NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!]
+    static let attribute12RegDGDark = [NSAttributedString.Key.foregroundColor: UIColor.white,
                                        NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!]
-    static let attribute10RegDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                                    NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 10.0)!]
-    static let attribute14ItalicsDG = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                                        NSAttributedString.Key.font: UIFont(name: Fonts.italicsFont, size: 14.0)!]
-    static let attribute14DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
-                                        NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 14.0)!]
-    static let attribute14Gray = [ NSAttributedString.Key.foregroundColor: UIColor.gray,
-                                        NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 14.0)!]
-    
-    
-    static let attribute16Gray = [ NSAttributedString.Key.foregroundColor: UIColor.gray,
-                                   NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
-    static let attribute12Gray = [ NSAttributedString.Key.foregroundColor: UIColor.gray,
-                                   NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 12.0)!]
-    static let attribute16RegularBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
-                                        NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!]
-    static let attribute16DemiBlack = [ NSAttributedString.Key.foregroundColor: UIColor.black,
-                                        NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
-    static let attribute16DemiBlackAve = [ NSAttributedString.Key.foregroundColor: UIColor.black,
-                                        NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
-    static let attribute14DemiBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
+    static let attribute12BoldDG = [NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                                    NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 12.0)!]
+    static let attribute12BoldDGDark = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                        NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 12.0)!]
+    @available(iOS 13.0, *)
+    static let attribute12BoldBlue = [NSAttributedString.Key.foregroundColor: UIColor.link,
+                                      NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 12.0)!]
+    @available(iOS 13.0, *)
+    static let attribute12RegBlue = [NSAttributedString.Key.foregroundColor: UIColor.link,
+                                     NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!]
+    static let attribute10RegDG = [NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                                   NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 10.0)!]
+    static let attribute10RegDGDark = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                       NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 10.0)!]
+    static let attribute14ItalicsDG = [NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                                       NSAttributedString.Key.font: UIFont(name: Fonts.italicsFont, size: 14.0)!]
+    static let attribute14DemiBlack = [NSAttributedString.Key.foregroundColor: UIColor.black,
                                        NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 14.0)!]
-    static let attribute16DemiBlue = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
-                                       NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!]
-    
-    static let smallImageAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
-                                       NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 12, style: .solid)]
-    
-    static let toolBarImageSolidAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
-                                              NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
-    
-    static let navBarImageLightAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
-                                             NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
-    
-    static let addFactButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
-                                          NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
-    static let currentLocationButtonAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
-                                          NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .solid)]
-    
-    static let toolBarLabelAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
-                                         NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 10.0)!]
-    
-    static let toolBarImageClickedAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
-                                                NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
-    static let navBarImageClickedAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
-                                                NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
-    static let toolBarLabelClickedAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
-                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 10.0)!]
-    
-    static let loginButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
+    static let attribute14Gray = [NSAttributedString.Key.foregroundColor: UIColor.gray,
+                                  NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 14.0)!]
+
+
+    static let attribute16Gray = [NSAttributedString.Key.foregroundColor: UIColor.gray,
+                                  NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
+    static let attribute12Gray = [NSAttributedString.Key.foregroundColor: UIColor.gray,
+                                  NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 12.0)!]
+    static let attribute16RegularBlack = [NSAttributedString.Key.foregroundColor: UIColor.black,
+                                          NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!]
+    static let attribute16RegularBlackDark = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                              NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!]
+    static let attribute16DemiBlack = [NSAttributedString.Key.foregroundColor: UIColor.black,
+                                       NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
+    static let attribute16DemiBlackDark = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                           NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
+    static let attribute16DemiBlackAve = [NSAttributedString.Key.foregroundColor: UIColor.black,
+                                          NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
+    static let attribute16DemiBlackAveDark = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                              NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 16.0)!]
+    @available(iOS 13.0, *)
+    static let attribute14DemiBlue = [NSAttributedString.Key.foregroundColor: UIColor.link,
+                                      NSAttributedString.Key.font: UIFont(name: Fonts.demiBoldFont, size: 14.0)!]
+    @available(iOS 13.0, *)
+    static let attribute16DemiBlue = [NSAttributedString.Key.foregroundColor: UIColor.link,
+                                      NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!]
+
+    static let smallImageAttribute = [NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+                                      NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 12, style: .solid)]
+
+    static let toolBarImageSolidAttribute = [NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+                                             NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .solid)]
+
+    static let navBarImageLightAttribute = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                            NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
+
+    static let addFactButtonAttribute = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                         NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 25, style: .light)]
+    static let currentLocationButtonAttribute = [NSAttributedString.Key.foregroundColor: Colors.systemGreenColor,
+                                                 NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .solid)]
+
+    static let toolBarLabelAttribute = [NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                                        NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 10.0)!]
+
+    static let toolBarImageClickedAttribute = [NSAttributedString.Key.foregroundColor: Colors.systemGreenColor,
+                                               NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
+    static let navBarImageClickedAttribute = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                              NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
+    static let toolBarLabelClickedAttribute = [NSAttributedString.Key.foregroundColor: Colors.systemGreenColor,
+                                               NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 10.0)!]
+
+    static let loginButtonAttribute = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                       NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
+    static let cancelButtonAttribute = [NSAttributedString.Key.foregroundColor: Colors.systemGreenColor,
                                         NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
-    static let cancelButtonAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
-                                        NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
-    static let cancelButtonClickedAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
-                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
-    
-    static let loginButtonImageBrandAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
-                                                  NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
-    static let loginButtonImageSolidAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
-                                                  NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .solid)]
-    
-    static let loginButtonClickedAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+    static let cancelButtonClickedAttribute = [NSAttributedString.Key.foregroundColor: Colors.systemGreenColor,
                                                NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
-    static let loginButtonImageSolidClickedAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
-                                                         NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .solid)]
-    static let loginButtonImageBrandClickedAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
-                                                         NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
-    
-    static let googleLoginButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+
+    static let loginButtonImageBrandAttribute = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                                 NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
+    static let loginButtonImageSolidAttribute = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                                 NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .solid)]
+
+    static let loginButtonClickedAttribute = [NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
                                               NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
-    static let googleLoginButtonImageSolidAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.white,
+    static let loginButtonImageSolidClickedAttribute = [NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+                                                        NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .solid)]
+    static let loginButtonImageBrandClickedAttribute = [NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
                                                         NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
-    
-    static let googleLoginButtonClickedAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
-                                                     NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
-    static let googleLoginButtonImageSolidClickedAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
-                                                               NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
-    
-    static let searchButtonAttribute = [ NSAttributedString.Key.foregroundColor: UIColor(white: 0.1, alpha: 1.0),
+
+    static let googleLoginButtonAttribute = [NSAttributedString.Key.foregroundColor: UIColor.darkGray,
+                                             NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
+    static let googleLoginButtonImageSolidAttribute = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                                       NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
+
+    static let googleLoginButtonClickedAttribute = [NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+                                                    NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 16.0)!]
+    static let googleLoginButtonImageSolidClickedAttribute = [NSAttributedString.Key.foregroundColor: UIColor(white: 0.5, alpha: 1.0),
+                                                              NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 20, style: .brands)]
+
+    static let searchButtonAttribute = [NSAttributedString.Key.foregroundColor: UIColor(white: 0.1, alpha: 1.0),
                                         NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)!]
-    static let searchButtonSelectedAttribute = [ NSAttributedString.Key.foregroundColor: Colors.seagreenColor,
-                                         NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 14.0)!]
+    static let searchButtonAttributeDark = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                            NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 14.0)!]
+    static let searchButtonSelectedAttribute = [NSAttributedString.Key.foregroundColor: Colors.systemGreenColor,
+                                                NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 14.0)!]
+
+    static let navTitleAttribute = [NSAttributedString.Key.foregroundColor: UIColor.white,
+                                    NSAttributedString.Key.font: UIFont(name: Fonts.boldFont, size: 28)!]
 
 }
 
@@ -256,9 +290,9 @@ struct AnnotationType {
 
 struct Constants {
     static let flexibleSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace,
-                                               target: nil,
-                                               action: nil)
-    
+            target: nil,
+            action: nil)
+
     static let landmarkTypes = ["--- Select landmark type ---",
                                 LandmarkTypes.art,
                                 LandmarkTypes.cool,
@@ -267,7 +301,7 @@ struct Constants {
                                 LandmarkTypes.natural,
                                 LandmarkTypes.park,
                                 LandmarkTypes.restaurant]
-    
+
     static let rejectionReason = ["Source invalid",
                                   "Fact does not match the source",
                                   "Image incorrect",
@@ -276,7 +310,7 @@ struct Constants {
                                   "Fact has too many grammatical errors/spelling mistakes",
                                   "Copyright violation",
                                   "Other"]
-    
+
     static let disputeReason = ["--- Select a reason ---",
                                 "Factually incorrect",
                                 "Fact belongs to another landmark",
@@ -284,7 +318,7 @@ struct Constants {
                                 "Source website content is inaccurate",
                                 "Copyright violation",
                                 "Other"]
-    
+
     static func getMarkerDetails(type: String, width: Double, height: Double) -> AnnotationType {
         var annotationType = AnnotationType(color: UIColor(), image: UIImage())
         switch type {
@@ -304,7 +338,7 @@ struct Constants {
             annotationType.color = Colors.azureBlue
             annotationType.image = UIImage.fontAwesomeIcon(name: .water, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.park:
-            annotationType.color = Colors.seagreenColor
+            annotationType.color = Colors.systemGreenColor
             annotationType.image = UIImage.fontAwesomeIcon(name: .trees, style: .solidp, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.promotions:
             annotationType.color = .yellow

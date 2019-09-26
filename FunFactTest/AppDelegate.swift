@@ -36,8 +36,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
         settings.areTimestampsInSnapshotsEnabled = true
         db.settings = settings
         geofirestore = GeoFirestoreManager()
+        
     }
-
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         // Configure Facebook Sign in

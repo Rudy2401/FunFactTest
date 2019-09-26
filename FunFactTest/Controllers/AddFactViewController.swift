@@ -112,6 +112,17 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        
         switch mode {
         case .edit:
             navigationItem.title = "Edit Fun Fact"
@@ -126,6 +137,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             landmarkImage.image = UIImage()
             addDashedBorder()
         }
+        darkModeSupport()
         algoliaManager.delegate = self
         funFactDescription.keyboardDistanceFromTextField = 200
         tagsTextField.keyboardDistanceFromTextField = 200
@@ -234,11 +246,51 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         sourceTextField.layer.borderColor = UIColor.darkGray.cgColor
         sourceTextField.layer.cornerRadius = 5
 
-        submitButton.backgroundColor = Colors.seagreenColor
+        submitButton.backgroundColor = Colors.systemGreenColor
         submitButton.accessibilityIdentifier = "submit"
         submitButton.widthAnchor.constraint(equalToConstant: self.view.frame.width - 20).isActive = true
         
     }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            scrollView.backgroundColor = .white
+            contentView.backgroundColor = .white
+            addressBtn.setTitleColor(.black, for: .normal)
+            landmarkNameBtn.setTitleColor(.black, for: .normal)
+            funFactTitleBtn.setTitleColor(.black, for: .normal)
+            tagsBtn.setTitleColor(.black, for: .normal)
+            sourceBtn.setTitleColor(.black, for: .normal)
+            imageCaption.backgroundColor = .white
+            funFactDescription.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                scrollView.backgroundColor = .secondarySystemBackground
+                contentView.backgroundColor = .secondarySystemBackground
+                imageCaption.backgroundColor = .secondarySystemBackground
+                funFactDescription.backgroundColor = .secondarySystemBackground
+                addressBtn.setTitleColor(.white, for: .normal)
+                landmarkNameBtn.setTitleColor(.white, for: .normal)
+                funFactTitleBtn.setTitleColor(.white, for: .normal)
+                tagsBtn.setTitleColor(.white, for: .normal)
+                sourceBtn.setTitleColor(.white, for: .normal)
+            } else {
+                scrollView.backgroundColor = .black
+                contentView.backgroundColor = .black
+                imageCaption.backgroundColor = .black
+                funFactDescription.backgroundColor = .black
+                addressBtn.setTitleColor(.white, for: .normal)
+                landmarkNameBtn.setTitleColor(.white, for: .normal)
+                funFactTitleBtn.setTitleColor(.white, for: .normal)
+                tagsBtn.setTitleColor(.white, for: .normal)
+                sourceBtn.setTitleColor(.white, for: .normal)
+            }
+        }
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
@@ -298,8 +350,8 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                             self.sourceTextField.text = funFact?.source
                             self.funFactTitleTextField.text = funFact?.funFactTitle
                             self.tagsTextField.text = hashtags
-                            self.funFactDescription.textColor = UIColor.black
-                            self.imageCaption.textColor = UIColor.black
+                            self.funFactDescription.textColor = self.traitCollection.userInterfaceStyle == .light ? .black : .white
+                            self.imageCaption.textColor = self.traitCollection.userInterfaceStyle == .light ? .black : .white
                             self.setupImage()
                         }
                     })
@@ -393,6 +445,9 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         chooseImageLabel.isHidden = true
         
         picker.dismiss(animated: true, completion: {
+            if #available(iOS 13.0, *) {
+                cropController.modalPresentationStyle = .fullScreen
+            }
             self.present(cropController, animated: true, completion: nil)
         })
     }
@@ -409,6 +464,15 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         updateImageViewWithImage(image, fromCropViewController: cropViewController)
     }
     
+    func cropViewController(_ cropViewController: CropViewController, didFinishCancelled cancelled: Bool) {
+        //This code fails on iOS13.
+        //cropViewController.dismiss(animated: true)
+
+        let viewController = cropViewController.children.first!
+        viewController.modalTransitionStyle = .coverVertical
+        viewController.presentingViewController?.dismiss(animated: true, completion: nil)
+    }
+    
     func updateImageViewWithImage(_ image: UIImage, fromCropViewController cropViewController: CropViewController) {
         if mode == .edit {
             landmarkImage.image = UIImage()
@@ -422,7 +486,6 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         
         if cropViewController.croppingStyle != .circular {
             landmarkImage.isHidden = true
-            
             cropViewController.dismissAnimatedFrom(self, withCroppedImage: image,
                                                    toView: landmarkImage,
                                                    toFrame: CGRect.zero,
@@ -614,7 +677,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  message: message,
                                  viewController: self,
                                  toFocus: self.addressTextField!,
-                                 type: "textfield")
+                                 type: .textfield)
         }
         if (landmarkNameTextField?.text?.isEmpty)! {
             errors = true
@@ -623,7 +686,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  message: message,
                                  viewController: self,
                                  toFocus: self.landmarkNameTextField!,
-                                 type: "textfield")
+                                 type: .textfield)
         }
         if funFactDescription?.text == funFactDescPlaceholder {
             errors = true
@@ -632,7 +695,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  message: message,
                                  viewController: self,
                                  toFocus: self.funFactDescription!,
-                                 type: "textview")
+                                 type: .textview)
         }
         if (sourceTextField?.text?.isEmpty)! || !(sourceTextField.text?.isValidURL)! {
             errors = true
@@ -641,7 +704,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  message: message,
                                  viewController: self,
                                  toFocus: self.sourceTextField!,
-                                 type: "textfield")
+                                 type: .textfield)
         }
         if !staticImage.isHidden  {
             errors = true
@@ -650,7 +713,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  message: message,
                                  viewController: self,
                                  toFocus: self.landmarkImage!,
-                                 type: "imageview")
+                                 type: .imageview)
         }
         if ((type ?? "").isEmpty || type == "--- Select landmark type ---") && mode != .edit {
             errors = true
@@ -659,7 +722,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  message: message,
                                  viewController: self,
                                  toFocus: self.landmarkType!,
-                                 type: "pickerview")
+                                 type: .pickerview)
         }
         if (type == "--- Select landmark type ---") && mode == .edit {
             errors = true
@@ -668,7 +731,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  message: message,
                                  viewController: self,
                                  toFocus: self.landmarkType!,
-                                 type: "pickerview")
+                                 type: .pickerview)
         }
 
         if funFactDescription.text.count > 400 {
@@ -678,23 +741,23 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                  message: message,
                                  viewController: self,
                                  toFocus: self.funFactDescription!,
-                                 type: "textview")
+                                 type: .textview)
         }
         return errors
     }
-    func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: Any, type: String) {
+    func alertWithTitle(title: String!, message: String, viewController: UIViewController, toFocus: Any, type: AlertType) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let action = UIAlertAction(title: "OK",
                                    style: UIAlertAction.Style.cancel,
                                    handler: {_ in
             switch(type) {
-            case "textfield":
+            case .textfield:
                 (toFocus as! UITextField).becomeFirstResponder()
-            case "textview":
+            case .textview:
                 (toFocus as! UITextView).becomeFirstResponder()
-            case "imageview":
+            case .imageview:
                 (toFocus as! UIImageView).becomeFirstResponder()
-            case "pickerview":
+            case .pickerview:
                 (toFocus as! UIPickerView).becomeFirstResponder()
             default:
                 print("default")
@@ -779,7 +842,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             landmarkName = UserDefaults.standard.string(forKey: "name")
         }
         if UserDefaults.standard.object(forKey: "caption") != nil {
-            imageCaption?.textColor = .black
+            imageCaption?.textColor = traitCollection.userInterfaceStyle == .light ? .black : .white
             imageCaption?.text = UserDefaults.standard.string(forKey: "caption")
         }
         if UserDefaults.standard.object(forKey: "description") != nil {

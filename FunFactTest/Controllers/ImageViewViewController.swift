@@ -102,8 +102,8 @@ class ImageViewViewController: UIViewController, UIScrollViewDelegate{
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         tabBarController?.tabBar.isHidden = false
-        navigationController?.navigationBar.backgroundColor = Colors.seagreenColor
-        navigationController?.navigationBar.barTintColor = Colors.seagreenColor
+        navigationController?.navigationBar.backgroundColor = Colors.systemGreenColor
+        navigationController?.navigationBar.barTintColor = Colors.systemGreenColor
     }
 
 }

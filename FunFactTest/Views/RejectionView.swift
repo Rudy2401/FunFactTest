@@ -50,7 +50,12 @@ class RejectionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
         contentView.frame = bounds
         contentView.autoresizingMask = [.flexibleWidth,
                                        .flexibleHeight]
-        
+
+        if #available(iOS 13.0, *) {
+            contentView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .secondarySystemBackground
+        } else {
+            contentView.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .darkGray
+        }
         pickerData = Constants.rejectionReason
         rejectionReason.delegate = self
         rejectionReason.dataSource = self
@@ -58,7 +63,7 @@ class RejectionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
         rejectionReason?.layer.borderColor = UIColor.darkGray.cgColor
         rejectionReason?.layer.cornerRadius = 5
         
-        okButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        okButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
         okButton.frame = CGRect(x: 0, y: 0, width: contentView.frame.width/2 - 10, height: 50)
         let okButtonText = NSAttributedString(string: "Submit", attributes: Attributes.loginButtonAttribute)
         okButton.setAttributedTitle(okButtonText, for: .normal)
@@ -66,10 +71,10 @@ class RejectionView: UIView, UIPickerViewDelegate, UIPickerViewDataSource {
         okButton.setAttributedTitle(okButtonClickedText, for: .highlighted)
         okButton.setAttributedTitle(okButtonClickedText, for: .selected)
         
-        cancelButton.layer.backgroundColor = UIColor.white.cgColor
-        cancelButton.layer.borderColor = Colors.seagreenColor.cgColor
+        cancelButton.layer.backgroundColor = UIColor.clear.cgColor
+        cancelButton.layer.borderColor = Colors.systemGreenColor.cgColor
         cancelButton.layer.borderWidth = 1.0
-        cancelButton.tintColor = Colors.seagreenColor
+        cancelButton.tintColor = Colors.systemGreenColor
         cancelButton.frame = CGRect(x: 0, y: 0, width: contentView.frame.width/2 - 10, height: 50)
         let cancelButtonText = NSAttributedString(string: "Cancel", attributes: Attributes.cancelButtonAttribute)
         cancelButton.setAttributedTitle(cancelButtonText, for: .normal)

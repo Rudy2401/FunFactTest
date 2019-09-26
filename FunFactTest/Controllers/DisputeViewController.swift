@@ -43,6 +43,18 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        if #available(iOS 13.0, *) {
+            let navBar = UINavigationBarAppearance()
+            navBar.backgroundColor = Colors.systemGreenColor
+            navBar.titleTextAttributes = Attributes.navTitleAttribute
+            navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
+            self.navigationController?.navigationBar.standardAppearance = navBar
+            self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
+        } else {
+            // Fallback on earlier versions
+        }
+        darkModeSupport()
+        
         pickerData = Constants.disputeReason
         self.reasonPicker.delegate = self
         self.reasonPicker.dataSource = self
@@ -69,7 +81,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         notesText.layer.borderColor = UIColor.gray.cgColor
         notesText.layer.cornerRadius = 5
         
-        submitButton.layer.backgroundColor = Colors.seagreenColor.cgColor
+        submitButton.layer.backgroundColor = Colors.systemGreenColor.cgColor
         
         let toolBarAttrImageClicked = [ NSAttributedString.Key.foregroundColor: UIColor.white,
                                         NSAttributedString.Key.font: UIFont.fontAwesome(ofSize: 30, style: .solid)]
@@ -91,6 +103,10 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
         back.titleLabel?.textAlignment = .center
         navigationItem.backBarButtonItem?.title = ""
     }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        darkModeSupport()
+    }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -101,6 +117,20 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     }
     func documentsDidUpdate() {
         
+    }
+    func darkModeSupport() {
+        if traitCollection.userInterfaceStyle == .light {
+            view.backgroundColor = .white
+            notesText.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                view.backgroundColor = .secondarySystemBackground
+                notesText.backgroundColor = .secondarySystemBackground
+            } else {
+                view.backgroundColor = .black
+                notesText.backgroundColor = .black
+            }
+        }
     }
     
     @objc func cancelAction(_ sender: Any) {
@@ -200,7 +230,7 @@ class DisputeViewController: UIViewController, UIPickerViewDataSource, UIPickerV
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == UIColor.lightGray {
             textView.text = nil
-            textView.textColor = UIColor.black
+            textView.textColor = traitCollection.userInterfaceStyle == .light ? .black : .white
         }
     }
     

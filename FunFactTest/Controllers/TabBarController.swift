@@ -12,7 +12,14 @@ class TabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tabBar.tintColor = Colors.seagreenColor
+        tabBar.tintColor = Colors.systemGreenColor
+        tabBar.layer.borderWidth = 0.5
+        tabBar.layer.borderColor = traitCollection.userInterfaceStyle == .dark ? UIColor.darkGray.cgColor : UIColor.white.cgColor
+        if #available(iOS 13.0, *) {
+            tabBar.backgroundColor = .tertiarySystemBackground
+        } else {
+            tabBar.backgroundColor = .darkGray
+        }
 
         tabBar.items?[0].setTitleTextAttributes(Attributes.toolBarLabelAttribute, for: .normal)
         tabBar.items?[0].setTitleTextAttributes(Attributes.toolBarLabelClickedAttribute, for: .selected)
@@ -69,5 +76,9 @@ class TabBarController: UITabBarController {
                                                                  size: CGSize(width: 30, height: 30))
         tabBar.items?[3].accessibilityIdentifier = "tabSearch"
         tabBar.items?[3].accessibilityValue = "Search"
+    }
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        viewDidLoad()
     }
 }
