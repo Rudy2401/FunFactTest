@@ -70,9 +70,10 @@ class LeaderboardViewController: UIViewController, UITableViewDelegate, UITableV
                 view.backgroundColor = .black
             }
         }
+        setupButtons()
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return leaders.count
+        leaders.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -114,7 +115,7 @@ class LeaderboardViewController: UIViewController, UITableViewDelegate, UITableV
         return cell
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60
+        60
     }
     func documentsDidUpdate() {
         
@@ -123,19 +124,29 @@ class LeaderboardViewController: UIViewController, UITableViewDelegate, UITableV
     
     func setupButtons() {
         let countryString = NSAttributedString(string: "Country", attributes: Attributes.searchButtonAttribute)
+        let countryStringDark = NSAttributedString(string: "Country", attributes: Attributes.searchButtonAttributeDark)
         let countryStringSelected = NSAttributedString(string: "Country", attributes: Attributes.searchButtonSelectedAttribute)
-        countryButton.setAttributedTitle(countryString, for: .normal)
         countryButton.setAttributedTitle(countryStringSelected, for: .selected)
         
         let cityString = NSAttributedString(string: "City", attributes: Attributes.searchButtonAttribute)
+        let cityStringDark = NSAttributedString(string: "City", attributes: Attributes.searchButtonAttributeDark)
         let cityStringSelected = NSAttributedString(string: "City", attributes: Attributes.searchButtonSelectedAttribute)
-        cityButton.setAttributedTitle(cityString, for: .normal)
         cityButton.setAttributedTitle(cityStringSelected, for: .selected)
         
         let overallString = NSAttributedString(string: "Worldwide", attributes: Attributes.searchButtonAttribute)
+        let overallStringDark = NSAttributedString(string: "Worldwide", attributes: Attributes.searchButtonAttributeDark)
         let overallStringSelected = NSAttributedString(string: "Worldwide", attributes: Attributes.searchButtonSelectedAttribute)
-        worldwideButton.setAttributedTitle(overallString, for: .normal)
         worldwideButton.setAttributedTitle(overallStringSelected, for: .selected)
+
+        if traitCollection.userInterfaceStyle == .light {
+            countryButton.setAttributedTitle(countryString, for: .normal)
+            cityButton.setAttributedTitle(cityString, for: .normal)
+            worldwideButton.setAttributedTitle(overallString, for: .normal)
+        } else {
+            countryButton.setAttributedTitle(countryStringDark, for: .normal)
+            cityButton.setAttributedTitle(cityStringDark, for: .normal)
+            worldwideButton.setAttributedTitle(overallStringDark, for: .normal)
+        }
     }
     
     @IBAction func cityAction(_ sender: Any) {

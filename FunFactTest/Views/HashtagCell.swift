@@ -15,6 +15,18 @@ class HashtagCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        if traitCollection.userInterfaceStyle == .light {
+            hashtag.backgroundColor = .white
+            count.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                hashtag.backgroundColor = .secondarySystemBackground
+                count.backgroundColor = .secondarySystemBackground
+            } else {
+                hashtag.backgroundColor = .black
+                count.backgroundColor = .black
+            }
+        }
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

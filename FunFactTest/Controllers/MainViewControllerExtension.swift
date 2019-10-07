@@ -122,7 +122,7 @@ extension MainViewController {
                             let landmark = landmark!
                             
                             count += 1
-                            // Add anotations
+                            // Add annotations
                             var annotation: FunFactAnnotation
                             annotation = FunFactAnnotation(
                                 landmarkID: landmark.id,

@@ -276,6 +276,9 @@ extension EditProfileViewController: UIImagePickerControllerDelegate, UINavigati
         self.image = image
         
         picker.dismiss(animated: true, completion: {
+            if #available(iOS 13.0, *) {
+                cropController.modalPresentationStyle = .fullScreen
+            }
             self.present(cropController, animated: true, completion: nil)
         })
     }

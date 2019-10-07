@@ -43,7 +43,7 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
         super.viewDidLoad()
         if #available(iOS 13.0, *) {
             let navBar = UINavigationBarAppearance()
-            navBar.backgroundColor = UIColor.secondarySystemBackground
+            navBar.backgroundColor = Colors.systemGreenColor
             navBar.titleTextAttributes = Attributes.navTitleAttribute
             navBar.largeTitleTextAttributes = Attributes.navTitleAttribute
             self.navigationController?.navigationBar.standardAppearance = navBar
@@ -64,7 +64,7 @@ class VerifyViewController: UIViewController, RejectionViewDelegate, FirestoreMa
         if #available(iOS 13.0, *) {
             self.view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .secondarySystemBackground
         } else {
-            self.view.backgroundColor = traitCollection.userInterfaceStyle == .light ? .white : .darkGray
+            self.view.backgroundColor = .white
         }
     }
     func cancelButtonPressed() {

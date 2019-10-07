@@ -1012,7 +1012,7 @@ class FirestoreManager {
         db.collection("landmarks")
             .whereField("coordinates", isGreaterThan: coordinates)
             .limit(to: 20)
-            .getDocuments(source: .default) { (snapshot, error) in
+            .getDocuments(source: .cache) { (snapshot, error) in
             if let error = error {
                 completion(nil, error.localizedDescription)
             } else {

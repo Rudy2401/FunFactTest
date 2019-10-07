@@ -61,57 +61,39 @@ class NotificationFrequency: UIViewController {
     }
     
     @IBAction func touristModeAction(_ sender: Any) {
-        if !touristSwitch.isOn {
-            touristSwitch.setOn(true, animated: true)
+        if touristSwitch.isOn {
             occasionalSwitch.setOn(false, animated: true)
             offSwitch.setOn(false, animated: true)
-        } else {
-            touristSwitch.setOn(false, animated: true)
         }
     }
     @IBAction func occasionalAction(_ sender: Any) {
-        if !occasionalSwitch.isOn {
-            occasionalSwitch.setOn(true, animated: true)
+        if occasionalSwitch.isOn {
             touristSwitch.setOn(false, animated: true)
             offSwitch.setOn(false, animated: true)
-        } else {
-            occasionalSwitch.setOn(false, animated: true)
         }
     }
     @IBAction func offAction(_ sender: Any) {
-        if !offSwitch.isOn {
-            offSwitch.setOn(true, animated: true)
+        if offSwitch.isOn {
             occasionalSwitch.setOn(false, animated: true)
             touristSwitch.setOn(false, animated: true)
-        } else {
-            offSwitch.setOn(false, animated: true)
         }
     }
     @IBAction func automobileAction(_ sender: Any) {
-        if !automobileSwitch.isOn {
-            automobileSwitch.setOn(true, animated: true)
+        if automobileSwitch.isOn {
             walkSwitch.setOn(false, animated: true)
             directionsOffSwitch.setOn(false, animated: true)
-        } else {
-            automobileSwitch.setOn(false, animated: true)
         }
     }
     @IBAction func walkAction(_ sender: Any) {
-        if !walkSwitch.isOn {
-            walkSwitch.setOn(true, animated: true)
+        if walkSwitch.isOn {
             automobileSwitch.setOn(false, animated: true)
             directionsOffSwitch.setOn(false, animated: true)
-        } else {
-            walkSwitch.setOn(false, animated: true)
         }
     }
     @IBAction func directionsOffAction(_ sender: Any) {
-        if !directionsOffSwitch.isOn {
-            directionsOffSwitch.setOn(true, animated: true)
+        if directionsOffSwitch.isOn {
             walkSwitch.setOn(false, animated: true)
             automobileSwitch.setOn(false, animated: true)
-        } else {
-            directionsOffSwitch.setOn(false, animated: true)
         }
     }
     @IBAction func updateAction(_ sender: Any) {
@@ -155,7 +137,7 @@ class NotificationFrequency: UIViewController {
         default:
             automobileSwitch.setOn(false, animated: true)
             walkSwitch.setOn(false, animated: true)
-            directionsOffSwitch.setOn(false, animated: true)
+            directionsOffSwitch.setOn(true, animated: true)
         }
     }
     func updateNotificationFrequency() {

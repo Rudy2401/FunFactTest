@@ -55,7 +55,7 @@ class ProfileViewController: UIViewController, FirestoreManagerDelegate, UIScrol
             self.navigationController?.navigationBar.scrollEdgeAppearance = navBar
             submittedNum.textColor = UIColor.link
         } else {
-            submittedNum.textColor = UIColor.blue
+            submittedNum.textColor = Colors.blueColor
         }
         darkModeSupport()
         firestore.delegate = self

@@ -105,8 +105,6 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             addFactGesture.numberOfTapsRequired = 1
             let button = navigationController?.toolbar.items?[2].customView as! UIButton // swiftlint:disable:this force_cast
             button.addGestureRecognizer(addFactGesture)
-        } else {
-//            navigationItem.title = funF
         }
         darkModeSupport()
     }
@@ -290,7 +288,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                     myAttrString2 = NSAttributedString(string: submittedBy2, attributes: Attributes.attribute12RegBlue)
                 } else {
                     myAttrString2 = NSAttributedString(string: submittedBy2, attributes:
-                        [NSAttributedString.Key.foregroundColor: UIColor.blue,
+                        [NSAttributedString.Key.foregroundColor: Colors.blueColor,
                          NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!])
                 }
                 let profileGesture = UITapGestureRecognizer(target: self, action: #selector(self.profileView))
@@ -352,7 +350,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
             disAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.link,
                                  NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!] as [NSAttributedString.Key: Any]
         } else {
-            disAttribute = [ NSAttributedString.Key.foregroundColor: UIColor.blue,
+            disAttribute = [ NSAttributedString.Key.foregroundColor: Colors.blueColor,
                              NSAttributedString.Key.font: UIFont(name: Fonts.regularFont, size: 12.0)!] as [NSAttributedString.Key: Any]
         }
         let dispute1 = "See something wrong? Dispute this fact "
@@ -463,7 +461,7 @@ class ContentViewController: UIViewController, FirestoreManagerDelegate, UITextV
                 hashtagAttrString.addAttributes(Attributes.attribute16DemiBlue,
                                                 range: NSMakeRange(0, hashtagAttrString.length))
             } else {
-                hashtagAttrString.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.blue,
+                hashtagAttrString.addAttributes([NSAttributedString.Key.foregroundColor: Colors.blueColor,
                 NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!],
                 range: NSMakeRange(0, hashtagAttrString.length))
             }
@@ -954,7 +952,7 @@ extension UITextView {
                                               range: NSRange(location: range.location,
                                                              length: range.length))
             } else {
-                funFactDescAttr.addAttributes([NSAttributedString.Key.foregroundColor: UIColor.blue,
+                funFactDescAttr.addAttributes([NSAttributedString.Key.foregroundColor: Colors.blueColor,
                 NSAttributedString.Key.font: UIFont(name: Fonts.mainTextFont, size: 16.0)!],
                                             range: NSRange(location: range.location,
                                                            length: range.length))

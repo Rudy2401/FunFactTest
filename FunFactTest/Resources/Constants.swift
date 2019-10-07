@@ -11,7 +11,7 @@ import UIKit
 
 enum Colors {
 //    static let blueColor = UIColor(displayP3Red: 0, green: 122/255, blue: 1.0, alpha: 1.0)
-    static let blueColor = UIColor.blue
+    static let blueColor = UIColor(displayP3Red: 9/255, green: 132/255, blue: 1.0, alpha: 1.0)
     static let seagreenColor = UIColor(displayP3Red: 46 / 255, green: 139 / 255, blue: 87 / 255, alpha: 1.0)
     static let systemGreenColor = UIColor(displayP3Red: 46 / 255, green: 160 / 255, blue: 87 / 255, alpha: 1.0)
     static let fbBlueColor = UIColor(displayP3Red: 59 / 255, green: 89 / 255, blue: 152 / 255, alpha: 1.0)
@@ -116,7 +116,7 @@ enum Deleted {
 
 enum ErrorMessages {
     static let funFactUploadError = "Error while uploading fun fact. Please try again later."
-    static let funFactUploadSuccess = "Fun fact uploaded succesfully!"
+    static let funFactUploadSuccess = "Fun fact uploaded successfully!"
     static let verificationError = "Error while verifying. Please try again later."
     static let disputeError = "Error uploading dispute. Please try again later."
     static let disputeSuccess = "Dispute uploaded successfully!"

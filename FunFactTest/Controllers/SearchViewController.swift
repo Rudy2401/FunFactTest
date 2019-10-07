@@ -114,6 +114,9 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
                 self.tableView.reloadData()
             })
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            self.tableView.reloadData()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -133,28 +136,33 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
     }
     func setupButtons() {
         var landmarkString = NSAttributedString()
-        let searchField = searchController.searchBar.searchTextField
-        if traitCollection.userInterfaceStyle == .light {
-            landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttribute)
-            view.backgroundColor = .white
-            tableView.backgroundColor = .white
-            searchController.searchBar.barStyle = .default
-            searchField.backgroundColor = .white
-            searchField.textColor = .black
-        } else {
-            landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttributeDark)
-            searchController.searchBar.barStyle = .blackOpaque
-            searchField.textColor = .white
-            if #available(iOS 13.0, *) {
-                view.backgroundColor = .secondarySystemBackground
-                tableView.backgroundColor = .secondarySystemBackground
-                searchField.backgroundColor = .secondarySystemBackground
+        if #available(iOS 13.0, *) {
+            let searchField = searchController.searchBar.searchTextField
+            if traitCollection.userInterfaceStyle == .light {
+                landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttribute)
+                view.backgroundColor = .white
+                tableView.backgroundColor = .white
+                searchController.searchBar.barStyle = .default
+                searchField.backgroundColor = .white
+                searchField.textColor = .black
             } else {
-                view.backgroundColor = .black
-                tableView.backgroundColor = .black
-                searchField.backgroundColor = .black
+                landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttributeDark)
+                searchController.searchBar.barStyle = .blackOpaque
+                searchField.textColor = .white
+                if #available(iOS 13.0, *) {
+                    view.backgroundColor = .secondarySystemBackground
+                    tableView.backgroundColor = .secondarySystemBackground
+                    searchField.backgroundColor = .secondarySystemBackground
+                } else {
+                    view.backgroundColor = .black
+                    tableView.backgroundColor = .black
+                    searchField.backgroundColor = .black
+                }
             }
+        } else {
+            landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttribute)
         }
+
         let landmarkStringSelected = NSAttributedString(string: "Places", attributes: Attributes.searchButtonSelectedAttribute)
         landmarkButton.setAttributedTitle(landmarkString, for: .normal)
         landmarkButton.setAttributedTitle(landmarkStringSelected, for: .selected)

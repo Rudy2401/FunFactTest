@@ -23,45 +23,36 @@
     <option name="FILTER_BY_CURRENT_PROJECT" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c222996b-dbe1-4361-b8e6-f9a0ffb7a2a4" name="Default Changelist" comment="New update with dark mode for ios 13">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/rushi.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/FunFactTestUITests.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/FunFactTest/Assets.xcassets/Color.colorset/Contents.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="c222996b-dbe1-4361-b8e6-f9a0ffb7a2a4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/rushi.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/rushi.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/xcode.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/xcode.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest.xcworkspace/xcuserdata/rushi.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest.xcworkspace/xcuserdata/rushi.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/AppDelegate.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/AppDelegate.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Base.lproj/Main.storyboard" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Base.lproj/Main.storyboard" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/AddFactTextViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/AddFactTextViewController.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/AddFactViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/AddFactViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/AddressViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/AddressViewController.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/ContentViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/ContentViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/DisputeViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/DisputeViewController.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/EditProfileViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/EditProfileViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/FunFactPageViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/FunFactPageViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/FunFactsTableViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/FunFactsTableViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/ImageViewViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/ImageViewViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/InterestViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/InterestViewController.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/LeaderboardViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/LeaderboardViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/MainViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/MainViewController.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/MainViewControllerExtension.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/MainViewControllerExtension.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/NotificationFrequency.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/NotificationFrequency.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/ProfileViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/ProfileViewController.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/SearchViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/SearchViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/SettingsViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/SettingsViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/SignInViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/SignInViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/SignUpViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/SignUpViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/TabBarController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/TabBarController.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/VerifyViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/VerifyViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Controllers/WelcomeViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Controllers/WelcomeViewController.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FunFactTest/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FunFactTest/Managers/FirestoreManager.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Managers/FirestoreManager.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FunFactTest/Resources/Constants.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Resources/Constants.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Resources/Utils.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Resources/Utils.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Views/AnnotationBottomView.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Views/AnnotationBottomView.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Views/CustomUINavigation.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Views/CustomUINavigation.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactTest/Views/RejectionView.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Views/RejectionView.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FunFactUnitTests/FunFactUnitTests.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactUnitTests/FunFactUnitTests.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FunFactTest/Views/HashtagCell.swift" beforeDir="false" afterPath="$PROJECT_DIR$/FunFactTest/Views/HashtagCell.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PodFile" beforeDir="false" afterPath="$PROJECT_DIR$/PodFile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Podfile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Manifest.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Manifest.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Pods.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Pods.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/BoringSSL.xcscheme" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/BoringSSL.xcscheme" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/Pods-FunFactTest.xcscheme" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/Pods-FunFactTest.xcscheme" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/gRPC-Core.xcscheme" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/gRPC-Core.xcscheme" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/leveldb-library.xcscheme" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/leveldb-library.xcscheme" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/xcschememanagement.plist" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Pods.xcodeproj/xcuserdata/rushi.xcuserdatad/xcschemes/xcschememanagement.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-acknowledgements.markdown" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-acknowledgements.markdown" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-acknowledgements.plist" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest-acknowledgements.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.debug.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.debug.xcconfig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.release.xcconfig" beforeDir="false" afterPath="$PROJECT_DIR$/Pods/Target Support Files/Pods-FunFactTest/Pods-FunFactTest.release.xcconfig" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -87,7 +78,7 @@
     <option name="autoscrollToSource" value="true" />
     <option name="IS_AUTOSCROLL_TO_SOURCE" value="true" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="iphoneos_ace8bdf919cafa1991c09ca83c908461ab68f12b" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="iphoneos_" />
   <component name="FavoritesManager">
     <favorites_list name="FunFactTest" />
   </component>
@@ -101,7 +92,7 @@
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Swift" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.General" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -193,8 +184,21 @@
       <workItem from="1568935269072" duration="2172000" />
       <workItem from="1568944917808" duration="13375000" />
       <workItem from="1569083857228" duration="5287000" />
-      <workItem from="1569372116648" duration="21092000" />
+      <workItem from="1569372116648" duration="46719000" />
+      <workItem from="1569803785387" duration="1682000" />
+      <workItem from="1569954987980" duration="1744000" />
+      <workItem from="1569979425580" duration="4716000" />
+      <workItem from="1570485275399" duration="31000" />
+      <workItem from="1570485345200" duration="266000" />
     </task>
+    <task id="LOCAL-00001" summary="New update with dark mode for ios 13">
+      <created>1569525206327</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1569525206327</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,6 +218,7 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <MESSAGE value="New update with dark mode for ios 13" />
     <option name="LAST_COMMIT_MESSAGE" value="New update with dark mode for ios 13" />
   </component>

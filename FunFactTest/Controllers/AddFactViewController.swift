@@ -262,6 +262,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
             sourceBtn.setTitleColor(.black, for: .normal)
             imageCaption.backgroundColor = .white
             funFactDescription.backgroundColor = .white
+            autocompleteTableView.backgroundColor = .white
         } else {
             if #available(iOS 13.0, *) {
                 scrollView.backgroundColor = .secondarySystemBackground
@@ -273,6 +274,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                 funFactTitleBtn.setTitleColor(.white, for: .normal)
                 tagsBtn.setTitleColor(.white, for: .normal)
                 sourceBtn.setTitleColor(.white, for: .normal)
+                autocompleteTableView.backgroundColor = .secondarySystemBackground
             } else {
                 scrollView.backgroundColor = .black
                 contentView.backgroundColor = .black
@@ -283,6 +285,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                 funFactTitleBtn.setTitleColor(.white, for: .normal)
                 tagsBtn.setTitleColor(.white, for: .normal)
                 sourceBtn.setTitleColor(.white, for: .normal)
+                autocompleteTableView.backgroundColor = .black
             }
         }
     }
@@ -557,7 +560,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                         self.dislikes = dislikes!
                     }
                     //Upload Landmark details - merge if landmark already exists
-                    let ffID = (self.mode != .edit) ? db.collection("funFacts").document().documentID : self.funFactID
+                    let tempFunFactID = (self.mode != .edit) ? db.collection("funFacts").document().documentID : self.funFactID
                     let landmark = Landmark(id: tempLandmarkID,
                                             name: self.landmarkName ?? "",
                                             address: self.address ?? "",
@@ -568,7 +571,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                             type: self.type ?? "",
                                             coordinates: GeoPoint(latitude: self.coordinate.latitude as Double,
                                                                   longitude: self.coordinate.longitude as Double),
-                                            image: ffID,
+                                            image: tempFunFactID,
                                             numOfFunFacts: self.numOfFunFacts,
                                             likes: self.landLikes,
                                             dislikes: self.landDislikes)
@@ -598,13 +601,13 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                             hashtags.remove(at: 0)
                             let funFact = FunFact(landmarkId: tempLandmarkID,
                                                   landmarkName: self.landmarkName ?? "",
-                                                  id: ffID,
+                                                  id: tempFunFactID,
                                                   description: self.funFactDescription.text,
                                                   funFactTitle: self.funFactTitleTextField.text ?? "",
                                                   likes: self.likes,
                                                   dislikes: self.dislikes,
                                                   verificationFlag: self.verificationFlag,
-                                                  image: ffID,
+                                                  image: tempFunFactID,
                                                   imageCaption: imageCaptionText,
                                                   disputeFlag: self.disputeFlag,
                                                   submittedBy: Auth.auth().currentUser?.uid ?? "",
@@ -629,9 +632,9 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                 } else {
                                     print("Document successfully written!")
                                     
-                                    self.firestore.addHashtags(funFactID: ffID, hashtags: hashtags)
+                                    self.firestore.addHashtags(funFactID: tempFunFactID, hashtags: hashtags)
                                     self.firestore.addUserSubmitted(funFact: funFact, userID: Auth.auth().currentUser?.uid ?? "")
-                                    self.firestore.uploadImage(imageName: ffID + ".jpeg",
+                                    self.firestore.uploadImage(imageName: tempFunFactID + ".jpeg",
                                                                image: self.landmarkImage.image ?? UIImage(),
                                                                type: ImageType.funFact,
                                                                completion: { (url, error) in
@@ -639,8 +642,8 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                                                     print ("Error uploading image \(error)")
                                                                 } else {
                                                                     print ("Image uploaded successfully")
-                                                                    if CacheManager.shared.checkIfImageExists(imageName: ffID + ".jpeg") {
-                                                                        CacheManager.shared.replaceImage(imageName: ffID + ".jpeg", image: self.landmarkImage.image ?? UIImage())
+                                                                    if CacheManager.shared.checkIfImageExists(imageName: tempFunFactID + ".jpeg") {
+                                                                        CacheManager.shared.replaceImage(imageName: tempFunFactID + ".jpeg", image: self.landmarkImage.image ?? UIImage())
                                                                     }
                                                                 }
                                     })
@@ -664,7 +667,6 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
         alertController.addAction(okayAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
-        return
     }
     func validatePage() -> Bool {
         var errors = false
@@ -941,11 +943,20 @@ fileprivate func convertFromUIImagePickerControllerInfoKey(
 
 extension AddNewFactViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return autocompleteHashtags.count
+        autocompleteHashtags.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? HashtagCell
+        if traitCollection.userInterfaceStyle == .light {
+            cell?.backgroundColor = .white
+        } else {
+            if #available(iOS 13.0, *) {
+                cell?.backgroundColor = .secondarySystemBackground
+            } else {
+                cell?.backgroundColor = .black
+            }
+        }
         let index = indexPath.row as Int
         let name = "#\(autocompleteHashtags[index].nameHighlighted ?? "")"
         let count = "\(autocompleteHashtags[index].count ?? 0) posts"
