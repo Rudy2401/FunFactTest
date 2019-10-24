@@ -275,7 +275,6 @@ class WelcomeViewController: UIViewController, FirestoreManagerDelegate {
                     let mainVC = self.storyboard?.instantiateViewController(withIdentifier: "tabBar")
                     mainVC?.modalPresentationStyle = .fullScreen
                     self.present(mainVC!, animated: true)
-//                    self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
                 }
             })
         }
@@ -293,7 +292,6 @@ class WelcomeViewController: UIViewController, FirestoreManagerDelegate {
                 let mainVC = self.storyboard?.instantiateViewController(withIdentifier: "tabBar")
                 mainVC?.modalPresentationStyle = .fullScreen
                 self.present(mainVC!, animated: true)
-//                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
             }
         }
     }
@@ -342,7 +340,6 @@ extension WelcomeViewController: GIDSignInDelegate, GIDSignInUIDelegate {
                 let mainVC = self.storyboard?.instantiateViewController(withIdentifier: "tabBar")
                 mainVC?.modalPresentationStyle = .fullScreen
                 self.present(mainVC!, animated: true)
-//                self.performSegue(withIdentifier: "mainViewSegue", sender: nil)
             }
         })
     }

@@ -133,6 +133,8 @@ class AlgoliaSearchManager {
                     let zipcode = hit["zipcode"] as! String
                     if zipcode == zipCode {
                         completion(landmarkID, numOfFunFacts, likes, dislikes, nil)
+                    } else {
+                        completion("", nil, nil, nil, nil)
                     }
                 }
             }

@@ -23,6 +23,7 @@ enum Colors {
     static let aliceBlue = UIColor(displayP3Red: 240 / 255, green: 248 / 255, blue: 255 / 255, alpha: 1.0)
     static let veryLightGray = UIColor(red: 235 / 255.0, green: 235 / 255.0, blue: 235 / 255.0, alpha: 1.0)
     static let orangeColor = UIColor(displayP3Red: 180 / 255, green: 70 / 255, blue: 25 / 255, alpha: 1.0)
+    static let indigoColor = UIColor(displayP3Red: 88/255, green: 86/255, blue: 214/255, alpha: 1.0)
 }
 
 enum AlertType {
@@ -344,7 +345,11 @@ struct Constants {
             annotationType.color = .yellow
             annotationType.image = UIImage.fontAwesomeIcon(name: .star, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         case LandmarkTypes.restaurant:
-            annotationType.color = .darkGray
+            if #available(iOS 13.0, *) {
+                annotationType.color = .systemIndigo
+            } else {
+                annotationType.color = Colors.indigoColor
+            }
             annotationType.image = UIImage.fontAwesomeIcon(name: .utensils, style: .solid, textColor: .white, size: CGSize(width: width, height: height))
         default:
             annotationType.color = .red

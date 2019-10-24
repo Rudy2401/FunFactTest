@@ -54,13 +54,17 @@ class GeoFirestoreManager: FirestoreManagerDelegate {
         })
     }
     /// Retrieve all documents based on center and radius
+    /// - Parameters:
+    ///   - center: CLLocation object of the center of the region
+    ///   - radius: In meters
     func getLandmarks(from center: CLLocation, radius: Double, completion: @escaping (Landmark?, String?, Int?) -> ()) {
         // MARK: Testing GeoFirestore
         if radius > 800 {
             completion(nil, FirestoreErrors.mapTooLarge, 0)
             return
         }
-        let query = geoFirestore?.query(withCenter: center, radius: radius)
+        let radiusKm = radius/1000
+        let query = geoFirestore?.query(withCenter: center, radius: radiusKm)
         var count = 0
         let _ = query?.observe(.documentEntered, with: { (key, location) in
             if let landmarkID = key {

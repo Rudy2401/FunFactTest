@@ -422,30 +422,30 @@ class FunFactPageViewController: UIPageViewController, UIPageViewControllerDataS
                 print ("Error getting image \(error.localizedDescription)")
             } else {
                 guard let link = URL(string: "https://funfactsproject/?landmarkID=\(self.landmarkID)&funFactID=\(currentVC.funFact.id)&apn=com.rushi.FunFact&d=1") else { return }
-                let dynamicLinksDomainURIPrefix = "funfactsproject.page.link"
+                let dynamicLinksDomainURIPrefix = "https://funfactsproject.page.link"
                 
-                let linkBuilder = DynamicLinkComponents(link: link, domain: dynamicLinksDomainURIPrefix)
-                linkBuilder.iOSParameters = DynamicLinkIOSParameters(bundleID: "com.rushi.FunFact")
-                linkBuilder.iOSParameters?.appStoreID = "962194608"
-                linkBuilder.iOSParameters?.minimumAppVersion = "1.0"
+                let linkBuilder = DynamicLinkComponents(link: link, domainURIPrefix: dynamicLinksDomainURIPrefix)
+                linkBuilder?.iOSParameters = DynamicLinkIOSParameters(bundleID: "com.rushi.FunFact")
+                linkBuilder?.iOSParameters?.appStoreID = "962194608"
+                linkBuilder?.iOSParameters?.minimumAppVersion = "1.0"
                 
                 //        linkBuilder.androidParameters = DynamicLinkAndroidParameters(packageName: "com.rushi.FunFact")
                 //        linkBuilder.androidParameters?.minimumVersion = 1
                 
-                linkBuilder.socialMetaTagParameters = DynamicLinkSocialMetaTagParameters()
-                linkBuilder.socialMetaTagParameters?.title = self.headingContent
-                linkBuilder.socialMetaTagParameters?.descriptionText = currentVC.funFact.funFactTitle + "\n" + currentVC.funFact.description
-                linkBuilder.socialMetaTagParameters?.imageURL = imageUrl!
+                linkBuilder?.socialMetaTagParameters = DynamicLinkSocialMetaTagParameters()
+                linkBuilder?.socialMetaTagParameters?.title = self.headingContent
+                linkBuilder?.socialMetaTagParameters?.descriptionText = currentVC.funFact.funFactTitle + "\n" + currentVC.funFact.description
+                linkBuilder?.socialMetaTagParameters?.imageURL = imageUrl!
                 
-                guard let longDynamicLink = linkBuilder.url else { return }
+                guard let longDynamicLink = linkBuilder?.url else { return }
                 print("The long URL is: \(longDynamicLink)")
                 DynamicLinks.performDiagnostics(completion: nil)
                 
                 let options = DynamicLinkComponentsOptions()
                 options.pathLength = .short
-                linkBuilder.options = options
+                linkBuilder?.options = options
                 
-                linkBuilder.shorten { url, warnings, error in
+                linkBuilder?.shorten { url, warnings, error in
                     if let error = error {
                         print ("Error while shortening \(error.localizedDescription)")
                     } else {

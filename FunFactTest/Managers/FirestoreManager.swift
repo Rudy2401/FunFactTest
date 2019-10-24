@@ -105,12 +105,12 @@ class FirestoreManager {
         }
     }
     /// Upload Hashtags to the /hashtags collection
-    func addHashtags(funFactID: String, hashtags: [String]) {
-        let funFactRef = db.collection("funFacts").document(funFactID)
-        
+    func addHashtags(funFact: FunFact, hashtags: [String]) {
         for hashtag in hashtags {
-            db.collection("hashtags").document(hashtag).collection("funFacts").document(funFactID).setData([
-                "funFactID": funFactRef
+            db.collection("hashtags").document(hashtag).collection("funFacts").document(funFact.id).setData([
+                "landmarkName": funFact.landmarkName,
+                "id": funFact.id,
+                "description": funFact.description
             ], merge: true) { err in
                 if let err = err {
                     print("Error writing document: \(err)")
@@ -127,9 +127,9 @@ class FirestoreManager {
             .collection("funFactsSubmitted")
             .document(funFact.id)
             .setData([
-            "landmarkName": funFact.landmarkName,
-            "id": funFact.id,
-            "description": funFact.description
+                "landmarkName": funFact.landmarkName,
+                "id": funFact.id,
+                "description": funFact.description
         ], merge: true) { err in
             if let err = err {
                 print("Error writing document: \(err)")
@@ -182,7 +182,7 @@ class FirestoreManager {
         // Create a storage reference from our storage service
         let storageRef = Storage.storage().reference()
         // Data in memory
-        
+
 //        do {
 //            try image.compressImage(800, completion: { (image, compressRatio) in
 //                print(image.size)

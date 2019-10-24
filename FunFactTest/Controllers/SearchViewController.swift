@@ -149,15 +149,9 @@ FirestoreManagerDelegate, AlgoliaSearchManagerDelegate, CLLocationManagerDelegat
                 landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttributeDark)
                 searchController.searchBar.barStyle = .blackOpaque
                 searchField.textColor = .white
-                if #available(iOS 13.0, *) {
-                    view.backgroundColor = .secondarySystemBackground
-                    tableView.backgroundColor = .secondarySystemBackground
-                    searchField.backgroundColor = .secondarySystemBackground
-                } else {
-                    view.backgroundColor = .black
-                    tableView.backgroundColor = .black
-                    searchField.backgroundColor = .black
-                }
+                view.backgroundColor = .secondarySystemBackground
+                tableView.backgroundColor = .secondarySystemBackground
+                searchField.backgroundColor = .secondarySystemBackground
             }
         } else {
             landmarkString = NSAttributedString(string: "Places", attributes: Attributes.searchButtonAttribute)

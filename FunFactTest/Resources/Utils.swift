@@ -43,8 +43,6 @@ class Utils {
                 (toFocus as! UIImageView).becomeFirstResponder()
             case .pickerview:
                 (toFocus as! UIPickerView).becomeFirstResponder()
-            default:
-                print("default")
             }
             
         })

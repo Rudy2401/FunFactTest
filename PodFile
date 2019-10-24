@@ -25,6 +25,8 @@ target 'FunFactTest' do
     #pod 'WSTagsField'
     pod 'SDWebImage', '~> 5.0'
     pod 'Google-Mobile-Ads-SDK'
+    pod 'Firebase/Analytics'
+    pod 'Firebase/AdMob'
 end
 target 'FunFactUnitTests' do
     pod 'Firebase/Core'

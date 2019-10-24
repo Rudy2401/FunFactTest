@@ -23,7 +23,7 @@ class FunFactsTableViewController: UITableViewController, FirestoreManagerDelega
                       ListOfFunFactsByType.hashtags: "funFacts"]
     
     private lazy var baseQuery: Query = {
-        if self.sender == ListOfFunFactsByType.hashtags {
+        if self.sender == .hashtags {
             return Firestore.firestore()
                 .collection("hashtags")
                 .document(self.hashtagName.components(separatedBy: "#").last!)

@@ -632,7 +632,7 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                                 } else {
                                     print("Document successfully written!")
                                     
-                                    self.firestore.addHashtags(funFactID: tempFunFactID, hashtags: hashtags)
+                                    self.firestore.addHashtags(funFact: funFact, hashtags: hashtags)
                                     self.firestore.addUserSubmitted(funFact: funFact, userID: Auth.auth().currentUser?.uid ?? "")
                                     self.firestore.uploadImage(imageName: tempFunFactID + ".jpeg",
                                                                image: self.landmarkImage.image ?? UIImage(),
@@ -761,8 +761,6 @@ class AddNewFactViewController: UIViewController, UINavigationControllerDelegate
                 (toFocus as! UIImageView).becomeFirstResponder()
             case .pickerview:
                 (toFocus as! UIPickerView).becomeFirstResponder()
-            default:
-                print("default")
             }
     
         })

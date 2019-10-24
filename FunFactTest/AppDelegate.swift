@@ -16,6 +16,7 @@ import Firebase
 import FirebaseFirestore
 import FirebaseStorage
 import FirebaseDynamicLinks
+import GoogleMobileAds
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelegate {
@@ -46,22 +47,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
         // Configure Google Sign in
         GIDSignIn.sharedInstance().clientID = FirebaseApp.app()?.options.clientID
         
-        locationManager.delegate = self
-        locationManager.requestAlwaysAuthorization()
-        locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        // Google Ads initializer
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
         
-        if CLLocationManager.authorizationStatus() == .notDetermined {
-            locationManager.requestAlwaysAuthorization()
-        }
-            // 2. authorization were denied
-        else if CLLocationManager.authorizationStatus() == .denied {
-            
-        }
-            // 3. we do have authorization
-        else if CLLocationManager.authorizationStatus() == .authorizedAlways {
-            locationManager.startUpdatingLocation()
-        }
+        setupLocationManager()
         
         // get the singleton object
         notificationCenter = UNUserNotificationCenter.current()
@@ -95,6 +84,28 @@ class AppDelegate: UIResponder, UIApplicationDelegate, GeoFirestoreManagerDelega
             UserDefaults.standard.set(dateString, forKey: SettingsUserDefaults.notificationDate)
         }
         return true
+    }
+    
+    func setupLocationManager() {
+        locationManager.delegate = self
+        locationManager.requestAlwaysAuthorization()
+        locationManager.distanceFilter = kCLLocationAccuracyNearestTenMeters
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        
+        switch CLLocationManager.authorizationStatus() {
+        case .notDetermined:
+            locationManager.requestAlwaysAuthorization()
+        case .denied:
+            print ("Denied")
+        case .authorizedAlways:
+            locationManager.startUpdatingLocation()
+        case .authorizedWhenInUse:
+            locationManager.startUpdatingLocation()
+        case .restricted:
+            print ("Restricted")
+        @unknown default:
+            print ("Default")
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -205,7 +216,7 @@ extension AppDelegate: CLLocationManagerDelegate {
         if CLLocationManager.isMonitoringAvailable(for: CLCircularRegion.self) {
             
             // 2. region data
-            let regionRadius = 100.0
+            let regionRadius = 50.0
             
             let identifier = landmarkID + "|" + title
             // 3. setup region
@@ -231,10 +242,10 @@ extension AppDelegate: CLLocationManagerDelegate {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         let now = Date()
-        let todayDate = formatter.string(from: now)
+        let todaysDate = formatter.string(from: now)
         
         if UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount)
-            >= UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationFrequency) && todayDate == notificationDate {
+            >= UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationFrequency) && todaysDate == notificationDate {
             return
         }
         if !region.identifier.contains("|") {
@@ -313,12 +324,12 @@ extension AppDelegate: CLLocationManagerDelegate {
                                                     if error != nil {
                                                         print("Error adding notification with identifier: \(identifier) \(error?.localizedDescription ?? "")")
                                                     } else {
-                                                        if notificationDate == todayDate {
+                                                        if notificationDate == todaysDate {
                                                             var count = UserDefaults.standard.integer(forKey: SettingsUserDefaults.notificationCount)
                                                             count += 1
                                                             UserDefaults.standard.set(count, forKey: SettingsUserDefaults.notificationCount)
                                                         } else {
-                                                            UserDefaults.standard.set(todayDate, forKey: SettingsUserDefaults.notificationDate)
+                                                            UserDefaults.standard.set(todaysDate, forKey: SettingsUserDefaults.notificationDate)
                                                             UserDefaults.standard.set(0, forKey: SettingsUserDefaults.notificationCount)
                                                         }
                                                     }
@@ -336,21 +347,22 @@ extension AppDelegate: CLLocationManagerDelegate {
         }
     }
     func createDynamicLink(landmarkID: String, funFactID: String, completion: @escaping (String?, String?) -> ()) {
-        guard let link = URL(string: "https://funfactsproject/?efr=1&landmarkID=\(landmarkID)&funFactID=\(landmarkID)&apn=com.rushi.FunFact") else { return }
-        let dynamicLinksDomainURIPrefix = "funfactsproject.page.link"
+        guard let link = URL(string: "https://funfactsproject/?efr=1&landmarkID=\(landmarkID)&funFactID=\(landmarkID)&apn=com.rushi.FunFact&d=1") else { return }
+        let dynamicLinksDomainURIPrefix = "https://funfactsproject.page.link"
         
-        let linkBuilder = DynamicLinkComponents(link: link, domain: dynamicLinksDomainURIPrefix)
-        linkBuilder.iOSParameters = DynamicLinkIOSParameters(bundleID: "com.rushi.FunFact")
+        let linkBuilder = DynamicLinkComponents(link: link,
+                                                domainURIPrefix: dynamicLinksDomainURIPrefix)
+        linkBuilder?.iOSParameters = DynamicLinkIOSParameters(bundleID: "com.rushi.FunFact")
         
-        guard let longDynamicLink = linkBuilder.url else { return }
+        guard let longDynamicLink = linkBuilder?.url else { return }
         print("The long URL is: \(longDynamicLink)")
         DynamicLinks.performDiagnostics(completion: nil)
         
         let options = DynamicLinkComponentsOptions()
         options.pathLength = .short
-        linkBuilder.options = options
+        linkBuilder?.options = options
         
-        linkBuilder.shorten { url, warnings, error in
+        linkBuilder?.shorten { url, warnings, error in
             if let error = error {
                 completion(nil, error.localizedDescription)
             } else {
